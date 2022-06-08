@@ -2,6 +2,8 @@ plugins {
 	id 'org.springframework.boot' version '2.7.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'org.ec4j.editorconfig' version '0.0.3'
+	id 'checkstyle'
 }
 
 group = 'com.example'
@@ -16,6 +18,19 @@ configurations {
 
 repositories {
 	mavenCentral()
+}
+
+editorconfig {
+	excludes = ['build']
+}
+
+check.dependsOn editorconfigCheck
+
+checkstyle {
+	maxWarnings = 0
+	configFile = file("${rootDir}/naver-chestyle-rules.xml")
+	configProperties = ["suppressionFile" : "${rootDir}/naver-checkstyle-suppressions.xml"]
+	toolVersion ="8.24"
 }
 
 dependencies {
