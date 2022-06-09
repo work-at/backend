@@ -1,4 +1,4 @@
-package com.example.workat;
+package com.workat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
