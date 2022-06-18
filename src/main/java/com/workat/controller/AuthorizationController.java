@@ -1,6 +1,5 @@
 package com.workat.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,11 +11,13 @@ import com.workat.dto.KakaoOAuthAccessToken;
 import com.workat.dto.KakaoOAuthTokenRequest;
 import com.workat.service.KakaoOAuthService;
 
+import lombok.RequiredArgsConstructor;
+
 @RequestMapping("/api/v1/auth")
 @RestController
+@RequiredArgsConstructor
 public class AuthorizationController {
-	@Autowired
-	private KakaoOAuthService authorizationService;
+	private final KakaoOAuthService authorizationService;
 
 	@PostMapping("/token")
 	public ResponseEntity<KakaoOAuthAccessToken> issueToken(@RequestBody KakaoOAuthTokenRequest request) {
