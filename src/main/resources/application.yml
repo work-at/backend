@@ -5,3 +5,6 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+external:
+  kakaoOauth:
+    clientId: "7052acd04b3385c80fac9bb40d8b5a32"

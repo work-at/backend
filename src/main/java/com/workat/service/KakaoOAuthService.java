@@ -1,5 +1,6 @@
 package com.workat.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,9 +18,10 @@ import com.workat.exception.base.BusinessException;
 
 @Service
 public class KakaoOAuthService {
-	private static final String CLIENT_ID = "7052acd04b3385c80fac9bb40d8b5a32";
 	private static final String REDIRECT_URL = "http://localhost:3000/login"; // TODO: 프론트쪽 리다이렉트 동선 협의되면 수정
 	private static final String AUTH_URL = "https://kauth.kakao.com/oauth/token";
+	@Value("${external.kakaoOauth.clientId}")
+	private String CLIENT_ID;
 
 	public KakaoOAuthAccessToken auth(String code) {
 		HttpHeaders headers = new HttpHeaders();
