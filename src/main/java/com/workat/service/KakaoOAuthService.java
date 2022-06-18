@@ -4,7 +4,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -34,10 +33,9 @@ public class KakaoOAuthService {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 
-			final ResponseEntity<KakaoOAuthTokenResponse> exchange = restTemplate.exchange(AUTH_URL,
-				HttpMethod.POST, request, KakaoOAuthTokenResponse.class);
-
-			return exchange.getBody();
+			return restTemplate
+				.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOAuthTokenResponse.class)
+				.getBody();
 		} catch (Exception e) {
 			throw e;
 		}
