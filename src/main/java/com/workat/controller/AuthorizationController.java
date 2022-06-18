@@ -13,7 +13,7 @@ import com.workat.service.KakaoOAuthService;
 
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @RestController
 @RequiredArgsConstructor
 public class AuthorizationController {
