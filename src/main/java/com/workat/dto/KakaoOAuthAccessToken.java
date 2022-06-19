@@ -1,10 +1,20 @@
 package com.workat.dto;
 
+import static lombok.AccessLevel.*;
+
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = PROTECTED)
 public class KakaoOAuthAccessToken {
-	private final String accessToken;
+	private String accessToken;
+
+	private KakaoOAuthAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
+
+	public static KakaoOAuthAccessToken from(String accessToken) {
+		return new KakaoOAuthAccessToken(accessToken);
+	}
 }

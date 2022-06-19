@@ -31,7 +31,7 @@ public class KakaoOAuthService {
 
 		KakaoOAuthTokenResponse body = requestAuth(kakaoTokenRequest);
 
-		return new KakaoOAuthAccessToken(body.getAccessToken());
+		return KakaoOAuthAccessToken.from(body.getAccessToken());
 	}
 
 	private KakaoOAuthTokenResponse requestAuth(HttpEntity request) {
