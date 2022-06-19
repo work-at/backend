@@ -14,7 +14,7 @@ public class KakaoOAuthTokenRequestDto {
 		this.code = code;
 	}
 
-	public static KakaoOAuthTokenRequestDto from(String code) {
+	public static KakaoOAuthTokenRequestDto of(String code) {
 		return new KakaoOAuthTokenRequestDto(code);
 	}
 }

@@ -14,7 +14,7 @@ public class KakaoOAuthAccessTokenDto {
 		this.accessToken = accessToken;
 	}
 
-	public static KakaoOAuthAccessTokenDto from(String accessToken) {
+	public static KakaoOAuthAccessTokenDto of(String accessToken) {
 		return new KakaoOAuthAccessTokenDto(accessToken);
 	}
 }
