@@ -11,8 +11,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import com.workat.dto.KakaoOAuthAccessToken;
-import com.workat.dto.KakaoOAuthTokenResponse;
+import com.workat.dto.KakaoOAuthAccessTokenDto;
+import com.workat.dto.KakaoOAuthTokenResponseDto;
 import com.workat.exception.InternalServerException;
 import com.workat.exception.base.BusinessException;
 
@@ -23,22 +23,23 @@ public class KakaoOAuthService {
 	@Value("${external.kakaoOauth.clientId}")
 	private String CLIENT_ID;
 
-	public KakaoOAuthAccessToken auth(String code) {
+	public KakaoOAuthAccessTokenDto auth(String code) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
 		HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(getAuthParam(code), headers);
 
-		KakaoOAuthTokenResponse body = requestAuth(kakaoTokenRequest);
+		KakaoOAuthTokenResponseDto body = requestAuth(kakaoTokenRequest);
 
-		return KakaoOAuthAccessToken.from(body.getAccessToken());
+		return KakaoOAuthAccessTokenDto.from(body.getAccessToken());
 	}
 
-	private KakaoOAuthTokenResponse requestAuth(HttpEntity request) {
+	private KakaoOAuthTokenResponseDto requestAuth(HttpEntity request) {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 
-			return restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOAuthTokenResponse.class).getBody();
+			return restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOAuthTokenResponseDto.class)
+				.getBody();
 		} catch (HttpStatusCodeException e) {
 			System.out.println(e.getMessage()); // TODO: 로깅 처리 필요
 
