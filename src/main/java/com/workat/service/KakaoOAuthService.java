@@ -12,7 +12,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import com.workat.dto.KakaoOAuthAccessTokenDto;
-import com.workat.dto.KakaoOAuthTokenResponseDto;
+import com.workat.dto.KakaoOAuthTokenResponse;
 import com.workat.exception.InternalServerException;
 import com.workat.exception.base.BusinessException;
 
@@ -29,16 +29,16 @@ public class KakaoOAuthService {
 
 		HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(getAuthParam(code), headers);
 
-		KakaoOAuthTokenResponseDto body = requestAuth(kakaoTokenRequest);
+		KakaoOAuthTokenResponse body = requestAuth(kakaoTokenRequest);
 
 		return KakaoOAuthAccessTokenDto.of(body.getAccessToken());
 	}
 
-	private KakaoOAuthTokenResponseDto requestAuth(HttpEntity request) {
+	private KakaoOAuthTokenResponse requestAuth(HttpEntity request) {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 
-			return restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOAuthTokenResponseDto.class)
+			return restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOAuthTokenResponse.class)
 				.getBody();
 		} catch (HttpStatusCodeException e) {
 			System.out.println(e.getMessage()); // TODO: 로깅 처리 필요

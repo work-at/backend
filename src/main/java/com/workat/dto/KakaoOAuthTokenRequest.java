@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class KakaoOAuthTokenRequestDto {
+public class KakaoOAuthTokenRequest {
 	private String code;
 
-	private KakaoOAuthTokenRequestDto(String code) {
+	private KakaoOAuthTokenRequest(String code) {
 		this.code = code;
 	}
 
-	public static KakaoOAuthTokenRequestDto of(String code) {
-		return new KakaoOAuthTokenRequestDto(code);
+	public static KakaoOAuthTokenRequest of(String code) {
+		return new KakaoOAuthTokenRequest(code);
 	}
 }
