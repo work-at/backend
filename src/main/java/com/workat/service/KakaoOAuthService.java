@@ -20,6 +20,7 @@ import com.workat.exception.base.BusinessException;
 public class KakaoOAuthService {
 	private static final String REDIRECT_URL = "http://localhost:3000/login"; // TODO: 프론트쪽 리다이렉트 동선 협의되면 수정
 	private static final String AUTH_URL = "https://kauth.kakao.com/oauth/token";
+
 	@Value("${external.kakaoOauth.clientId}")
 	private String CLIENT_ID;
 
