@@ -7,10 +7,13 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import com.workat.dto.KakaoOAuthAccessToken;
 import com.workat.dto.KakaoOAuthTokenResponse;
+import com.workat.exception.InternalServerException;
+import com.workat.exception.base.BusinessException;
 
 @Service
 public class KakaoOAuthService {
@@ -33,11 +36,13 @@ public class KakaoOAuthService {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 
-			return restTemplate
-				.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOAuthTokenResponse.class)
-				.getBody();
-		} catch (Exception e) {
-			throw e;
+			return restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOAuthTokenResponse.class).getBody();
+		} catch (HttpStatusCodeException e) {
+			System.out.println(e.getMessage()); // TODO: 로깅 처리 필요
+
+			throw new BusinessException(e.getStatusCode(), "login error");
+		} catch (RuntimeException e) {
+			throw new InternalServerException(e.getMessage());
 		}
 	}
 
