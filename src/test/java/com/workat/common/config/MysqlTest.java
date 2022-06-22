@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -18,6 +19,7 @@ public class MysqlTest {
 	private static final String USER = "root";
 	private static final String PASSWORD = "password";
 
+	@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'local'}", loadContext = true)
 	@Test
 	void testMysqlConnection() {
 		Assertions.assertDoesNotThrow(this::connect);
