@@ -1,0 +1,23 @@
+---
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: workatworkat
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 50
+      pool-name: pool-work-at
+external:
+  kakaoOauth:
+    clientId: "7052acd04b3385c80fac9bb40d8b5a32"
