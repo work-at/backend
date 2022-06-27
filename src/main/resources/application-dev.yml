@@ -11,28 +11,17 @@ spring:
       ddl-auto: update
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mariadb://34.64.37.69:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false
     username: root
-    password: password
+    password: workatworkat
     hikari:
       minimum-idle: 10
       maximum-pool-size: 50
       pool-name: pool-work-at
   redis:
-    host: localhost
+    host: 34.64.37.69
     port: 6379
-
+    password: workat@1234
 external:
   kakaoOauth:
     clientId: "7052acd04b3385c80fac9bb40d8b5a32"
-  tour-api:
-    big-data:
-      "2scFfN6uVjhuRcXrj1DgGjslYn0wYJc7kvCOHHwOI/0kr1sjf2OqLLjq5SvCt3jKyr4JPHr/K3QGuXhvv6HYlQ=="
-
-restTemplate:
-  factory:
-    readTimeout: 5000
-    connectTimeout: 3000
-  httpClient:
-    maxConnTotal: 100
-    maxConnPerRoute: 5
