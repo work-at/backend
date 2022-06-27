@@ -1,13 +1,13 @@
 package com.workat.common.config;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -17,7 +17,7 @@ public class RedisTest {
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 
-	@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'local'}", loadContext = true)
+	@Disabled
 	@Test
 	void setRedisKeyValue() {
 		ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
