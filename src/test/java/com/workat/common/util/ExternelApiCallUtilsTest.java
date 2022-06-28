@@ -1,13 +1,18 @@
 package com.workat.common.util;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
 
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.workat.api.tour.BigDataLocalResponse;
@@ -15,13 +20,26 @@ import com.workat.api.tour.BigDataMetroResponse;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ExternelApiCallUtilsTest{
+public class ExternelApiCallUtilsTest {
 
 	@Autowired
 	private TestRestTemplate restTemplate;
 
 	@Autowired
 	private ExternalApiCallUtils externalApiCallUtils;
+
+	@BeforeAll
+	public static void setup(@Autowired TestRestTemplate restTemplate) {
+		HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+		factory.setReadTimeout(5000);
+		factory.setConnectTimeout(5000);
+		factory.setHttpClient(
+			HttpClientBuilder.create()
+				.setMaxConnTotal(5)
+				.setMaxConnPerRoute(5)
+				.build());
+		restTemplate.getRestTemplate().setRequestFactory(factory);
+	}
 
 	@Test
 	void getBigDataMetro_get_multiple_success_test() throws IOException {

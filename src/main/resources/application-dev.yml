@@ -22,6 +22,7 @@ spring:
     host: 34.64.37.69
     port: 6379
     password: workat@1234
+
 external:
   kakaoOauth:
     clientId: "7052acd04b3385c80fac9bb40d8b5a32"
