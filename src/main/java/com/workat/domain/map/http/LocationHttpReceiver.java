@@ -28,7 +28,7 @@ public class LocationHttpReceiver {
 	private static String KAKAO_LOCAL_URI = "https://dapi.kakao.com/v2/local/search/category.json";
 
 	@Value("${external.kakaoOauth.clientId}")
-	private final String key;
+	private String key;
 
 	private final RestTemplate restTemplate;
 

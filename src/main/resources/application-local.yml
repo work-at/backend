@@ -11,7 +11,7 @@ spring:
       ddl-auto: create-drop
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: workatworkat
     hikari:

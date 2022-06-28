@@ -1,8 +1,5 @@
 ---
 spring:
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -11,7 +8,7 @@ spring:
       ddl-auto: update
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mariadb://34.64.37.69:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://34.64.37.69:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: workatworkat
     hikari:

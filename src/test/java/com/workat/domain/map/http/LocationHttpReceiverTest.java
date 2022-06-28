@@ -31,11 +31,11 @@ class LocationHttpReceiverTest {
 	@Mock
 	private RestTemplate restTemplate;
 
-	private String key = "";
+	private String key = "7052acd04b3385c80fac9bb40d8b5a32";
 
 	@BeforeEach
 	void init() {
-		this.locationHttpReceiver = new LocationHttpReceiver(key, restTemplate);
+		this.locationHttpReceiver = new LocationHttpReceiver(restTemplate);
 	}
 
 	@Test
