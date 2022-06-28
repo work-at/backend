@@ -7,18 +7,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.client.RestTemplate;
 
 import com.workat.api.tour.BigDataLocalResponse;
 import com.workat.api.tour.BigDataMetroResponse;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
-public class ExternelApiCallUtilsTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class ExternelApiCallUtilsTest{
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private TestRestTemplate restTemplate;
+
 	@Autowired
 	private ExternalApiCallUtils externalApiCallUtils;
 
