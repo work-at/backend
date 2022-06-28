@@ -66,11 +66,7 @@ class LocationHttpReceiverTest {
 			})
 			.collect(Collectors.toList());
 
-		KakaoLocalMetaDto givenMetaDto = KakaoLocalMetaDto.builder()
-			.isEnd(true)
-			.pageableCount(1)
-			.totalCount(1)
-			.build();
+		KakaoLocalMetaDto givenMetaDto = KakaoLocalMetaDto.of(true, 1, 1);
 
 		KakaoLocalResponse givenResponse = KakaoLocalResponse.builder()
 			.documents(givenDocuments)

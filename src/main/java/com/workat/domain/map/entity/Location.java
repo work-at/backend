@@ -17,7 +17,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(uniqueConstraints = {@UniqueConstraint(name = "location_unique", columnNames = "placeId")})
+// 나중에 사용할 예정 현재는 주석으로 처리해둠
+// @Table(uniqueConstraints = {@UniqueConstraint(name = "location_unique", columnNames = "placeId")})
 @Getter
 @Entity
 public class Location {
@@ -59,15 +60,14 @@ public class Location {
 
 	@Builder
 	public Location(LocationCategory category, KakaoLocalDataDto dto) {
-		Location location = new Location();
-		location.category = category;
-		location.phone = dto.getPhone();
-		location.placeId = dto.getId();
-		location.placeName = dto.getPlaceName();
-		location.placeUrl = dto.getPlaceUrl();
-		location.addressName = dto.getAddressName();
-		location.roadAddressName = dto.getRoadAddressName();
-		location.x = Float.parseFloat(dto.getX());
-		location.y = Float.parseFloat(dto.getY());
+		this.category = category;
+		this.phone = dto.getPhone();
+		this.placeId = dto.getId();
+		this.placeName = dto.getPlaceName();
+		this.placeUrl = dto.getPlaceUrl();
+		this.addressName = dto.getAddressName();
+		this.roadAddressName = dto.getRoadAddressName();
+		this.x = Float.parseFloat(dto.getX());
+		this.y = Float.parseFloat(dto.getY());
 	}
 }
