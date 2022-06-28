@@ -1,4 +1,4 @@
-package com.workat.domain.config;
+package com.workat.common.config;
 
 import com.google.common.collect.Sets;
 import org.springframework.context.annotation.Bean;

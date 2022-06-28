@@ -1,4 +1,4 @@
-package com.workat.domain.config;
+package com.workat.common.config;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+
+import com.workat.common.exception.handler.RestTemplateExceptionHandler;
 
 @Configuration
 public class RestTemplateConfig {
@@ -41,6 +43,8 @@ public class RestTemplateConfig {
 
 	@Bean
 	RestTemplate restTemplate(HttpComponentsClientHttpRequestFactory factory) {
-		return new RestTemplate(factory);
+		RestTemplate restTemplate = new RestTemplate(factory);
+		restTemplate.setErrorHandler(new RestTemplateExceptionHandler());
+		return restTemplate;
 	}
 }
