@@ -9,11 +9,18 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.workat.common.exception.ExternalApiException;
 import com.workat.common.exception.InternalServerException;
+import com.workat.common.exception.base.BusinessException;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Component
 public class RestTemplateExceptionHandler implements ResponseErrorHandler {
+
+	private final ObjectMapper objectMapper;
 
 	@Override
 	public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
@@ -24,13 +31,6 @@ public class RestTemplateExceptionHandler implements ResponseErrorHandler {
 
 	@Override
 	public void handleError(ClientHttpResponse httpResponse) throws IOException {
-
-		if (httpResponse.getStatusCode().series() == HttpStatus.Series.SERVER_ERROR) {
-			throw new ExternalApiException("[external api exception] external server error");
-		} else if (httpResponse.getStatusCode().series() == HttpStatus.Series.CLIENT_ERROR) {
-			if (httpResponse.getStatusCode() == HttpStatus.NOT_FOUND) {
-				throw new InternalServerException("[external api exception] internal server error");
-			}
-		}
+		throw new BusinessException(httpResponse.getStatusCode(), objectMapper.readValue(httpResponse.getBody(), Object.class).toString());
 	}
 }

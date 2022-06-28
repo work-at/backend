@@ -10,6 +10,9 @@ import org.springframework.web.client.RestTemplate;
 
 import com.workat.common.exception.handler.RestTemplateExceptionHandler;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Configuration
 public class RestTemplateConfig {
 
@@ -18,10 +21,14 @@ public class RestTemplateConfig {
 
 	@Value("${restTemplate.factory.connectTimeout}")
 	private int CONNECT_TIMEOUT;
+
 	@Value("${restTemplate.httpClient.maxConnTotal}")
 	private int MAX_CONN_TOTAL;
+
 	@Value("${restTemplate.httpClient.maxConnPerRoute}")
 	private int MAX_CONN_PER_ROUTE;
+
+	private final RestTemplateExceptionHandler restTemplateExceptionHandler;
 
 	@Bean
 	HttpClient httpClient() {
@@ -37,14 +44,13 @@ public class RestTemplateConfig {
 		factory.setReadTimeout(READ_TIMEOUT);
 		factory.setConnectTimeout(CONNECT_TIMEOUT);
 		factory.setHttpClient(httpClient);
-
 		return factory;
 	}
 
 	@Bean
 	RestTemplate restTemplate(HttpComponentsClientHttpRequestFactory factory) {
 		RestTemplate restTemplate = new RestTemplate(factory);
-		restTemplate.setErrorHandler(new RestTemplateExceptionHandler());
+		restTemplate.setErrorHandler(restTemplateExceptionHandler);
 		return restTemplate;
 	}
 }
