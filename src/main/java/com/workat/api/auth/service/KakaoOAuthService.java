@@ -15,9 +15,14 @@ import com.workat.api.auth.dto.KakaoOAuthAccessTokenDto;
 import com.workat.api.auth.dto.KakaoOAuthTokenResponse;
 import com.workat.common.exception.InternalServerException;
 import com.workat.common.exception.base.BusinessException;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 public class KakaoOAuthService {
+
+	private final RestTemplate restTemplate;
+
 	private static final String REDIRECT_URL = "http://localhost:3000/login"; // TODO: 프론트쪽 리다이렉트 동선 협의되면 수정
 	private static final String AUTH_URL = "https://kauth.kakao.com/oauth/token";
 
@@ -37,8 +42,6 @@ public class KakaoOAuthService {
 
 	private KakaoOAuthTokenResponse requestAuth(HttpEntity request) {
 		try {
-			RestTemplate restTemplate = new RestTemplate();
-
 			return restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOAuthTokenResponse.class)
 				.getBody();
 		} catch (HttpStatusCodeException e) {
