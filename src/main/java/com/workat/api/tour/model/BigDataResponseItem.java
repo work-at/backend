@@ -4,7 +4,6 @@ import static lombok.AccessLevel.*;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,16 +36,4 @@ public class BigDataResponseItem {
 
 	@JsonProperty("touNum")
 	private double touristNum;
-
-	@Builder
-	public BigDataResponseItem(int baseYmd, int dayOfWeekCode, String dayOfWeekName, int cityCode, String cityName, int touristCode, String touristName, double touristNum) {
-		this.baseYmd = baseYmd;
-		this.dayOfWeekCode = dayOfWeekCode;
-		this.dayOfWeekName = dayOfWeekName;
-		this.cityCode = cityCode;
-		this.cityName = cityName;
-		this.touristCode = touristCode;
-		this.touristName = touristName;
-		this.touristNum = touristNum;
-	}
 }

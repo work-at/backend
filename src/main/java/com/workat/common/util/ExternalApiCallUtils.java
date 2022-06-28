@@ -115,33 +115,20 @@ public class ExternalApiCallUtils {
 			}
 		}
 
-		BigDataResponseItems bigDataResponseItems = BigDataResponseItems.builder()
-			.item(bigDataResponseItemList)
-			.build();
+		BigDataResponseItems bigDataResponseItems = BigDataResponseItems.of(bigDataResponseItemList);
 
-		BigDataResponseBody bigDataResponseBody = BigDataResponseBody
-			.builder()
-			.items(bigDataResponseItems)
-			.numOfRows(body.get("numOfRows").asInt())
-			.totalCount(body.get("totalCount").asInt())
-			.pageNo(body.get("pageNo").asInt())
-			.build();
+		int numOfRows = body.get("numOfRows").asInt();
+		int pageNo = body.get("pageNo").asInt();
+		int totalCount = body.get("totalCount").asInt();
+		BigDataResponseBody bigDataResponseBody = BigDataResponseBody.of(bigDataResponseItems, numOfRows, pageNo, totalCount);
 
-		BigDataResponse bigDataResponse = BigDataResponse
-			.builder()
-			.header(bigDataResponseHeader)
-			.body(bigDataResponseBody)
-			.build();
+		BigDataResponse bigDataResponse = BigDataResponse.of(bigDataResponseHeader, bigDataResponseBody);
 
 		if (clazz == BigDataMetroResponse.class) {
-			BigDataMetroResponse bigDataMetroResponse = BigDataMetroResponse.builder()
-				.response(bigDataResponse)
-				.build();
+			BigDataMetroResponse bigDataMetroResponse = BigDataMetroResponse.of(bigDataResponse);
 			return clazz.cast(bigDataMetroResponse);
 		} else if (clazz == BigDataLocalResponse.class) {
-			BigDataLocalResponse bigDataLocalResponse = BigDataLocalResponse.builder()
-				.response(bigDataResponse)
-				.build();
+			BigDataLocalResponse bigDataLocalResponse = BigDataLocalResponse.of(bigDataResponse);
 			return clazz.cast(bigDataLocalResponse);
 		}
 		throw new InternalServerException("convert class type error");

@@ -4,7 +4,6 @@ import static lombok.AccessLevel.*;
 
 import java.util.List;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,8 +13,11 @@ public class BigDataResponseItems {
 
 	private List<BigDataResponseItem> item;
 
-	@Builder
-	public BigDataResponseItems(List<BigDataResponseItem> item) {
+	private BigDataResponseItems(List<BigDataResponseItem> item) {
 		this.item = item;
+	}
+
+	public static BigDataResponseItems of(List<BigDataResponseItem> item) {
+		return new BigDataResponseItems(item);
 	}
 }

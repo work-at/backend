@@ -2,7 +2,6 @@ package com.workat.api.tour.model;
 
 import static lombok.AccessLevel.*;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,11 +14,14 @@ public class BigDataResponseBody {
 	private int pageNo;
 	private int totalCount;
 
-	@Builder
-	public BigDataResponseBody(BigDataResponseItems items, int numOfRows, int pageNo, int totalCount) {
+	private BigDataResponseBody(BigDataResponseItems items, int numOfRows, int pageNo, int totalCount) {
 		this.items = items;
 		this.numOfRows = numOfRows;
 		this.pageNo = pageNo;
 		this.totalCount = totalCount;
+	}
+
+	public static BigDataResponseBody of(BigDataResponseItems items, int numOfRows, int pageNo, int totalCount) {
+		return new BigDataResponseBody(items, numOfRows, pageNo, totalCount);
 	}
 }

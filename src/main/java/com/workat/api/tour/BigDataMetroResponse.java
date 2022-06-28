@@ -3,7 +3,6 @@ package com.workat.api.tour;
 import static lombok.AccessLevel.*;
 
 import com.workat.api.tour.model.BigDataResponse;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,8 +12,11 @@ public class BigDataMetroResponse {
 
 	private BigDataResponse response;
 
-	@Builder
-	public BigDataMetroResponse(BigDataResponse response) {
+	private BigDataMetroResponse(BigDataResponse response) {
 		this.response = response;
+	}
+
+	public static BigDataMetroResponse of(BigDataResponse response) {
+		return new BigDataMetroResponse(response);
 	}
 }
