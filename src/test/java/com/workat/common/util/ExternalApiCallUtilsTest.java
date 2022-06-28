@@ -1,12 +1,10 @@
 package com.workat.common.util;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
 
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +18,7 @@ import com.workat.api.tour.BigDataMetroResponse;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ExternelApiCallUtilsTest {
+public class ExternalApiCallUtilsTest {
 
 	@Autowired
 	private TestRestTemplate restTemplate;
