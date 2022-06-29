@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class RestTemplateExceptionHandler implements ResponseErrorHandler {
 
-	private final ObjectMapper objectMapper;
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public boolean hasError(ClientHttpResponse httpResponse) throws IOException {

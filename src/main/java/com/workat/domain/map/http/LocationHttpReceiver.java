@@ -58,7 +58,7 @@ public class LocationHttpReceiver {
 		int page = locationRequest.getPage();
 
 		return UriComponentsBuilder.fromHttpUrl(url)
-			.queryParam("category_group_code", category)
+			.queryParam("category_group_code", "")
 			.queryParam("x", String.valueOf(x))
 			.queryParam("y", String.valueOf(y))
 			.queryParam("radius", String.valueOf(radius))
