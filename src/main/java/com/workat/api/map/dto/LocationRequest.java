@@ -17,12 +17,12 @@ public class LocationRequest {
 
 	private int page;
 
-	@Builder
-	public LocationRequest(float x, float y, int radius, int page) {
-		this.x = x;
-		this.y = y;
-		this.radius = radius;
-		this.page = page;
+	public static LocationRequest of(float x, float y, int radius, int page) {
+		LocationRequest request = new LocationRequest();
+		request.x = x;
+		request.y = y;
+		request.radius = radius;
+		request.page = page;
+		return request;
 	}
-
 }

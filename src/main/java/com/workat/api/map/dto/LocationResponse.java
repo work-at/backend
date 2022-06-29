@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LocationResponse {
 
-	List<LocationDto> locations;
+	private List<LocationDto> locations;
 
 	public static LocationResponse of(List<LocationDto> locations) {
 		LocationResponse response = new LocationResponse();

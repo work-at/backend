@@ -42,13 +42,7 @@ class LocationHttpReceiverTest {
 	void getLocation() {
 		//given
 		LocationCategory givenLocationCategory = LocationCategory.CAFE;
-		LocationRequest givenLocationRequest = LocationRequest.builder()
-			.x(1.0f)
-			.y(1.0f)
-			.radius(1)
-			.page(1)
-			.build();
-
+		LocationRequest givenLocationRequest = LocationRequest.of(1.0f, 1.0f, 1, 1);
 		List<KakaoLocalDataDto> givenDocuments = IntStream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 			.boxed()
 			.map(index -> {
