@@ -3,13 +3,13 @@ package com.workat.common.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -49,32 +49,39 @@ public class ExternalApiCallUtils {
 	private String tourApiBigDataToken;
 
 	public BigDataMetroResponse getBigDataMetro(String startYmd, String endYmd, String pageNum, String numOfRows) throws IOException {
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-		String url = TOUR_API_BIGDATA_BASE_URL + TOUR_API_BIGDATA_METRO_GOVERNMENT;
-		String uri = UriComponentsBuilder.fromHttpUrl(url)
-			.queryParam("serviceKey", tourApiBigDataToken)
-			.queryParam("MobileOS", MOBILE_OS)
-			.queryParam("MobileApp", MOBILE_APP)
-			.queryParam("numOfRows", numOfRows)
-			.queryParam("startYmd", startYmd)
-			.queryParam("pageNo", pageNum)
-			.queryParam("endYmd", endYmd)
-			.queryParam("_type", _TYPE)
-			.build()
-			.toUriString();
-		log.info(uri);
-
-		HttpEntity<?> entity = new HttpEntity<>(headers);
-		HttpEntity<JsonNode> response = restTemplate.exchange(uri, HttpMethod.GET, entity, JsonNode.class);
-		return convert(Objects.requireNonNull(response.getBody()), BigDataMetroResponse.class);
+		JsonNode responseBody = getJsonNodeResponse(TOUR_API_BIGDATA_METRO_GOVERNMENT, startYmd, endYmd, pageNum, numOfRows);
+		return convert(responseBody, BigDataMetroResponse.class);
 	}
 
 	public BigDataLocalResponse getBigDataLocal(String startYmd, String endYmd, String pageNum, String numOfRows) throws IOException {
+		JsonNode responseBody = getJsonNodeResponse(TOUR_API_BIGDATA_LOCAL_GOVERNMENT, startYmd, endYmd, pageNum, numOfRows);
+		return convert(responseBody, BigDataLocalResponse.class);
+	}
+
+	private JsonNode getJsonNodeResponse(String path, String startYmd, String endYmd, String pageNum, String numOfRows) {
+		HttpHeaders headers = getJsonHeader();
+		String uri = convertUrl(path, startYmd, endYmd, pageNum, numOfRows);
+		log.info(uri);
+
+		HttpEntity<?> entity = new HttpEntity<>(headers);
+		ResponseEntity<JsonNode> response = restTemplate.exchange(uri, HttpMethod.GET, entity, JsonNode.class);
+
+		if (response.getBody() == null) {
+			// TODO: 내부 캐싱 값 유지
+			log.info("Cannot receive response from Tour Api");
+		}
+		return response.getBody();
+	}
+
+	private HttpHeaders getJsonHeader() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-		String url = TOUR_API_BIGDATA_BASE_URL + TOUR_API_BIGDATA_LOCAL_GOVERNMENT;
-		String uri = UriComponentsBuilder.fromHttpUrl(url)
+		return headers;
+	}
+
+	private String convertUrl(String path, String startYmd, String endYmd, String pageNum, String numOfRows) {
+		String url = TOUR_API_BIGDATA_BASE_URL + path;
+		return UriComponentsBuilder.fromHttpUrl(url)
 			.queryParam("serviceKey", tourApiBigDataToken)
 			.queryParam("MobileOS", MOBILE_OS)
 			.queryParam("MobileApp", MOBILE_APP)
@@ -85,11 +92,6 @@ public class ExternalApiCallUtils {
 			.queryParam("_type", _TYPE)
 			.build()
 			.toUriString();
-		log.info(uri);
-
-		HttpEntity<?> entity = new HttpEntity<>(headers);
-		HttpEntity<JsonNode> response = restTemplate.exchange(uri, HttpMethod.GET, entity, JsonNode.class);
-		return convert(Objects.requireNonNull(response.getBody()), BigDataLocalResponse.class);
 	}
 
 	private <T> T convert(JsonNode jsonNode, Class<T> clazz) throws IOException {
