@@ -45,8 +45,6 @@ public class LocationHttpReceiver {
 				convertUrl(KAKAO_LOCAL_BASE_URI + KAKAO_CATEGORY_SEARCH_PATH, locationCategory, locationRequest),
 				HttpMethod.GET, new HttpEntity<>(headers), KakaoLocalResponse.class);
 			return response.getBody();
-		} catch (HttpStatusCodeException e) {
-			throw new BusinessException(e.getStatusCode(), e.getMessage());
 		} catch (RuntimeException e) {
 			throw new InternalServerException(e.getMessage());
 		}
@@ -57,11 +55,9 @@ public class LocationHttpReceiver {
 
 		try {
 			ResponseEntity<KakaoAddressResponse> response = restTemplate.exchange(
-				convertUrl(KAKAO_LOCAL_BASE_URI + KAKAO_CATEGORY_SEARCH_PATH, longitude, latitude),
+				convertUrl(KAKAO_LOCAL_BASE_URI + KAKAO_CONVERT_TO_ADDRESS_PATH, longitude, latitude),
 				HttpMethod.GET, new HttpEntity<>(headers), KakaoAddressResponse.class);
 			return response.getBody();
-		} catch (HttpStatusCodeException e) {
-			throw new BusinessException(e.getStatusCode(), e.getMessage());
 		} catch (RuntimeException e) {
 			throw new InternalServerException(e.getMessage());
 		}

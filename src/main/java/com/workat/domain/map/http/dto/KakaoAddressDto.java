@@ -31,4 +31,8 @@ public class KakaoAddressDto {
 
 	private String zipCode;
 
+	public String getEntireAddress() {
+		return region1DepthName + " " + region2DepthName + " " + region3DepthName;
+	}
+
 }
