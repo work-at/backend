@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.workat.api.auth.dto.KakaoOAuthAccessTokenDto;
-import com.workat.api.auth.dto.KakaoOAuthTokenRequest;
-import com.workat.api.auth.service.KakaoOAuthService;
+import com.workat.api.auth.dto.KakaoOauthAccessTokenDto;
+import com.workat.api.auth.dto.KakaoOauthTokenRequest;
+import com.workat.api.auth.service.KakaoOauthService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,11 +17,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class AuthorizationController {
-	private final KakaoOAuthService authorizationService;
+
+	private final KakaoOauthService kakaoOauthService;
 
 	@PostMapping("/v1/auth/token")
-	public ResponseEntity<KakaoOAuthAccessTokenDto> issueToken(@RequestBody KakaoOAuthTokenRequest request) {
-		KakaoOAuthAccessTokenDto data = authorizationService.auth(request.getCode());
+	public ResponseEntity<KakaoOauthAccessTokenDto> issueToken(@RequestBody KakaoOauthTokenRequest request) {
+		KakaoOauthAccessTokenDto data = kakaoOauthService.getAccessToken(request.getCode());
 
 		return ResponseEntity.status(HttpStatus.OK).body(data);
 	}

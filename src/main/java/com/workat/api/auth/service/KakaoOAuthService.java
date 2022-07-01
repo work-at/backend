@@ -11,43 +11,63 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import com.workat.api.auth.dto.KakaoOAuthAccessTokenDto;
-import com.workat.api.auth.dto.KakaoOAuthTokenResponse;
+import com.workat.api.auth.dto.KakaoOauthAccessTokenDto;
+import com.workat.api.auth.dto.KakaoOauthIdDto;
+import com.workat.api.auth.dto.KakaoOauthTokenInfoResponse;
+import com.workat.api.auth.dto.KakaoOauthTokenResponse;
 import com.workat.common.exception.InternalServerException;
 import com.workat.common.exception.base.BusinessException;
-import lombok.RequiredArgsConstructor;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RequiredArgsConstructor
 @Service
-public class KakaoOAuthService {
+public class KakaoOauthService {
 
-	private final RestTemplate restTemplate;
-
+	// TODO: Value 로
 	private static final String REDIRECT_URL = "http://localhost:3000/login"; // TODO: 프론트쪽 리다이렉트 동선 협의되면 수정
+
 	private static final String AUTH_URL = "https://kauth.kakao.com/oauth/token";
+
+	private static final String ACCESS_TOKEN_INFO_URL = "https://kapi.kakao.com/v1/user/access_token_info";
+	
+	private final RestTemplate restTemplate;
 
 	@Value("${external.kakaoOauth.clientId}")
 	private String CLIENT_ID;
 
-	public KakaoOAuthAccessTokenDto auth(String code) {
+	public KakaoOauthAccessTokenDto getAccessToken(String code) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(getAuthParam(code), headers);
+		HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(getAuthParam(code), headers);
 
-		KakaoOAuthTokenResponse body = requestAuth(kakaoTokenRequest);
+		KakaoOauthTokenResponse body = requestAccessToken(tokenRequest);
 
-		return KakaoOAuthAccessTokenDto.of(body.getAccessToken());
+		return KakaoOauthAccessTokenDto.of(body.getAccessToken());
 	}
 
-	private KakaoOAuthTokenResponse requestAuth(HttpEntity request) {
-		try {
-			return restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOAuthTokenResponse.class)
-				.getBody();
-		} catch (HttpStatusCodeException e) {
-			System.out.println(e.getMessage()); // TODO: 로깅 처리 필요
+	public KakaoOauthIdDto getId(String accessToken) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", accessToken); // Authorization: Bearer ${ACCESS_TOKEN}
 
-			throw new BusinessException(e.getStatusCode(), "login error");
+		HttpEntity tokenInfoRequest = new HttpEntity(headers);
+
+		KakaoOauthTokenInfoResponse body = requestAccessTokenInfo(tokenInfoRequest);
+
+		return KakaoOauthIdDto.of(body.getId());
+	}
+
+	private KakaoOauthTokenInfoResponse requestAccessTokenInfo(HttpEntity request) {
+		try {
+			return restTemplate.exchange(ACCESS_TOKEN_INFO_URL, HttpMethod.GET, request,
+				KakaoOauthTokenInfoResponse.class).getBody();
+		} catch (HttpStatusCodeException e) {
+			log.error(e.getMessage());
+
+			throw new BusinessException(e.getStatusCode(), "oauth error");
 		} catch (RuntimeException e) {
 			throw new InternalServerException(e.getMessage());
 		}
@@ -61,5 +81,17 @@ public class KakaoOAuthService {
 		params.add("code", code);
 
 		return params;
+	}
+
+	private KakaoOauthTokenResponse requestAccessToken(HttpEntity request) {
+		try {
+			return restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOauthTokenResponse.class).getBody();
+		} catch (HttpStatusCodeException e) {
+			log.error(e.getMessage());
+
+			throw new BusinessException(e.getStatusCode(), "oauth error");
+		} catch (RuntimeException e) {
+			throw new InternalServerException(e.getMessage());
+		}
 	}
 }
