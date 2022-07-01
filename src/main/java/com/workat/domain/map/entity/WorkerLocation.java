@@ -13,7 +13,6 @@ import lombok.ToString;
 @Getter
 @RedisHash(value = "worker", timeToLive = 648000) // TODO: set time to live
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
 public class WorkerLocation {
 
 	@Id
