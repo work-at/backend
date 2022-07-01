@@ -78,8 +78,8 @@ public class AddressServiceTest {
 		//then
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(saved.getUserId(), workerLocation.getUserId()),
-			() -> Assertions.assertEquals(saved.getLongitude(), workerLocation.getLongitude()),
-			() -> Assertions.assertEquals(saved.getLatitude(), workerLocation.getLatitude()),
+			() -> Assertions.assertEquals(saved.getLocation().getX(), workerLocation.getLocation().getX()),
+			() -> Assertions.assertEquals(saved.getLocation().getY(), workerLocation.getLocation().getY()),
 			() -> Assertions.assertEquals(saved.getAddress(), workerLocation.getAddress())
 		);
 
