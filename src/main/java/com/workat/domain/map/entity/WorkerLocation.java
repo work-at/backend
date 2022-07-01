@@ -1,7 +1,9 @@
 package com.workat.domain.map.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.GeoIndexed;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,16 +17,14 @@ public class WorkerLocation {
 	@Id
 	private String userId;
 
-	private String longitude;
-
-	private String latitude;
+	@GeoIndexed
+	private Point location;
 
 	private String address;
 
 	private WorkerLocation(String userId, String longitude, String latitude, String address) {
 		this.userId = userId;
-		this.longitude = longitude;
-		this.latitude = latitude;
+		this.location = new Point(Double.parseDouble(longitude), Double.parseDouble(latitude));
 		this.address = address;
 	}
 
