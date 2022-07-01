@@ -36,11 +36,15 @@ public class ExternalApiCallUtils {
 	private final RestTemplate restTemplate;
 
 	private static final String TOUR_API_BIGDATA_BASE_URL = "http://api.visitkorea.or.kr/openapi/service/rest/DataLabService";
+
 	private static final String TOUR_API_BIGDATA_METRO_GOVERNMENT = "/metcoRegnVisitrDDList";
+
 	private static final String TOUR_API_BIGDATA_LOCAL_GOVERNMENT = "/locgoRegnVisitrDDList";
 
 	private static final String MOBILE_OS = "ETC";
+
 	private static final String MOBILE_APP = "WORK_AT";
+
 	private static final String _TYPE = "json";
 
 	private static final ObjectMapper mapper = new ObjectMapper();
@@ -61,7 +65,7 @@ public class ExternalApiCallUtils {
 	private JsonNode getJsonNodeResponse(String path, String startYmd, String endYmd, String pageNum, String numOfRows) {
 		HttpHeaders headers = getJsonHeader();
 		String uri = convertUrl(path, startYmd, endYmd, pageNum, numOfRows);
-		log.info(uri);
+		log.info("[관광 API : 요청 URI]" + uri);
 
 		HttpEntity<?> entity = new HttpEntity<>(headers);
 		ResponseEntity<JsonNode> response = restTemplate.exchange(uri, HttpMethod.GET, entity, JsonNode.class);

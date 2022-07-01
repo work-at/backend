@@ -16,7 +16,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
+
 	private static final String API_NAME = "Workat API";
+
 	private static final String API_VERSION = "1.0";
 
 
