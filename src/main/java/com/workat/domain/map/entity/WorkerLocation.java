@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.index.GeoIndexed;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
 @RedisHash(value = "worker", timeToLive = 648000) // TODO: set time to live
