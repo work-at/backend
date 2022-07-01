@@ -32,7 +32,7 @@ public class KakaoOauthService {
 	private static final String AUTH_URL = "https://kauth.kakao.com/oauth/token";
 
 	private static final String ACCESS_TOKEN_INFO_URL = "https://kapi.kakao.com/v1/user/access_token_info";
-	
+
 	private final RestTemplate restTemplate;
 
 	@Value("${external.kakaoOauth.clientId}")
