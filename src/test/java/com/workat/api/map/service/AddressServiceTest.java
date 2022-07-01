@@ -1,14 +1,13 @@
 package com.workat.api.map.service;
 
-import org.junit.jupiter.api.Assertions;
+import static org.mockito.BDDMockito.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.mockito.BDDMockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -73,15 +72,10 @@ public class AddressServiceTest {
 		Mockito.when(workerLocationRedisRepository.save(any())).thenReturn(workerLocation);
 
 		//when
-		WorkerLocation saved = addressService.saveAddress("123", "127.423084873712", "37.0789561558879");
+		addressService.saveAddress("123", "127.423084873712", "37.0789561558879");
 
 		//then
-		Assertions.assertAll(
-			() -> Assertions.assertEquals(saved.getUserId(), workerLocation.getUserId()),
-			() -> Assertions.assertEquals(saved.getLongitude(), workerLocation.getLongitude()),
-			() -> Assertions.assertEquals(saved.getLatitude(), workerLocation.getLatitude()),
-			() -> Assertions.assertEquals(saved.getAddress(), workerLocation.getAddress())
-		);
+		verify(workerLocationRedisRepository, times(1)).save(any());
 
 	}
 }
