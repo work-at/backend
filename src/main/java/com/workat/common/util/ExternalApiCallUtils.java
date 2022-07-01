@@ -64,11 +64,10 @@ public class ExternalApiCallUtils {
 
 	private JsonNode getJsonNodeResponse(String path, String startYmd, String endYmd, String pageNum, String numOfRows) {
 		HttpHeaders headers = getJsonHeader();
-		String uri = convertUrl(path, startYmd, endYmd, pageNum, numOfRows);
+		String uri = convertToUri(path, startYmd, endYmd, pageNum, numOfRows);
 		log.info("[관광 API : 요청 URI]" + uri);
 
-		HttpEntity<?> entity = new HttpEntity<>(headers);
-		ResponseEntity<JsonNode> response = restTemplate.exchange(uri, HttpMethod.GET, entity, JsonNode.class);
+		ResponseEntity<JsonNode> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), JsonNode.class);
 
 		if (response.getBody() == null) {
 			// TODO: 내부 캐싱 값 유지
@@ -83,7 +82,7 @@ public class ExternalApiCallUtils {
 		return headers;
 	}
 
-	private String convertUrl(String path, String startYmd, String endYmd, String pageNum, String numOfRows) {
+	private String convertToUri(String path, String startYmd, String endYmd, String pageNum, String numOfRows) {
 		String url = TOUR_API_BIGDATA_BASE_URL + path;
 		return UriComponentsBuilder.fromHttpUrl(url)
 			.queryParam("serviceKey", tourApiBigDataToken)

@@ -38,12 +38,11 @@ public class LocationHttpReceiver {
 	private final RestTemplate restTemplate;
 
 	public KakaoLocalResponse getLocation(LocationCategory locationCategory, LocationRequest locationRequest) {
-		HttpHeaders headers = getKakaoLocalHeader();
-
 		try {
+			HttpHeaders headers = getKakaoLocalHeader();
+			String uri = convertToUri(KAKAO_LOCAL_BASE_URI + KAKAO_CATEGORY_SEARCH_PATH, locationCategory, locationRequest);
 			ResponseEntity<KakaoLocalResponse> response = restTemplate.exchange(
-				convertUrl(KAKAO_LOCAL_BASE_URI + KAKAO_CATEGORY_SEARCH_PATH, locationCategory, locationRequest),
-				HttpMethod.GET, new HttpEntity<>(headers), KakaoLocalResponse.class);
+				uri, HttpMethod.GET, new HttpEntity<>(headers), KakaoLocalResponse.class);
 			return response.getBody();
 		} catch (RuntimeException e) {
 			throw new InternalServerException(e.getMessage());
@@ -51,12 +50,11 @@ public class LocationHttpReceiver {
 	}
 
 	public KakaoAddressResponse getAddress(String longitude, String latitude) {
-		HttpHeaders headers = getKakaoLocalHeader();
-
 		try {
+			HttpHeaders headers = getKakaoLocalHeader();
+			String uri = convertToUri(KAKAO_LOCAL_BASE_URI + KAKAO_CONVERT_TO_ADDRESS_PATH, longitude, latitude);
 			ResponseEntity<KakaoAddressResponse> response = restTemplate.exchange(
-				convertUrl(KAKAO_LOCAL_BASE_URI + KAKAO_CONVERT_TO_ADDRESS_PATH, longitude, latitude),
-				HttpMethod.GET, new HttpEntity<>(headers), KakaoAddressResponse.class);
+				uri, HttpMethod.GET, new HttpEntity<>(headers), KakaoAddressResponse.class);
 			return response.getBody();
 		} catch (RuntimeException e) {
 			throw new InternalServerException(e.getMessage());
@@ -70,14 +68,15 @@ public class LocationHttpReceiver {
 		return headers;
 	}
 
-	private String convertUrl(String url, String longitude, String latitude) {
+	private String convertToUri(String url, String longitude, String latitude) {
 		return UriComponentsBuilder.fromHttpUrl(url)
 			.queryParam("x", longitude)
 			.queryParam("y", latitude)
-			.queryParam("input_coord", COORDINATE).toUriString();
+			.queryParam("input_coord", COORDINATE)
+			.toUriString();
 	}
 
-	private String convertUrl(String url, LocationCategory locationCategory, LocationRequest locationRequest) {
+	private String convertToUri(String url, LocationCategory locationCategory, LocationRequest locationRequest) {
 		String category = locationCategory.getValue();
 		float x = locationRequest.getX();
 		float y = locationRequest.getY();
@@ -90,7 +89,8 @@ public class LocationHttpReceiver {
 			.queryParam("y", String.valueOf(y))
 			.queryParam("radius", String.valueOf(radius))
 			.queryParam("page", String.valueOf(page))
-			.queryParam("size", "15").toUriString();
+			.queryParam("size", "15")
+			.toUriString();
 	}
 
 }
