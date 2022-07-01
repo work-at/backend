@@ -10,8 +10,11 @@ import lombok.NoArgsConstructor;
 public class BigDataResponseBody {
 
 	private BigDataResponseItems items;
+
 	private int numOfRows;
+
 	private int pageNo;
+
 	private int totalCount;
 
 	private BigDataResponseBody(BigDataResponseItems items, int numOfRows, int pageNo, int totalCount) {

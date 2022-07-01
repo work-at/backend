@@ -16,6 +16,7 @@ import com.workat.api.map.dto.LocationRequest;
 import com.workat.common.exception.InternalServerException;
 import com.workat.common.exception.base.BusinessException;
 import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.http.dto.KakaoLocalResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class LocationHttpReceiver {
 
-	private static String KAKAO_LOCAL_URI = "https://dapi.kakao.com/v2/local/search/category.json";
+	private static String KAKAO_LOCAL_BASE_URI = "https://dapi.kakao.com/v2/local";
+	private static String KAKAO_CATEGORY_SEARCH_PATH = "/search/category.json";
+	private static String KAKAO_CONVERT_TO_ADDRESS_PATH = "/geo/coord2address.json";
+	private static String COORDINATE = "WGS84";
 
 	@Value("${external.kakaoOauth.clientId}")
 	private String key;
@@ -34,23 +38,45 @@ public class LocationHttpReceiver {
 	private final RestTemplate restTemplate;
 
 	public KakaoLocalResponse getLocation(LocationCategory locationCategory, LocationRequest locationRequest) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		headers.set("Authorization", "KakaoAK " + key);
-
 		try {
+			HttpHeaders headers = getKakaoLocalHeader();
+			String uri = convertToUri(KAKAO_LOCAL_BASE_URI + KAKAO_CATEGORY_SEARCH_PATH, locationCategory, locationRequest);
 			ResponseEntity<KakaoLocalResponse> response = restTemplate.exchange(
-				convertUrl(KAKAO_LOCAL_URI, locationCategory, locationRequest),
-				HttpMethod.GET, new HttpEntity<>(headers), KakaoLocalResponse.class);
+				uri, HttpMethod.GET, new HttpEntity<>(headers), KakaoLocalResponse.class);
 			return response.getBody();
-		} catch (HttpStatusCodeException e) {
-			throw new BusinessException(e.getStatusCode(), e.getMessage());
 		} catch (RuntimeException e) {
 			throw new InternalServerException(e.getMessage());
 		}
 	}
 
-	private String convertUrl(String url, LocationCategory locationCategory, LocationRequest locationRequest) {
+	public KakaoAddressResponse getAddress(String longitude, String latitude) {
+		try {
+			HttpHeaders headers = getKakaoLocalHeader();
+			String uri = convertToUri(KAKAO_LOCAL_BASE_URI + KAKAO_CONVERT_TO_ADDRESS_PATH, longitude, latitude);
+			ResponseEntity<KakaoAddressResponse> response = restTemplate.exchange(
+				uri, HttpMethod.GET, new HttpEntity<>(headers), KakaoAddressResponse.class);
+			return response.getBody();
+		} catch (RuntimeException e) {
+			throw new InternalServerException(e.getMessage());
+		}
+	}
+
+	private HttpHeaders getKakaoLocalHeader() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.set("Authorization", "KakaoAK " + key);
+		return headers;
+	}
+
+	private String convertToUri(String url, String longitude, String latitude) {
+		return UriComponentsBuilder.fromHttpUrl(url)
+			.queryParam("x", longitude)
+			.queryParam("y", latitude)
+			.queryParam("input_coord", COORDINATE)
+			.toUriString();
+	}
+
+	private String convertToUri(String url, LocationCategory locationCategory, LocationRequest locationRequest) {
 		String category = locationCategory.getValue();
 		float x = locationRequest.getX();
 		float y = locationRequest.getY();
@@ -63,7 +89,8 @@ public class LocationHttpReceiver {
 			.queryParam("y", String.valueOf(y))
 			.queryParam("radius", String.valueOf(radius))
 			.queryParam("page", String.valueOf(page))
-			.queryParam("size", "15").toUriString();
+			.queryParam("size", "15")
+			.toUriString();
 	}
 
 }
