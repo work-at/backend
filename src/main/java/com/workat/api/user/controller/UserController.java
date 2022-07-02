@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.workat.api.auth.dto.KakaoOauthIdDto;
 import com.workat.api.auth.service.KakaoOauthService;
-import com.workat.api.user.dto.SignUpDto;
+import com.workat.api.user.dto.SignUpRequest;
 import com.workat.api.user.service.UserService;
 import com.workat.common.annotation.OauthTokenValidation;
 
@@ -26,9 +26,10 @@ public class UserController {
 	@ApiOperation(value = "회원가입")
 	@PostMapping("api/v1/signup")
 	@OauthTokenValidation
-	public ResponseEntity signUp(@RequestHeader("Authorization") String accessToken, @RequestBody SignUpDto signUpDto) {
+	public ResponseEntity signUp(@RequestHeader("Authorization") String accessToken,
+		@RequestBody SignUpRequest signUpRequest) {
 		KakaoOauthIdDto kakaoOauthIdDto = kakaoOauthService.getId(accessToken);
-		userService.signUp(kakaoOauthIdDto, signUpDto);
+		userService.signUp(kakaoOauthIdDto, signUpRequest);
 
 		return ResponseEntity.ok().build();
 	}

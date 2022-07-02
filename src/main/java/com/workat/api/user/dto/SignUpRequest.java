@@ -7,18 +7,18 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class SignUpDto {
+public class SignUpRequest {
 	private String nickname;
 	private String position;
 	private int workingYear;
 
-	public SignUpDto(String nickname, String position, int workingYear) {
+	public SignUpRequest(String nickname, String position, int workingYear) {
 		this.nickname = nickname;
 		this.position = position;
 		this.workingYear = workingYear;
 	}
 
-	public static SignUpDto of(String nickname, String position, int workingYear) {
-		return new SignUpDto(nickname, position, workingYear);
+	public static SignUpRequest of(String nickname, String position, int workingYear) {
+		return new SignUpRequest(nickname, position, workingYear);
 	}
 }
