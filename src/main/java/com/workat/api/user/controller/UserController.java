@@ -15,8 +15,8 @@ import com.workat.common.annotation.OauthTokenValidation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
-@RestController
 @RequiredArgsConstructor
+@RestController
 public class UserController {
 
 	private final UserService userService;

@@ -14,8 +14,8 @@ import com.workat.api.auth.service.KakaoOauthService;
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/api")
-@RestController
 @RequiredArgsConstructor
+@RestController
 public class AuthorizationController {
 
 	private final KakaoOauthService kakaoOauthService;
