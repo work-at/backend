@@ -23,13 +23,13 @@ public class LocationDto {
 
 	private String phone;
 
-	private float x;
+	private double x;
 
-	private float y;
+	private double y;
 
 	@Builder
 	public LocationDto(Long id, LocationCategory category, String placeId, String placeName, String placeUrl,
-		String phone, float x, float y) {
+		String phone, double x, double y) {
 		this.id = id;
 		this.category = category;
 		this.placeId = placeId;

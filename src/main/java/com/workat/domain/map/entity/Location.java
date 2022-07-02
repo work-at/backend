@@ -27,11 +27,11 @@ public class Location {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column
-	private String placeId;
-
 	@Enumerated(EnumType.STRING)
 	private LocationCategory category;
+
+	@Column
+	private String placeId;
 
 	@Column
 	private String phone;
@@ -49,10 +49,10 @@ public class Location {
 	private String roadAddressName;
 
 	@Column
-	private float x;
+	private double x;
 
 	@Column
-	private float y;
+	private double y;
 
 	protected Location() {
 
