@@ -25,7 +25,7 @@ public class UserService {
 	public void signUp(long oauthId, SignUpRequest signUpRequest) {
 
 		userRepository.findByOauthId(oauthId).ifPresent(user -> {
-			log.error(String.valueOf(user.getId()));
+			log.error("user already exists, userId : ", user.getId());
 			throw new ConflictException("user already exists");
 		});
 
