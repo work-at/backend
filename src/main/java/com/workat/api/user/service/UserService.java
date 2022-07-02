@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.workat.api.auth.dto.KakaoOauthIdDto;
 import com.workat.api.user.dto.SignUpRequest;
 import com.workat.api.user.repository.UserRepository;
 import com.workat.common.exception.ConflictException;
@@ -23,8 +22,7 @@ public class UserService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public void signUp(KakaoOauthIdDto idDto, SignUpRequest signUpRequest) {
-		final long oauthId = idDto.getId();
+	public void signUp(long oauthId, SignUpRequest signUpRequest) {
 
 		userRepository.findByOauthId(oauthId).ifPresent(user -> {
 			log.error(String.valueOf(user.getId()));

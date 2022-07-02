@@ -12,7 +12,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import com.workat.api.auth.dto.KakaoOauthAccessTokenDto;
-import com.workat.api.auth.dto.KakaoOauthIdDto;
 import com.workat.api.auth.dto.KakaoOauthTokenInfoResponse;
 import com.workat.api.auth.dto.KakaoOauthTokenResponse;
 import com.workat.common.exception.InternalServerException;
@@ -49,7 +48,7 @@ public class KakaoOauthService {
 		return KakaoOauthAccessTokenDto.of(body.getAccessToken());
 	}
 
-	public KakaoOauthIdDto getId(String accessToken) {
+	public long getId(String accessToken) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", accessToken); // Authorization: Bearer ${ACCESS_TOKEN}
 
@@ -57,7 +56,7 @@ public class KakaoOauthService {
 
 		KakaoOauthTokenInfoResponse body = requestAccessTokenInfo(tokenInfoRequest);
 
-		return KakaoOauthIdDto.of(body.getId());
+		return body.getId();
 	}
 
 	private KakaoOauthTokenInfoResponse requestAccessTokenInfo(HttpEntity request) {

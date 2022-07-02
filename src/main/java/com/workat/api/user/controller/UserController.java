@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.workat.api.auth.dto.KakaoOauthIdDto;
 import com.workat.api.auth.service.KakaoOauthService;
 import com.workat.api.user.dto.SignUpRequest;
 import com.workat.api.user.service.UserService;
@@ -28,8 +27,7 @@ public class UserController {
 	@OauthTokenValidation
 	public ResponseEntity signUp(@RequestHeader("Authorization") String accessToken,
 		@RequestBody SignUpRequest signUpRequest) {
-		KakaoOauthIdDto kakaoOauthIdDto = kakaoOauthService.getId(accessToken);
-		userService.signUp(kakaoOauthIdDto, signUpRequest);
+		userService.signUp(kakaoOauthService.getId(accessToken), signUpRequest);
 
 		return ResponseEntity.ok().build();
 	}
