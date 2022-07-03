@@ -21,7 +21,7 @@ public class LocationController {
 	@GetMapping("/api/v1/location/{category}")
 	public ResponseEntity<LocationResponse> getLocation(
 		@PathVariable("category") String category, @RequestBody LocationRequest request) {
-		LocationResponse response = locationService.getLocation(category, request);
+		LocationResponse response = locationService.getLocations(category, request);
 		return ResponseEntity.ok(response);
 	}
 }

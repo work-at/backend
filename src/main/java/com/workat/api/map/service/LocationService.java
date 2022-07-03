@@ -28,7 +28,7 @@ public class LocationService {
 
 	private final LocationRepository locationRepository;
 
-	public LocationResponse getLocation(String category, LocationRequest request) {
+	public LocationResponse getLocations(String category, LocationRequest request) {
 		LocationCategory locationCategory = LocationCategory.of(category);
 
 		if (locationCategory == null) {
