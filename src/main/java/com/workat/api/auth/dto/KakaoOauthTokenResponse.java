@@ -12,16 +12,22 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class KakaoOAuthTokenResponse {
+public class KakaoOauthTokenResponse {
+
 	private String accessToken;
+
 	private String tokenType;
+
 	private String refreshToken;
+
 	private int expiresIn;
+
 	private String scope;
+
 	private int refreshTokenExpiresIn;
 
 	@Builder
-	public KakaoOAuthTokenResponse(String accessToken, String tokenType, String refreshToken, int expiresIn,
+	public KakaoOauthTokenResponse(String accessToken, String tokenType, String refreshToken, int expiresIn,
 		String scope, int refreshTokenExpiresIn) {
 		this.accessToken = accessToken;
 		this.tokenType = tokenType;
