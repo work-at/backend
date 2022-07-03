@@ -17,16 +17,16 @@ public class CollectReviewEnumController {
 
 	private final CollectReviewTypeService collectReviewEnumService;
 
-	@GetMapping("/types/review/cafe")
+	@GetMapping("/cafe/review/type")
 	public ResponseEntity<ReviewTypeListResponse> getCafeTypesReviewTypes() {
 		ReviewTypeListResponse response = collectReviewEnumService.collectCafeReviewTypes();
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
-	@GetMapping("/types/review/restaurant")
-	public ResponseEntity<ReviewTypeListResponse> getRestaurantReviewTypes() {
-		ReviewTypeListResponse response = collectReviewEnumService.collectRestaurantReviewTypes();
+	@GetMapping("/food/review/type")
+	public ResponseEntity<ReviewTypeListResponse> getFoodReviewTypes() {
+		ReviewTypeListResponse response = collectReviewEnumService.collectFoodReviewTypes();
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}

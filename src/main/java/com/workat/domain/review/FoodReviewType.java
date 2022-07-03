@@ -1,6 +1,6 @@
 package com.workat.domain.review;
 
-public enum RestaurantReviewType implements BaseReviewType {
+public enum FoodReviewType implements BaseReviewType {
 
 	PARKING("주차하기 편해요~"),
 	VIEW("뷰가 좋아요"),
@@ -15,7 +15,7 @@ public enum RestaurantReviewType implements BaseReviewType {
 
 	private String content;
 
-	RestaurantReviewType(String content) {
+	FoodReviewType(String content) {
 		this.content = content;
 	}
 
