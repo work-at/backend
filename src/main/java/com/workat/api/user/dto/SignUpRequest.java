@@ -2,6 +2,8 @@ package com.workat.api.user.dto;
 
 import static lombok.AccessLevel.*;
 
+import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.job.DepartmentType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,16 +11,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PROTECTED)
 public class SignUpRequest {
 	private String nickname;
-	private String position;
-	private int workingYear;
+	private DepartmentType position;
+	private DurationType workingYear;
 
-	public SignUpRequest(String nickname, String position, int workingYear) {
+	public SignUpRequest(String nickname, DepartmentType position, DurationType workingYear) {
 		this.nickname = nickname;
 		this.position = position;
 		this.workingYear = workingYear;
 	}
 
-	public static SignUpRequest of(String nickname, String position, int workingYear) {
+	public static SignUpRequest of(String nickname, DepartmentType position, DurationType workingYear) {
 		return new SignUpRequest(nickname, position, workingYear);
 	}
 }
