@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.workat.api.map.dto.LocationDto;
 import com.workat.api.map.dto.LocationRequest;
@@ -17,7 +16,6 @@ import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.http.dto.KakaoLocalMetaDto;
 import com.workat.domain.map.http.dto.KakaoLocalResponse;
 import com.workat.domain.map.repository.LocationRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

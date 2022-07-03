@@ -4,14 +4,11 @@ import static org.springframework.http.HttpStatus.Series.*;
 
 import java.io.IOException;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.workat.common.exception.ExternalApiException;
-import com.workat.common.exception.InternalServerException;
 import com.workat.common.exception.base.BusinessException;
 
 import lombok.RequiredArgsConstructor;
