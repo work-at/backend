@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ReviewTypeResponse {
 
-	private String emoji;
+	private String name;
 	private String content;
 
-	private ReviewTypeResponse(String emoji, String content) {
-		this.emoji = emoji;
+	private ReviewTypeResponse(String name, String content) {
+		this.name = name;
 		this.content = content;
 	}
 
