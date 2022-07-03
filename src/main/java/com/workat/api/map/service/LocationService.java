@@ -1,5 +1,6 @@
 package com.workat.api.map.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +11,7 @@ import com.workat.api.map.dto.LocationRequest;
 import com.workat.api.map.dto.LocationResponse;
 import com.workat.api.map.dto.LocationUpdateRequest;
 import com.workat.common.exception.BadRequestException;
+import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.LocationHttpReceiver;
@@ -36,12 +38,10 @@ public class LocationService {
 		}
 
 		List<Location> locations = locationRepository.findAllByCategory(locationCategory)
-			.orElseThrow(() -> {
-				throw new RuntimeException("");
-			});
+			.orElseGet(Collections::emptyList);
 
 		if (locations.isEmpty()) {
-			throw new RuntimeException("");
+			throw new NotFoundException("location not found exception");
 		}
 
 		List<LocationDto> locationDtos = locations.stream()
