@@ -64,8 +64,12 @@ public class LocationService {
 		for (LocationCategory category : LocationCategory.values()) {
 			List<KakaoLocalDataDto> locationDtos = locationHttpReceiver.updateLocations(category, request);
 			List<Location> locations = locationDtos.stream()
-				.map(dto -> locationRepository.findByPlaceId(dto.getId())
-					.orElseGet(() -> parseDtoToLocation(category, dto)))
+				.distinct()
+				.map(dto -> {
+					Location location = locationRepository.findByPlaceId(dto.getId())
+						.orElseGet(() -> parseDtoToLocation(category, dto));
+					return location.update(dto);
+				})
 				.collect(Collectors.toList());
 			locationRepository.saveAll(locations);
 		}

@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@EqualsAndHashCode(exclude = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class KakaoLocalDataDto {
