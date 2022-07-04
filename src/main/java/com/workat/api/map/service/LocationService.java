@@ -37,8 +37,7 @@ public class LocationService {
 			throw new BadRequestException("category must be food or cafe");
 		}
 
-		List<Location> locations = locationRepository.findAllByCategory(locationCategory)
-			.orElseGet(Collections::emptyList);
+		List<Location> locations = locationRepository.findAllByCategory(locationCategory);
 
 		if (locations.isEmpty()) {
 			throw new NotFoundException("location not found exception");
