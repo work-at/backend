@@ -1,4 +1,4 @@
-package com.workat.domain.user;
+package com.workat.domain.user.entity;
 
 import java.util.UUID;
 
