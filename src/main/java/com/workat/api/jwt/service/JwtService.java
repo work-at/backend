@@ -10,8 +10,6 @@ import javax.xml.bind.DatatypeConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.workat.domain.auth.OauthType;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -60,16 +58,6 @@ public class JwtService {
 
 	public <T> T getValueFromJWT(String token, String key, Class<T> requiredType) {
 		return extractClaims(token).get(key, requiredType);
-	}
-
-	public OauthType getOauthType(String token) {
-		final String strOauthType = extractClaims(token).get("oauthType", String.class);
-
-		return OauthType.valueOf(strOauthType);
-	}
-
-	public Long getOauthId(String token) {
-		return extractClaims(token).get("oauthId", long.class);
 	}
 
 	public boolean isTokenExpired(String token) {
