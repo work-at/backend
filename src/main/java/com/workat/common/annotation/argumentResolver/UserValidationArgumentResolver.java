@@ -66,7 +66,7 @@ public class UserValidationArgumentResolver implements HandlerMethodArgumentReso
 		final String requestTokenHeader = httpServletRequest.getHeader("Authorization")
 															.substring(7);
 
-		if (requestTokenHeader == null && !requestTokenHeader.startsWith("Bearer ")) {
+		if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer ")) {
 			throw new UnAuthorizedException("No Bearer header found");
 		}
 
