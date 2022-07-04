@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class DurationTypeResponse implements JobTypeResponse {
+public class DurationTypeDto implements JobTypeDto {
 
 	String name;
 
@@ -14,13 +14,13 @@ public class DurationTypeResponse implements JobTypeResponse {
 
 	String description;
 
-	private DurationTypeResponse(String name, String content, String description) {
+	private DurationTypeDto(String name, String content, String description) {
 		this.name = name;
 		this.content = content;
 		this.description = description;
 	}
 
-	public static DurationTypeResponse of(String name, String content, String description) {
-		return new DurationTypeResponse(name, content, description);
+	public static DurationTypeDto of(String name, String content, String description) {
+		return new DurationTypeDto(name, content, description);
 	}
 }
