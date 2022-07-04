@@ -1,5 +1,6 @@
 package com.workat.api.map.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,14 +9,15 @@ import org.springframework.stereotype.Service;
 import com.workat.api.map.dto.LocationDto;
 import com.workat.api.map.dto.LocationRequest;
 import com.workat.api.map.dto.LocationResponse;
+import com.workat.api.map.dto.LocationUpdateRequest;
 import com.workat.common.exception.BadRequestException;
+import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
-import com.workat.domain.map.http.dto.KakaoLocalMetaDto;
-import com.workat.domain.map.http.dto.KakaoLocalResponse;
 import com.workat.domain.map.repository.LocationRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,14 +30,18 @@ public class LocationService {
 
 	private final LocationRepository locationRepository;
 
-	public LocationResponse getLocation(String category, LocationRequest locationRequest) {
+	public LocationResponse getLocations(String category, LocationRequest request) {
 		LocationCategory locationCategory = LocationCategory.of(category);
 
 		if (locationCategory == null) {
 			throw new BadRequestException("category must be food or cafe");
 		}
 
-		List<Location> locations = getLocationFromKakao(locationCategory, locationRequest);
+		List<Location> locations = locationRepository.findAllByCategory(locationCategory);
+
+		if (locations.isEmpty()) {
+			throw new NotFoundException("location not found exception");
+		}
 
 		List<LocationDto> locationDtos = locations.stream()
 			.map(location -> LocationDto.builder()
@@ -53,18 +59,25 @@ public class LocationService {
 		return LocationResponse.of(locationDtos);
 	}
 
-	private List<Location> getLocationFromKakao(LocationCategory category, LocationRequest request) {
-		KakaoLocalResponse response = locationHttpReceiver.getLocation(category, request);
-		List<KakaoLocalDataDto> data = response.getDocuments();
-		KakaoLocalMetaDto metaDto = response.getMeta();
+	public void updateLocations(LocationUpdateRequest request) {
+		for (LocationCategory category : LocationCategory.values()) {
+			List<KakaoLocalDataDto> locationDtos = locationHttpReceiver.updateLocations(category, request);
+			List<Location> locations = locationDtos.stream()
+				.distinct()
+				.map(dto -> {
+					Location location = locationRepository.findByPlaceId(dto.getId())
+						.orElseGet(() -> parseDtoToLocation(category, dto));
+					return location.update(dto);
+				})
+				.collect(Collectors.toList());
+			locationRepository.saveAll(locations);
+		}
+	}
 
-		List<Location> locations = data.stream()
-			.map(dto -> Location.builder()
-				.category(category)
-				.dto(dto)
-				.build())
-			.collect(Collectors.toList());
-
-		return locationRepository.saveAll(locations);
+	private Location parseDtoToLocation(LocationCategory category, KakaoLocalDataDto dto) {
+		return Location.builder()
+			.category(category)
+			.dto(dto)
+			.build();
 	}
 }

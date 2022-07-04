@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class LocationRequest {
+public class LocationUpdateRequest {
 
 	private double x;
 
@@ -14,14 +14,11 @@ public class LocationRequest {
 
 	private int radius;
 
-	private int page;
-
-	public static LocationRequest of(double x, double y, int radius, int page) {
-		LocationRequest request = new LocationRequest();
+	public static LocationUpdateRequest of(double x, double y, int radius) {
+		LocationUpdateRequest request = new LocationUpdateRequest();
 		request.x = x;
 		request.y = y;
 		request.radius = radius;
-		request.page = page;
 		return request;
 	}
 }

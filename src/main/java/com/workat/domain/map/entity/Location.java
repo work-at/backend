@@ -27,11 +27,11 @@ public class Location {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column
-	private String placeId;
-
 	@Enumerated(EnumType.STRING)
 	private LocationCategory category;
+
+	@Column(unique = true)
+	private String placeId;
 
 	@Column
 	private String phone;
@@ -49,10 +49,10 @@ public class Location {
 	private String roadAddressName;
 
 	@Column
-	private float x;
+	private double x;
 
 	@Column
-	private float y;
+	private double y;
 
 	protected Location() {
 
@@ -69,5 +69,16 @@ public class Location {
 		this.roadAddressName = dto.getRoadAddressName();
 		this.x = Float.parseFloat(dto.getX());
 		this.y = Float.parseFloat(dto.getY());
+	}
+
+	public Location update(KakaoLocalDataDto dto) {
+		this.phone = dto.getPhone();
+		this.placeName = dto.getPlaceName();
+		this.placeUrl = dto.getPlaceUrl();
+		this.addressName = dto.getAddressName();
+		this.roadAddressName = dto.getRoadAddressName();
+		this.x = Double.parseDouble(dto.getX());
+		this.y = Double.parseDouble(dto.getY());
+		return this;
 	}
 }
