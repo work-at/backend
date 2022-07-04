@@ -27,7 +27,7 @@ public class User {
 
 	@Id
 	@Column(columnDefinition = "BINARY(16)")
-	private UUID id;
+	private String id;
 
 	@Column
 	private String nickname;
@@ -47,15 +47,18 @@ public class User {
 	private DurationType workingYear;
 
 	@Column
-	private float latitude;
+	private double latitude;
 
 	@Column
-	private float longitude;
+	private double longitude;
+
+	@Column
+	private String imageUrl;
 
 	@Builder
 	public User(UUID id, String nickname, OauthType oauthType, long oauthId, DepartmentType position, DurationType workingYear,
-		float latitude, float longitude) {
-		this.id = id;
+		double latitude, double longitude, String imageUrl) {
+		this.id = id.toString();
 		this.nickname = nickname;
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
@@ -63,5 +66,6 @@ public class User {
 		this.workingYear = workingYear;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.imageUrl = imageUrl;
 	}
 }
