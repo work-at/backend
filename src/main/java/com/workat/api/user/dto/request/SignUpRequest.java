@@ -1,9 +1,10 @@
-package com.workat.api.user.dto;
+package com.workat.api.user.dto.request;
 
 import static lombok.AccessLevel.*;
 
-import com.workat.domain.user.job.DurationType;
 import com.workat.domain.user.job.DepartmentType;
+import com.workat.domain.user.job.DurationType;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.workat.api.review.dto.ReviewTypeListResponse;
 import com.workat.api.review.service.CollectReviewTypeService;
+
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/api/v1")

@@ -1,6 +1,8 @@
-package com.workat.api.map.dto;
+package com.workat.api.map.dto.response;
 
 import java.util.List;
+
+import com.workat.api.map.dto.MapLocationDto;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,9 +12,9 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LocationResponse {
 
-	private List<LocationDto> locations;
+	private List<MapLocationDto> locations;
 
-	public static LocationResponse of(List<LocationDto> locations) {
+	public static LocationResponse of(List<MapLocationDto> locations) {
 		LocationResponse response = new LocationResponse();
 		response.locations = locations;
 		return response;

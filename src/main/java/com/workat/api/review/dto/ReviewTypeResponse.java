@@ -1,6 +1,7 @@
 package com.workat.api.review.dto;
 
 import com.workat.domain.review.BaseReviewType;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -2,7 +2,6 @@ package com.workat.domain.map.http;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -15,10 +14,9 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.workat.api.map.dto.LocationUpdateRequest;
+import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.common.exception.InternalServerException;
 import com.workat.common.exception.base.BusinessException;
-import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
@@ -45,7 +43,7 @@ public class LocationHttpReceiver {
 
 	private final RestTemplate restTemplate;
 
-	public List<KakaoLocalDataDto> updateLocations(LocationCategory category, LocationUpdateRequest request) {
+	public List<KakaoLocalDataDto> updateLocations(LocationCategory category, LocationTriggerRequest request) {
 		ArrayList<KakaoLocalDataDto> result = new ArrayList<>();
 
 		try {
@@ -102,7 +100,7 @@ public class LocationHttpReceiver {
 			.toUriString();
 	}
 
-	private String convertToUri(String url, LocationCategory category, LocationUpdateRequest request, int page) {
+	private String convertToUri(String url, LocationCategory category, LocationTriggerRequest request, int page) {
 		String categoryCode = category.getValue();
 		double x = request.getX();
 		double y = request.getY();

@@ -3,7 +3,7 @@ package com.workat.api.user.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.workat.api.user.dto.SignUpRequest;
+import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.api.user.repository.UserRepository;
 import com.workat.common.exception.ConflictException;
 import com.workat.domain.auth.OauthType;

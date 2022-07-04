@@ -1,15 +1,14 @@
 package com.workat.api.map.service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.workat.api.map.dto.LocationDto;
-import com.workat.api.map.dto.LocationRequest;
-import com.workat.api.map.dto.LocationResponse;
-import com.workat.api.map.dto.LocationUpdateRequest;
+import com.workat.api.map.dto.MapLocationDto;
+import com.workat.api.map.dto.request.LocationRequest;
+import com.workat.api.map.dto.request.LocationTriggerRequest;
+import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
@@ -30,21 +29,19 @@ public class LocationService {
 
 	private final LocationRepository locationRepository;
 
-	public LocationResponse getLocations(String category, LocationRequest request) {
-		LocationCategory locationCategory = LocationCategory.of(category);
-
-		if (locationCategory == null) {
+	public LocationResponse getLocations(LocationCategory category, LocationRequest request) {
+		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
 		}
 
-		List<Location> locations = locationRepository.findAllByCategory(locationCategory);
+		List<Location> locations = locationRepository.findAllByCategory(category);
 
 		if (locations.isEmpty()) {
 			throw new NotFoundException("location not found exception");
 		}
 
-		List<LocationDto> locationDtos = locations.stream()
-			.map(location -> LocationDto.builder()
+		List<MapLocationDto> mapLocationDtos = locations.stream()
+			.map(location -> MapLocationDto.builder()
 				.id(location.getId())
 				.category(location.getCategory())
 				.phone(location.getPhone())
@@ -56,10 +53,10 @@ public class LocationService {
 				.build())
 			.collect(Collectors.toList());
 
-		return LocationResponse.of(locationDtos);
+		return LocationResponse.of(mapLocationDtos);
 	}
 
-	public void updateLocations(LocationUpdateRequest request) {
+	public void updateLocations(LocationTriggerRequest request) {
 		for (LocationCategory category : LocationCategory.values()) {
 			List<KakaoLocalDataDto> locationDtos = locationHttpReceiver.updateLocations(category, request);
 			List<Location> locations = locationDtos.stream()

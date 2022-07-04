@@ -7,15 +7,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 // 나중에 사용할 예정 현재는 주석으로 처리해둠
 // @Table(uniqueConstraints = {@UniqueConstraint(name = "location_unique", columnNames = "placeId")})

@@ -1,16 +1,17 @@
-package com.workat.api.map.dto;
+package com.workat.api.map.dto.response;
 
 import com.workat.api.user.dto.DepartmentTypeDto;
 import com.workat.api.user.dto.DurationTypeDto;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class WorkerResponse {
+public class WorkerDetailResponse {
 
 	private Long id;
 
@@ -20,15 +21,18 @@ public class WorkerResponse {
 
 	private DurationTypeDto workingYear;
 
-	private WorkerResponse(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
+	private String story;
+
+	private WorkerDetailResponse(Long id, String imageUrl, DepartmentType position, DurationType workingYear, String story) {
 		this.id = id;
 		this.imageUrl = imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType(), workingYear.getDescription());
+		this.story = story;
 	}
 
-	public static WorkerResponse of(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
-		return new WorkerResponse(id, imageUrl, position, workingYear);
+	public static WorkerDetailResponse of(Long id, String imageUrl, DepartmentType position, DurationType workingYear, String story) {
+		return new WorkerDetailResponse(id, imageUrl, position, workingYear, story);
 	}
 
 }

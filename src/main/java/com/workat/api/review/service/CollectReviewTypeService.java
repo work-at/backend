@@ -10,6 +10,7 @@ import com.workat.api.review.dto.ReviewTypeListResponse;
 import com.workat.api.review.dto.ReviewTypeResponse;
 import com.workat.domain.review.CafeReviewType;
 import com.workat.domain.review.FoodReviewType;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

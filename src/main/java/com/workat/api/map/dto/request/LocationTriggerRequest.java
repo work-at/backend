@@ -1,4 +1,4 @@
-package com.workat.api.map.dto;
+package com.workat.api.map.dto.request;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class LocationUpdateRequest {
+public class LocationTriggerRequest {
 
 	private double x;
 
@@ -14,8 +14,8 @@ public class LocationUpdateRequest {
 
 	private int radius;
 
-	public static LocationUpdateRequest of(double x, double y, int radius) {
-		LocationUpdateRequest request = new LocationUpdateRequest();
+	public static LocationTriggerRequest of(double x, double y, int radius) {
+		LocationTriggerRequest request = new LocationTriggerRequest();
 		request.x = x;
 		request.y = y;
 		request.radius = radius;

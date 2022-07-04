@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.workat.api.auth.service.KakaoOauthService;
-import com.workat.api.user.dto.SignUpRequest;
+import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.api.user.service.UserService;
 import com.workat.common.annotation.OauthTokenValidation;
 

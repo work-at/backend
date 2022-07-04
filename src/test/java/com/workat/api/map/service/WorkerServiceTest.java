@@ -10,9 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.workat.api.map.dto.WorkerDetailResponse;
-import com.workat.api.map.dto.WorkerListResponse;
-import com.workat.api.map.dto.WorkerResponse;
+import com.workat.api.map.dto.WorkerDto;
+import com.workat.api.map.dto.response.WorkerDetailResponse;
+import com.workat.api.map.dto.response.WorkerListResponse;
 import com.workat.api.user.repository.UserRepository;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.MultipleDatasourceBaseTest;
@@ -26,7 +26,7 @@ import com.workat.domain.user.job.DurationType;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class WorkChatServiceTest extends MultipleDatasourceBaseTest {
+public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 
 	@Autowired
 	private WorkerLocationRedisRepository workerLocationRedisRepository;
@@ -35,7 +35,7 @@ public class WorkChatServiceTest extends MultipleDatasourceBaseTest {
 	private UserRepository userRepository;
 
 	@Autowired
-	private WorkChatService workChatService;
+	private WorkerService workerService;
 
 	private static WorkerLocation workerLocation, workerLocation1, workerLocation2;
 
@@ -68,7 +68,7 @@ public class WorkChatServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		int size = workChatService.countWorkerByLocationNear(user.getLongitude(), user.getLatitude(), 5);
+		int size = workerService.countWorkerByLocationNear(user.getLongitude(), user.getLatitude(), 5);
 
 		//then
 		Assertions.assertEquals(size, 2);
@@ -79,7 +79,7 @@ public class WorkChatServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		WorkerListResponse response = workChatService.findAllWorkerByLocationNear(user.getLongitude(), user.getLatitude(), 5);
+		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user.getLongitude(), user.getLatitude(), 5);
 
 		//then
 		Assertions.assertEquals(response.getResponse().size(), 1);
@@ -90,7 +90,7 @@ public class WorkChatServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		WorkerDetailResponse response = workChatService.findWorkerDetailById(user.getId());
+		WorkerDetailResponse response = workerService.findWorkerDetailById(user.getId());
 
 		//then
 		Assertions.assertAll(
@@ -107,7 +107,7 @@ public class WorkChatServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		WorkerResponse response = workChatService.findWorkerById(user.getId());
+		WorkerDto response = workerService.findWorkerById(user.getId());
 
 		//then
 		Assertions.assertAll(

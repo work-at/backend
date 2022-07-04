@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
