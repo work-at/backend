@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class BigDataResponseHeader {
 
 	private String resultCode;
+
 	private String resultMsg;
 }
