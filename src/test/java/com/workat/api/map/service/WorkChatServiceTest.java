@@ -10,7 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.workat.api.map.dto.WorkerDetailResponse;
 import com.workat.api.map.dto.WorkerListResponse;
+import com.workat.api.map.dto.WorkerResponse;
 import com.workat.api.user.repository.UserRepository;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.MultipleDatasourceBaseTest;
@@ -81,5 +83,38 @@ public class WorkChatServiceTest extends MultipleDatasourceBaseTest {
 
 		//then
 		Assertions.assertEquals(response.getResponse().size(), 1);
+	}
+
+	@Test
+	void findWorkerDetailById() {
+		//given
+
+		//when
+		WorkerDetailResponse response = workChatService.findWorkerDetailById(user.getId());
+
+		//then
+		Assertions.assertAll(
+			() -> Assertions.assertEquals(response.getId(), user.getId()),
+			() -> Assertions.assertEquals(response.getImageUrl(), user.getImageUrl()),
+			() -> Assertions.assertEquals(response.getPosition().getName(), user.getPosition().name()),
+			() -> Assertions.assertEquals(response.getWorkingYear().getName(), user.getWorkingYear().name()),
+			() -> Assertions.assertEquals(response.getStory(), user.getStory())
+		);
+	}
+
+	@Test
+	void findWorkerById() {
+		//given
+
+		//when
+		WorkerResponse response = workChatService.findWorkerById(user.getId());
+
+		//then
+		Assertions.assertAll(
+			() -> Assertions.assertEquals(response.getId(), user.getId()),
+			() -> Assertions.assertEquals(response.getImageUrl(), user.getImageUrl()),
+			() -> Assertions.assertEquals(response.getPosition().getName(), user.getPosition().name()),
+			() -> Assertions.assertEquals(response.getWorkingYear().getName(), user.getWorkingYear().name())
+		);
 	}
 }

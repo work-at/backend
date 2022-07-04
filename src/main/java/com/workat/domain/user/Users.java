@@ -51,9 +51,12 @@ public class Users {
 	@Column
 	private String imageUrl;
 
+	@Column
+	private String story;
+
 	@Builder
 	public Users(String nickname, OauthType oauthType, long oauthId, DepartmentType position, DurationType workingYear,
-		double latitude, double longitude, String imageUrl) {
+		double latitude, double longitude, String imageUrl, String story) {
 		this.nickname = nickname;
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
@@ -62,5 +65,6 @@ public class Users {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.imageUrl = imageUrl;
+		this.story = story;
 	}
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class WorkerDto {
+public class WorkerResponse {
 
 	private Long id;
 
@@ -20,15 +20,15 @@ public class WorkerDto {
 
 	private DurationTypeDto workingYear;
 
-	private WorkerDto(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
+	private WorkerResponse(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
 		this.id = id;
 		this.imageUrl = imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType(), workingYear.getDescription());
 	}
 
-	public static WorkerDto of(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
-		return new WorkerDto(id, imageUrl, position, workingYear);
+	public static WorkerResponse of(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
+		return new WorkerResponse(id, imageUrl, position, workingYear);
 	}
 
 }
