@@ -4,12 +4,16 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
 import com.workat.domain.auth.OauthType;
 
+import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.job.DepartmentType;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,11 +38,13 @@ public class User {
 	@Column
 	private long oauthId;
 
+	@Enumerated(EnumType.STRING)
 	@Column
-	private String position;
+	private DepartmentType position;
 
+	@Enumerated(EnumType.STRING)
 	@Column
-	private int workingYear;
+	private DurationType workingYear;
 
 	@Column
 	private float latitude;
@@ -47,7 +53,7 @@ public class User {
 	private float longitude;
 
 	@Builder
-	public User(UUID id, String nickname, OauthType oauthType, long oauthId, String position, int workingYear,
+	public User(UUID id, String nickname, OauthType oauthType, long oauthId, DepartmentType position, DurationType workingYear,
 		float latitude, float longitude) {
 		this.id = id;
 		this.nickname = nickname;
