@@ -73,7 +73,7 @@ public class AddressServiceTest {
 	@Test
 	void testSaveAddress() throws JsonProcessingException {
 		//given
-		WorkerLocation workerLocation = WorkerLocation.of("123", "127.423084873712", "37.0789561558879", "경기 안성시 죽산면 죽산리");
+		WorkerLocation workerLocation = WorkerLocation.of(123L, "127.423084873712", "37.0789561558879", "경기 안성시 죽산면 죽산리");
 		String responseString = response.toPrettyString();
 		JsonNode responseJsonNode = mapper.readTree(responseString);
 		KakaoAddressResponse kakaoResponse = mapper.treeToValue(responseJsonNode, KakaoAddressResponse.class);
@@ -81,7 +81,7 @@ public class AddressServiceTest {
 		Mockito.when(workerLocationRedisRepository.save(any())).thenReturn(workerLocation);
 
 		//when
-		addressService.saveAddress("123", "127.423084873712", "37.0789561558879");
+		addressService.saveAddress(123L, "127.423084873712", "37.0789561558879");
 
 		//then
 		verify(workerLocationRedisRepository, times(1)).save(any());

@@ -9,7 +9,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.workat.domain.map.entity.WorkerLocation;
 
-public interface WorkerLocationRedisRepository extends CrudRepository<WorkerLocation, String> {
+public interface WorkerLocationRedisRepository extends CrudRepository<WorkerLocation, Long> {
 
 	List<WorkerLocation> findAllByLocationNear(Point point, Distance distance);
 }

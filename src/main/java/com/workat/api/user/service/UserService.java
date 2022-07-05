@@ -30,7 +30,6 @@ public class UserService {
 		});
 
 		User user = User.builder()
-			.id(UUID.randomUUID())
 			.nickname(signUpRequest.getNickname())
 			.oauthType(OauthType.KAKAO)
 			.oauthId(oauthId)

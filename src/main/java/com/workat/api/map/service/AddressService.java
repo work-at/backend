@@ -24,7 +24,7 @@ public class AddressService {
 
 	private final WorkerLocationRedisRepository workerLocationRedisRepository;
 
-	public void saveAddress(String userId, String longitude, String latitude) {
+	public void saveAddress(Long userId, String longitude, String latitude) {
 		KakaoAddressResponse response = locationHttpReceiver.getAddress(longitude, latitude);
 
 		if (response.getMeta().getTotalCount() == 0) {

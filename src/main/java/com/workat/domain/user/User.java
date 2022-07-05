@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
@@ -26,8 +28,8 @@ import lombok.NoArgsConstructor;
 public class User {
 
 	@Id
-	@Column(columnDefinition = "BINARY(16)")
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
 	@Column
 	private String nickname;
@@ -56,9 +58,8 @@ public class User {
 	private String imageUrl;
 
 	@Builder
-	public User(UUID id, String nickname, OauthType oauthType, long oauthId, DepartmentType position, DurationType workingYear,
+	public User(String nickname, OauthType oauthType, long oauthId, DepartmentType position, DurationType workingYear,
 		double latitude, double longitude, String imageUrl) {
-		this.id = id.toString();
 		this.nickname = nickname;
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
