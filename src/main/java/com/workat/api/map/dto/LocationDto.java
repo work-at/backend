@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LocationDto {
 
-	private Long id;
+	private long id;
 
 	private LocationCategory category;
 
@@ -28,7 +28,7 @@ public class LocationDto {
 	private double y;
 
 	@Builder
-	public LocationDto(Long id, LocationCategory category, String placeId, String placeName, String placeUrl,
+	public LocationDto(long id, LocationCategory category, String placeId, String placeName, String placeUrl,
 		String phone, double x, double y) {
 		this.id = id;
 		this.category = category;

@@ -27,7 +27,7 @@ public class LocationController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/api/v1/map/cafes/{locationid}")
+	@GetMapping("/api/v1/map/cafes/{locationId}")
 	public ResponseEntity<LocationDto> getCafeById(@PathVariable("locationId") long locationId) {
 		LocationDto dto =
 			locationService.getLocationById(LocationCategory.CAFE, locationId);
@@ -43,7 +43,7 @@ public class LocationController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/api/v1/map/restaurants/{locationid}")
+	@GetMapping("/api/v1/map/restaurants/{locationId}")
 	public ResponseEntity<LocationDto> getRestaurantById(@PathVariable("locationId") long locationId) {
 		LocationDto dto =
 			locationService.getLocationById(LocationCategory.RESTAURANT, locationId);
