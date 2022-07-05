@@ -11,7 +11,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import com.workat.api.auth.dto.KakaoOauthAccessTokenDto;
 import com.workat.api.auth.dto.KakaoOauthTokenInfoResponse;
 import com.workat.api.auth.dto.KakaoOauthTokenResponse;
 import com.workat.common.exception.InternalServerException;
@@ -37,32 +36,46 @@ public class KakaoOauthService {
 	@Value("${external.kakaoOauth.clientId}")
 	private String CLIENT_ID;
 
-	public KakaoOauthAccessTokenDto getAccessToken(String code) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+	public long auth(String code) {
+		final String accessToken = issueToken(code);
 
-		HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(getAuthParam(code), headers);
+		final long kakaoId = validate(accessToken);
 
-		KakaoOauthTokenResponse body = requestAccessToken(tokenRequest);
-
-		return KakaoOauthAccessTokenDto.of(body.getAccessToken());
+		return kakaoId;
 	}
 
-	public long getId(String accessToken) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", accessToken); // Authorization: Bearer ${ACCESS_TOKEN}
+	private String issueToken(String code) {
+		final HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		HttpEntity tokenInfoRequest = new HttpEntity(headers);
+		final MultiValueMap<String, String> params = getTokenRequestParam(code);
 
-		KakaoOauthTokenInfoResponse body = requestAccessTokenInfo(tokenInfoRequest);
+		final HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(params, headers);
 
-		return body.getId();
+		final KakaoOauthTokenResponse res = requestAccessToken(tokenRequest);
+
+		return res.getAccessToken();
+	}
+
+	private long validate(String accessToken) {
+		final HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "Bearer " + accessToken); // Authorization: Bearer ${ACCESS_TOKEN}
+
+		final HttpEntity tokenInfoRequest = new HttpEntity(headers);
+
+		final KakaoOauthTokenInfoResponse res = requestAccessTokenInfo(tokenInfoRequest);
+
+		return res.getId();
 	}
 
 	private KakaoOauthTokenInfoResponse requestAccessTokenInfo(HttpEntity request) {
 		try {
-			return restTemplate.exchange(ACCESS_TOKEN_INFO_URL, HttpMethod.GET, request,
-				KakaoOauthTokenInfoResponse.class).getBody();
+			return restTemplate.exchange(
+								   ACCESS_TOKEN_INFO_URL,
+								   HttpMethod.GET,
+								   request,
+								   KakaoOauthTokenInfoResponse.class)
+							   .getBody();
 		} catch (HttpStatusCodeException e) {
 			log.error(e.getMessage());
 
@@ -72,25 +85,31 @@ public class KakaoOauthService {
 		}
 	}
 
-	private MultiValueMap<String, String> getAuthParam(String code) {
-		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+	private KakaoOauthTokenResponse requestAccessToken(HttpEntity request) {
+		try {
+			return restTemplate.exchange(
+								   AUTH_URL,
+								   HttpMethod.POST,
+								   request,
+								   KakaoOauthTokenResponse.class)
+							   .getBody();
+		} catch (HttpStatusCodeException e) {
+			log.error(e.getMessage());
+
+			throw new BusinessException(e.getStatusCode(), "oauth error");
+		} catch (RuntimeException e) {
+			throw new InternalServerException(e.getMessage());
+		}
+	}
+
+	private MultiValueMap<String, String> getTokenRequestParam(String code) {
+		final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+
 		params.add("grant_type", "authorization_code");
 		params.add("client_id", CLIENT_ID);
 		params.add("redirect_uri", REDIRECT_URL);
 		params.add("code", code);
 
 		return params;
-	}
-
-	private KakaoOauthTokenResponse requestAccessToken(HttpEntity request) {
-		try {
-			return restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, KakaoOauthTokenResponse.class).getBody();
-		} catch (HttpStatusCodeException e) {
-			log.error(e.getMessage());
-
-			throw new BusinessException(e.getStatusCode(), "oauth error");
-		} catch (RuntimeException e) {
-			throw new InternalServerException(e.getMessage());
-		}
 	}
 }

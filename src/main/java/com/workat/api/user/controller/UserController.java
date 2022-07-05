@@ -3,13 +3,13 @@ package com.workat.api.user.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.workat.api.auth.service.KakaoOauthService;
+import com.workat.api.auth.service.AuthorizationService;
+import com.workat.api.user.dto.SignUpResponse;
 import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.api.user.service.UserService;
-import com.workat.common.annotation.OauthTokenValidation;
+import com.workat.domain.user.entity.Users;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +20,18 @@ public class UserController {
 
 	private final UserService userService;
 
-	private final KakaoOauthService kakaoOauthService;
+	private final AuthorizationService authorizationService;
 
 	@ApiOperation(value = "회원가입")
 	@PostMapping("api/v1/signup")
-	@OauthTokenValidation
-	public ResponseEntity signUp(@RequestHeader("Authorization") String accessToken,
-		@RequestBody SignUpRequest signUpRequest) {
-		userService.signUp(kakaoOauthService.getId(accessToken), signUpRequest);
+	public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
 
-		return ResponseEntity.ok().build();
+		final Users user = userService.createUser(signUpRequest);
+		final long id = userService.signUp(user);
+
+		String accessToken = authorizationService.createAccessToken(id);
+
+		return ResponseEntity.ok()
+			.body(SignUpResponse.of(accessToken));
 	}
 }

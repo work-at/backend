@@ -10,6 +10,9 @@ external:
     big-data:
       "2scFfN6uVjhuRcXrj1DgGjslYn0wYJc7kvCOHHwOI/0kr1sjf2OqLLjq5SvCt3jKyr4JPHr/K3QGuXhvv6HYlQ=="
 
+jwt:
+  secret: JWT_SECRET_KEY
+
 restTemplate:
   factory:
     readTimeout: 5000

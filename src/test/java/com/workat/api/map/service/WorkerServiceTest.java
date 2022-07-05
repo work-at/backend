@@ -13,14 +13,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.workat.api.map.dto.WorkerDto;
 import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
-import com.workat.api.user.repository.UserRepository;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.MultipleDatasourceBaseTest;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.WorkerLocationRedisRepository;
-import com.workat.domain.user.Users;
+import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.repository.UserRepository;
 
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -28,25 +28,21 @@ import com.workat.domain.user.job.DurationType;
 @SpringBootTest
 public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 
+	private static WorkerLocation workerLocation, workerLocation1, workerLocation2;
+	private static Users user;
 	@Autowired
 	private WorkerLocationRedisRepository workerLocationRedisRepository;
-
 	@Autowired
 	private UserRepository userRepository;
-
 	@Autowired
 	private WorkerService workerService;
-
-	private static WorkerLocation workerLocation, workerLocation1, workerLocation2;
-
-	private static Users user;
 
 	@BeforeAll
 	void setup() {
 		user = Users.builder()
 			.nickname("nickname1")
 			.oauthType(OauthType.KAKAO)
-			.oauthId(12345)
+			.oauthId(12345L)
 			.position(DepartmentType.ACCOUNTANT)
 			.workingYear(DurationType.JUNIOR)
 			.longitude(127.423084873712)
@@ -55,7 +51,8 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 			.build();
 		userRepository.save(user);
 
-		workerLocation = WorkerLocation.of(user.getId(), String.valueOf(user.getLongitude()), String.valueOf(user.getLatitude()), "경기 안성시 죽산면 죽산리");
+		workerLocation = WorkerLocation.of(user.getId(), String.valueOf(user.getLongitude()),
+			String.valueOf(user.getLatitude()), "경기 안성시 죽산면 죽산리");
 		workerLocation1 = WorkerLocation.of(124L, "127.40", "37.07895", "경기 안성시 삼죽면 내장리");
 		workerLocation2 = WorkerLocation.of(125L, "127.51", "37.078", "경기 안성시 일죽면 산북리");
 		workerLocationRedisRepository.save(workerLocation);
@@ -79,7 +76,8 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user.getLongitude(), user.getLatitude(), 5);
+		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user.getLongitude(), user.getLatitude(),
+			5);
 
 		//then
 		Assertions.assertEquals(response.getResponse().size(), 1);

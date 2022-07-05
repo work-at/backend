@@ -2,8 +2,6 @@ package com.workat.api.user.dto;
 
 import static lombok.AccessLevel.*;
 
-import java.util.UUID;
-
 import com.workat.domain.auth.OauthType;
 
 import lombok.Builder;
@@ -14,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PROTECTED)
 public class UserDto {
 
-	private UUID id;
+	private long id;
 
 	private String nickname;
 
@@ -32,7 +30,7 @@ public class UserDto {
 
 	@Builder
 	public UserDto(
-		UUID id,
+		long id,
 		String nickname,
 		String position,
 		int workingYear,

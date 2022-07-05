@@ -1,4 +1,4 @@
-package com.workat.domain.user;
+package com.workat.domain.user.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -7,6 +7,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.user.job.DepartmentType;
@@ -20,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Table(indexes = @Index(columnList = "oauthId", unique = true))
 public class Users {
 
 	@Id
@@ -33,7 +36,7 @@ public class Users {
 	private OauthType oauthType;
 
 	@Column(unique = true)
-	private long oauthId;
+	private Long oauthId;
 
 	@Enumerated(EnumType.STRING)
 	@Column
@@ -58,7 +61,7 @@ public class Users {
 	private String story;
 
 	@Builder
-	public Users(String nickname, OauthType oauthType, long oauthId, DepartmentType position, DurationType workingYear,
+	public Users(String nickname, OauthType oauthType, Long oauthId, DepartmentType position, DurationType workingYear,
 		double latitude, double longitude, String imageUrl, String story) {
 		this.nickname = nickname;
 		this.oauthType = oauthType;
