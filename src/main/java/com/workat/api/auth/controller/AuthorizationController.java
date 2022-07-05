@@ -12,7 +12,7 @@ import com.workat.api.auth.service.AuthorizationService;
 import com.workat.api.auth.service.KakaoOauthService;
 import com.workat.api.user.service.UserService;
 import com.workat.domain.auth.OauthType;
-import com.workat.domain.user.entity.User;
+import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +34,7 @@ public class AuthorizationController {
 		final long kakaoId = kakaoOauthService.auth(request.getCode());
 
 		// DB 유저 존재 확인
-		final User user = userService.validateUserExistWithOauthId(OauthType.KAKAO, kakaoId).orElse(null);
+		final Users user = userService.validateUserExistWithOauthId(OauthType.KAKAO, kakaoId).orElse(null);
 
 		if (user == null) {
 			return ResponseEntity.ok()

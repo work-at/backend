@@ -1,7 +1,5 @@
 package com.workat.common.annotation.argumentResolver;
 
-import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.MethodParameter;
@@ -15,7 +13,7 @@ import com.workat.api.auth.dto.KakaoOauthTokenInfoResponse;
 import com.workat.api.jwt.service.JwtService;
 import com.workat.api.user.service.UserService;
 import com.workat.common.exception.UnAuthorizedException;
-import com.workat.domain.user.entity.User;
+import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,25 +46,23 @@ public class UserValidationArgumentResolver implements HandlerMethodArgumentReso
 			throw new UnAuthorizedException("Access token is expired");
 		}
 
-		final UUID id = extractIdFromJWT(jwt);
+		final long id = extractIdFromJWT(jwt);
 
-		final User user = userService.validateUserExistWithId(id)
-									 .orElseThrow(() -> {
-										 throw new UnAuthorizedException("Please login again");
-									 });
+		final Users user = userService.validateUserExistWithId(id)
+			.orElseThrow(() -> {
+				throw new UnAuthorizedException("Please login again");
+			});
 
 		return user;
 	}
 
-	private UUID extractIdFromJWT(String jwt) {
-		final String strId = jwtService.getValueFromJWT(jwt, "id");
-
-		return UUID.fromString(strId);
+	private long extractIdFromJWT(String jwt) {
+		return jwtService.getValueFromJWT(jwt, "id", Long.class);
 	}
 
 	private String parseTokenFromHeader() {
 		final String requestTokenHeader = httpServletRequest.getHeader("Authorization")
-															.substring(7);
+			.substring(7);
 
 		if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer ")) {
 			throw new UnAuthorizedException("No Bearer header found");

@@ -1,7 +1,6 @@
 package com.workat.api.auth.service;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,7 @@ public class AuthorizationService {
 
 	private final JwtService jwtService;
 
-	public String createAccessToken(UUID id) {
+	public String createAccessToken(long id) {
 		HashMap hashMap = new HashMap();
 		hashMap.put("id", id);
 

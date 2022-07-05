@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class WorkerDto {
 
-	private Long id;
+	private long id;
 
 	private String imageUrl;
 
@@ -21,14 +21,14 @@ public class WorkerDto {
 
 	private DurationTypeDto workingYear;
 
-	private WorkerDto(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
+	private WorkerDto(long id, String imageUrl, DepartmentType position, DurationType workingYear) {
 		this.id = id;
 		this.imageUrl = imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType(), workingYear.getDescription());
 	}
 
-	public static WorkerDto of(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
+	public static WorkerDto of(long id, String imageUrl, DepartmentType position, DurationType workingYear) {
 		return new WorkerDto(id, imageUrl, position, workingYear);
 	}
 

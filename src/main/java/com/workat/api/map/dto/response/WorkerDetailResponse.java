@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class WorkerDetailResponse {
 
-	private Long id;
+	private long id;
 
 	private String imageUrl;
 
@@ -23,7 +23,8 @@ public class WorkerDetailResponse {
 
 	private String story;
 
-	private WorkerDetailResponse(Long id, String imageUrl, DepartmentType position, DurationType workingYear, String story) {
+	private WorkerDetailResponse(long id, String imageUrl, DepartmentType position, DurationType workingYear,
+		String story) {
 		this.id = id;
 		this.imageUrl = imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
@@ -31,7 +32,8 @@ public class WorkerDetailResponse {
 		this.story = story;
 	}
 
-	public static WorkerDetailResponse of(Long id, String imageUrl, DepartmentType position, DurationType workingYear, String story) {
+	public static WorkerDetailResponse of(long id, String imageUrl, DepartmentType position, DurationType workingYear,
+		String story) {
 		return new WorkerDetailResponse(id, imageUrl, position, workingYear, story);
 	}
 

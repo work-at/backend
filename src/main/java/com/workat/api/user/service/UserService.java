@@ -1,7 +1,6 @@
 package com.workat.api.user.service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.common.exception.ConflictException;
 import com.workat.domain.auth.OauthType;
-import com.workat.domain.user.entity.User;
+import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class UserService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public UUID signUp(User user) {
+	public long signUp(Users user) {
 		OauthType oauthType = user.getOauthType();
 		long oauthId = user.getOauthId();
 
@@ -39,28 +38,25 @@ public class UserService {
 		return user.getId();
 	}
 
-	public User createUser(SignUpRequest signUpRequest) {
-		final UUID id = UUID.randomUUID();
-
-		return User.builder()
-				   .id(id)
-				   .oauthType(signUpRequest.getOauthType())
-				   .oauthId(signUpRequest.getOauthId())
-				   .nickname(signUpRequest.getNickname())
-				   .position(signUpRequest.getPosition())
-				   .workingYear(signUpRequest.getWorkingYear())
-				   .build();
+	public Users createUser(SignUpRequest signUpRequest) {
+		return Users.builder()
+					.oauthType(signUpRequest.getOauthType())
+					.oauthId(signUpRequest.getOauthId())
+					.nickname(signUpRequest.getNickname())
+					.position(signUpRequest.getPosition())
+					.workingYear(signUpRequest.getWorkingYear())
+					.build();
 
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<User> validateUserExistWithId(long id) {
+	public Optional<Users> validateUserExistWithId(long id) {
 		// id 로 가입된 유저 있는지 확인
 		return userRepository.findById(id);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<User> validateUserExistWithOauthId(OauthType oauthType, long oauthId) {
+	public Optional<Users> validateUserExistWithOauthId(OauthType oauthType, long oauthId) {
 		// ouath id 로 가입된 유저 있는지 확인
 		return userRepository.findByOauthTypeAndOauthId(oauthType, oauthId);
 	}

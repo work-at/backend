@@ -1,15 +1,14 @@
 package com.workat.domain.user.repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.workat.domain.auth.OauthType;
-import com.workat.domain.user.entity.User;
+import com.workat.domain.user.entity.Users;
 
-public interface UserRepository extends JpaRepository<User, UUID> {
-	Optional<User> findById(UUID id);
+public interface UserRepository extends JpaRepository<Users, Long> {
+	Optional<Users> findById(Long id);
 
-	Optional<User> findByOauthTypeAndOauthId(OauthType oauthType, long oAuthId);
+	Optional<Users> findByOauthTypeAndOauthId(OauthType oauthType, Long oauthId);
 }
