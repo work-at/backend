@@ -22,8 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
-import com.workat.api.map.dto.MapLocationDto;
-import com.workat.api.map.dto.request.LocationRequest;
+import com.workat.api.map.dto.LocationDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.common.exception.BadRequestException;
@@ -66,7 +65,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertThrows(BadRequestException.class,
-			() -> locationService.getLocations(null, LocationRequest.of(1.0, 1.0, 1, 1)));
+			() -> locationService.getLocations(null, 1.0, 1.0, 1, 1));
 	}
 
 	@Test
@@ -77,7 +76,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertThrows(NotFoundException.class,
-			() -> locationService.getLocations(LocationCategory.CAFE, LocationRequest.of(1.0, 1.0, 1, 1)));
+			() -> locationService.getLocations(LocationCategory.CAFE, 1.0, 1.0, 1, 1));
 	}
 
 	@Test
@@ -88,7 +87,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertThrows(NotFoundException.class,
-			() -> locationService.getLocations(LocationCategory.RESTAURANT, LocationRequest.of(1.0, 1.0, 1, 1)));
+			() -> locationService.getLocations(LocationCategory.RESTAURANT, 1.0, 1.0, 1, 1));
 	}
 
 	@Test
@@ -119,12 +118,10 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		}
 		locationRepository.saveAll(givenLocations);
 
-		LocationRequest givenRequest = LocationRequest.of(1.0, 1.0, 1, 1);
-
 		//when
-		LocationResponse response = locationService.getLocations(LocationCategory.CAFE, givenRequest);
-		List<MapLocationDto> givenDtos = givenLocations.stream()
-			.map(location -> MapLocationDto.builder()
+		LocationResponse response = locationService.getLocations(LocationCategory.CAFE, 1.0, 1.0, 1, 1);
+		List<LocationDto> givenDtos = givenLocations.stream()
+			.map(location -> LocationDto.builder()
 				.id(location.getId())
 				.category(location.getCategory())
 				.phone(location.getPhone())
@@ -138,9 +135,9 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertEquals(givenSize, response.getLocations().size());
-		for(int i=0; i<givenSize; i++) {
-			MapLocationDto given = givenDtos.get(i);
-			MapLocationDto result = response.getLocations().get(i);
+		for (int i = 0; i < givenSize; i++) {
+			LocationDto given = givenDtos.get(i);
+			LocationDto result = response.getLocations().get(i);
 
 			assertAll(
 				() -> assertEquals(given.getId(), result.getId()),
@@ -153,6 +150,65 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 				() -> assertEquals(given.getY(), result.getY())
 			);
 		}
+	}
+
+	@Test
+	void getLocationById_fail_not_found() {
+		//given
+
+		//when
+
+		//then
+		assertThrows(NotFoundException.class, () -> locationService.getLocationById(LocationCategory.CAFE, 1L));
+	}
+
+	@Test
+	void getLocationById_success() {
+		//given
+		String value = "1";
+		KakaoLocalDataDto dto = KakaoLocalDataDto.builder()
+			.id(value)
+			.phone("000-0000-0000")
+			.placeName(value)
+			.placeUrl(value)
+			.addressName(value)
+			.roadAddressName(value)
+			.x(value)
+			.y(value)
+			.build();
+
+		Location given = Location.builder()
+			.category(LocationCategory.CAFE)
+			.dto(dto)
+			.build();
+
+		long locationid = locationRepository.save(given).getId();
+
+		//when
+		LocationDto result = locationService.getLocationById(LocationCategory.CAFE,locationid);
+
+		//then
+		LocationDto givenDto = LocationDto.builder()
+			.id(given.getId())
+			.category(given.getCategory())
+			.phone(given.getPhone())
+			.placeId(given.getPlaceId())
+			.placeUrl(given.getPlaceUrl())
+			.placeName(given.getPlaceName())
+			.x(given.getX())
+			.y(given.getY())
+			.build();
+
+		assertAll(
+			() -> assertEquals(givenDto.getId(), result.getId()),
+			() -> assertEquals(givenDto.getCategory(), result.getCategory()),
+			() -> assertEquals(givenDto.getPhone(), result.getPhone()),
+			() -> assertEquals(givenDto.getPlaceId(), result.getPlaceId()),
+			() -> assertEquals(givenDto.getPlaceName(), result.getPlaceName()),
+			() -> assertEquals(givenDto.getPlaceUrl(), result.getPlaceUrl()),
+			() -> assertEquals(givenDto.getX(), result.getX()),
+			() -> assertEquals(givenDto.getY(), result.getY())
+		);
 	}
 
 	@Test

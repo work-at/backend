@@ -5,8 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.workat.api.map.dto.MapLocationDto;
-import com.workat.api.map.dto.request.LocationRequest;
+import com.workat.api.map.dto.LocationDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.common.exception.BadRequestException;
@@ -29,7 +28,10 @@ public class LocationService {
 
 	private final LocationRepository locationRepository;
 
-	public LocationResponse getLocations(LocationCategory category, LocationRequest request) {
+	public LocationResponse getLocations(LocationCategory category, double longitude, double latitude, int radius,
+		int page) {
+		// TODO: 2022/07/06  longitude, latitude, radius, page 추후 작업에서 사용하도록 변경할 예정
+
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
 		}
@@ -40,8 +42,8 @@ public class LocationService {
 			throw new NotFoundException("location not found exception");
 		}
 
-		List<MapLocationDto> mapLocationDtos = locations.stream()
-			.map(location -> MapLocationDto.builder()
+		List<LocationDto> locationDtos = locations.stream()
+			.map(location -> LocationDto.builder()
 				.id(location.getId())
 				.category(location.getCategory())
 				.phone(location.getPhone())
@@ -53,7 +55,25 @@ public class LocationService {
 				.build())
 			.collect(Collectors.toList());
 
-		return LocationResponse.of(mapLocationDtos);
+		return LocationResponse.of(locationDtos);
+	}
+
+	public LocationDto getLocationById(LocationCategory category, long locationId) {
+		// TODO: 2022/07/06  추후 Cafe와 Restaurant 분리 예정이라 그때 코드 수정
+		Location location = locationRepository.findById(locationId).orElseThrow(() -> {
+			throw new NotFoundException("location is not found");
+		});
+
+		return LocationDto.builder()
+			.id(location.getId())
+			.category(location.getCategory())
+			.phone(location.getPhone())
+			.placeId(location.getPlaceId())
+			.placeUrl(location.getPlaceUrl())
+			.placeName(location.getPlaceName())
+			.x(location.getX())
+			.y(location.getY())
+			.build();
 	}
 
 	public void updateLocations(LocationTriggerRequest request) {
