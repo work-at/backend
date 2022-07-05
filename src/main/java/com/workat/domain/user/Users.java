@@ -1,19 +1,16 @@
 package com.workat.domain.user;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
 
 import com.workat.domain.auth.OauthType;
-
-import com.workat.domain.user.job.DurationType;
 import com.workat.domain.user.job.DepartmentType;
+import com.workat.domain.user.job.DurationType;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,12 +19,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(indexes = @Index(columnList = "oauthId", unique = true))
-public class User {
+public class Users {
 
 	@Id
-	@Column(columnDefinition = "BINARY(16)")
-	private UUID id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
 	@Column
 	private String nickname;
@@ -35,7 +31,7 @@ public class User {
 	@Column
 	private OauthType oauthType;
 
-	@Column
+	@Column(unique = true)
 	private long oauthId;
 
 	@Enumerated(EnumType.STRING)
@@ -47,15 +43,17 @@ public class User {
 	private DurationType workingYear;
 
 	@Column
-	private float latitude;
+	private double latitude;
 
 	@Column
-	private float longitude;
+	private double longitude;
+
+	@Column
+	private String imageUrl;
 
 	@Builder
-	public User(UUID id, String nickname, OauthType oauthType, long oauthId, DepartmentType position, DurationType workingYear,
-		float latitude, float longitude) {
-		this.id = id;
+	public Users(String nickname, OauthType oauthType, long oauthId, DepartmentType position, DurationType workingYear,
+		double latitude, double longitude, String imageUrl) {
 		this.nickname = nickname;
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
@@ -63,5 +61,6 @@ public class User {
 		this.workingYear = workingYear;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.imageUrl = imageUrl;
 	}
 }
