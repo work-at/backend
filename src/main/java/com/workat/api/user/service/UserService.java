@@ -1,7 +1,5 @@
 package com.workat.api.user.service;
 
-import java.util.UUID;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,7 +7,7 @@ import com.workat.api.user.dto.SignUpRequest;
 import com.workat.api.user.repository.UserRepository;
 import com.workat.common.exception.ConflictException;
 import com.workat.domain.auth.OauthType;
-import com.workat.domain.user.User;
+import com.workat.domain.user.Users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +27,7 @@ public class UserService {
 			throw new ConflictException("user already exists");
 		});
 
-		User user = User.builder()
+		Users user = Users.builder()
 			.nickname(signUpRequest.getNickname())
 			.oauthType(OauthType.KAKAO)
 			.oauthId(oauthId)

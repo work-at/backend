@@ -7,7 +7,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -17,7 +16,7 @@ import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.MultipleDatasourceBaseTest;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.WorkerLocationRedisRepository;
-import com.workat.domain.user.User;
+import com.workat.domain.user.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
 
@@ -38,11 +37,11 @@ public class WorkChatServiceTest extends MultipleDatasourceBaseTest {
 
 	private static WorkerLocation workerLocation, workerLocation1, workerLocation2;
 
-	private static User user;
+	private static Users user;
 
 	@BeforeAll
 	void setup() {
-		user = User.builder()
+		user = Users.builder()
 			.nickname("nickname1")
 			.oauthType(OauthType.KAKAO)
 			.oauthId(12345)
