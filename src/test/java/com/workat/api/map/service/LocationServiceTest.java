@@ -1,12 +1,10 @@
 package com.workat.api.map.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -30,6 +28,7 @@ import com.workat.api.map.dto.LocationResponse;
 import com.workat.api.map.dto.LocationUpdateRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
+import com.workat.domain.config.MysqlContainerBaseTest;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.LocationHttpReceiver;
@@ -41,7 +40,7 @@ import com.workat.domain.map.repository.LocationRepository;
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 @DataJpaTest
-class LocationServiceTest {
+class LocationServiceTest extends MysqlContainerBaseTest {
 
 	private LocationService locationService;
 

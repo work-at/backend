@@ -1,7 +1,7 @@
 package com.workat.api.map.dto;
 
-import com.workat.api.user.dto.DepartmentTypeResponse;
-import com.workat.api.user.dto.DurationTypeResponse;
+import com.workat.api.user.dto.DepartmentTypeDto;
+import com.workat.api.user.dto.DurationTypeDto;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
 import lombok.AccessLevel;
@@ -16,15 +16,15 @@ public class WorkerDto {
 
 	private String imageUrl;
 
-	private DepartmentTypeResponse position;
+	private DepartmentTypeDto position;
 
-	private DurationTypeResponse workingYear;
+	private DurationTypeDto workingYear;
 
 	private WorkerDto(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
 		this.id = id;
 		this.imageUrl = imageUrl;
-		this.position = DepartmentTypeResponse.of(position.name(), position.getType());
-		this.workingYear = DurationTypeResponse.of(workingYear.name(), workingYear.getType(), workingYear.getDescription());
+		this.position = DepartmentTypeDto.of(position.name(), position.getType());
+		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType(), workingYear.getDescription());
 	}
 
 	public static WorkerDto of(Long id, String imageUrl, DepartmentType position, DurationType workingYear) {
