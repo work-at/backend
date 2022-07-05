@@ -32,6 +32,7 @@ public class Users {
 	@Column
 	private String nickname;
 
+	@Enumerated(EnumType.STRING)
 	@Column
 	private OauthType oauthType;
 
