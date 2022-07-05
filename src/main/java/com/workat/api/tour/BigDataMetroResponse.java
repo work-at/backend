@@ -3,6 +3,7 @@ package com.workat.api.tour;
 import static lombok.AccessLevel.*;
 
 import com.workat.api.tour.model.BigDataResponse;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

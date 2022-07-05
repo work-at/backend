@@ -8,23 +8,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.workat.api.review.dto.ReviewTypeListResponse;
 import com.workat.api.review.service.CollectReviewTypeService;
+
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @RestController
-public class CollectReviewEnumController {
+public class CollectReviewTypeController {
 
 	private final CollectReviewTypeService collectReviewEnumService;
 
-	@GetMapping("/cafe/review/type")
+	@GetMapping("/cafe/review-type")
 	public ResponseEntity<ReviewTypeListResponse> getCafeTypesReviewTypes() {
 		ReviewTypeListResponse response = collectReviewEnumService.collectCafeReviewTypes();
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
-	@GetMapping("/food/review/type")
+	@GetMapping("/food/review-type")
 	public ResponseEntity<ReviewTypeListResponse> getFoodReviewTypes() {
 		ReviewTypeListResponse response = collectReviewEnumService.collectFoodReviewTypes();
 

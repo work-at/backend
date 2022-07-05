@@ -29,7 +29,7 @@ public class UserController {
 	public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
 
 		final User user = userService.createUser(signUpRequest);
-		final UUID id = userService.signUp(user);
+		final long id = userService.signUp(user);
 
 		String accessToken = authorizationService.createAccessToken(id);
 

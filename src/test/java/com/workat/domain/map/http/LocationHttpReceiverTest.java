@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.workat.api.map.dto.LocationRequest;
+import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
@@ -48,10 +48,10 @@ class LocationHttpReceiverTest {
 	}
 
 	@Test
-	void getLocation() {
+	void updateLocation() {
 		//given
 		LocationCategory givenLocationCategory = LocationCategory.CAFE;
-		LocationRequest givenLocationRequest = LocationRequest.of(1.0f, 1.0f, 1, 1);
+		LocationTriggerRequest givenLocationTriggerRequest = LocationTriggerRequest.of(1.0f, 1.0f, 1);
 		List<KakaoLocalDataDto> givenDocuments = IntStream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 			.boxed()
 			.map(index -> {
@@ -80,12 +80,26 @@ class LocationHttpReceiverTest {
 			.willReturn(ResponseEntity.ok(givenResponse));
 
 		//when
-		KakaoLocalResponse response = locationHttpReceiver.getLocation(givenLocationCategory, givenLocationRequest);
+		List<KakaoLocalDataDto> response = locationHttpReceiver.updateLocations(givenLocationCategory,
+			givenLocationTriggerRequest);
 
 		//then
-		assertTrue(response.getDocuments().containsAll(givenDocuments));
-		assertEquals(response.getMeta(), givenMetaDto);
+		assertEquals(givenResponse.getDocuments().size(), response.size());
+		for (int i = 0; i < response.size(); i++) {
+			KakaoLocalDataDto given = givenDocuments.get(i);
+			KakaoLocalDataDto result = response.get(i);
 
+			assertAll(
+				() -> assertEquals(given.getId(), result.getId()),
+				() -> assertEquals(given.getPlaceName(), result.getPlaceName()),
+				() -> assertEquals(given.getPlaceUrl(), result.getPlaceUrl()),
+				() -> assertEquals(given.getX(), result.getX()),
+				() -> assertEquals(given.getY(), result.getY()),
+				() -> assertEquals(given.getPhone(), result.getPhone()),
+				() -> assertEquals(given.getAddressName(), result.getAddressName()),
+				() -> assertEquals(given.getRoadAddressName(), result.getRoadAddressName())
+			);
+		}
 	}
 
 	@Test
@@ -102,6 +116,7 @@ class LocationHttpReceiverTest {
 		roadAddress.put("sub_building_no", "4");
 		roadAddress.put("building_name", "무지개아파트");
 		roadAddress.put("zone_no", "17519");
+
 		ObjectNode address = mapper.createObjectNode();
 		address.put("address_name", "경기 안성시 죽산면 죽산리 343-1");
 		address.put("region_1depth_name", "경기");
@@ -111,31 +126,43 @@ class LocationHttpReceiverTest {
 		address.put("main_address_no", "343");
 		address.put("sub_address_no", "1");
 		address.put("zip_code", "");
+
 		ObjectNode document = mapper.createObjectNode();
 		document.set("road_address", roadAddress);
 		document.set("address", address);
+
 		ArrayNode documents = mapper.createArrayNode();
 		documents.add(document);
+
 		ObjectNode meta = mapper.createObjectNode();
 		meta.put("total_count", 1);
+
 		ObjectNode response = mapper.createObjectNode();
 		response.set("meta", meta);
 		response.set("documents", documents);
+
 		String responseString = response.toPrettyString();
 		JsonNode responseJsonNode = mapper.readTree(responseString);
 		KakaoAddressResponse kakaoResponse = mapper.treeToValue(responseJsonNode, KakaoAddressResponse.class);
+
 		given(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 			.willReturn(ResponseEntity.ok(kakaoResponse));
 
 		//when
-		KakaoAddressResponse kakaoAddressResponse = locationHttpReceiver.getAddress("127.423084873712", "37.0789561558879");
+		KakaoAddressResponse kakaoAddressResponse = locationHttpReceiver.getAddress("127.423084873712",
+			"37.0789561558879");
 
 		//then
 		Assertions.assertAll(
-			() -> Assertions.assertEquals(kakaoAddressResponse.getMeta().getTotalCount(), kakaoResponse.getMeta().getTotalCount()),
-			() -> Assertions.assertEquals(kakaoAddressResponse.getDocuments().size(), kakaoResponse.getDocuments().size()),
-			() -> Assertions.assertEquals(kakaoAddressResponse.getDocuments().get(0).getAddress().getRegion1DepthName(), kakaoResponse.getDocuments().get(0).getAddress().getRegion1DepthName()),
-			() -> Assertions.assertEquals(kakaoAddressResponse.getDocuments().get(0).getRoadAddress().getRegion2DepthName(), kakaoResponse.getDocuments().get(0).getRoadAddress().getRegion2DepthName())
+			() -> Assertions.assertEquals(kakaoAddressResponse.getMeta().getTotalCount(),
+				kakaoResponse.getMeta().getTotalCount()),
+			() -> Assertions.assertEquals(kakaoAddressResponse.getDocuments().size(),
+				kakaoResponse.getDocuments().size()),
+			() -> Assertions.assertEquals(kakaoAddressResponse.getDocuments().get(0).getAddress().getRegion1DepthName(),
+				kakaoResponse.getDocuments().get(0).getAddress().getRegion1DepthName()),
+			() -> Assertions.assertEquals(
+				kakaoAddressResponse.getDocuments().get(0).getRoadAddress().getRegion2DepthName(),
+				kakaoResponse.getDocuments().get(0).getRoadAddress().getRegion2DepthName())
 		);
 
 	}

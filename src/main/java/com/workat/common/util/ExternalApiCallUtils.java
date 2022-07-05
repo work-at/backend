@@ -25,6 +25,7 @@ import com.workat.api.tour.model.BigDataResponseHeader;
 import com.workat.api.tour.model.BigDataResponseItem;
 import com.workat.api.tour.model.BigDataResponseItems;
 import com.workat.common.exception.InternalServerException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

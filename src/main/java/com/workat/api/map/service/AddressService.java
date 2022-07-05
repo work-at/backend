@@ -12,6 +12,7 @@ import com.workat.domain.map.http.dto.KakaoAddressDocumentDto;
 import com.workat.domain.map.http.dto.KakaoAddressDto;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.repository.WorkerLocationRedisRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +25,7 @@ public class AddressService {
 
 	private final WorkerLocationRedisRepository workerLocationRedisRepository;
 
-	public void saveAddress(String userId, String longitude, String latitude) {
+	public void saveAddress(Long userId, String longitude, String latitude) {
 		KakaoAddressResponse response = locationHttpReceiver.getAddress(longitude, latitude);
 
 		if (response.getMeta().getTotalCount() == 0) {

@@ -15,20 +15,20 @@ import lombok.NoArgsConstructor;
 public class WorkerLocation {
 
 	@Id
-	private String userId;
+	private Long userId;
 
 	@GeoIndexed
 	private Point location;
 
 	private String address;
 
-	private WorkerLocation(String userId, String longitude, String latitude, String address) {
+	private WorkerLocation(Long userId, String longitude, String latitude, String address) {
 		this.userId = userId;
 		this.location = new Point(Double.parseDouble(longitude), Double.parseDouble(latitude));
 		this.address = address;
 	}
 
-	public static WorkerLocation of(String userId, String longitude, String latitude, String address) {
+	public static WorkerLocation of(Long userId, String longitude, String latitude, String address) {
 		return new WorkerLocation(userId, longitude, latitude, address);
 	}
 }

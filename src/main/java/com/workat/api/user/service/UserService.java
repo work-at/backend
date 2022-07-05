@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.workat.api.user.dto.SignUpRequest;
+import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.common.exception.ConflictException;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.user.entity.User;
@@ -54,7 +54,7 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<User> validateUserExistWithId(UUID id) {
+	public Optional<User> validateUserExistWithId(long id) {
 		// id 로 가입된 유저 있는지 확인
 		return userRepository.findById(id);
 	}
