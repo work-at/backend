@@ -14,7 +14,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import com.workat.api.auth.dto.KakaoOauthTokenInfoResponse;
 import com.workat.api.jwt.service.JwtService;
 import com.workat.api.user.service.UserService;
-import com.workat.common.exception.NotFoundException;
 import com.workat.common.exception.UnAuthorizedException;
 import com.workat.domain.user.entity.User;
 
@@ -45,13 +44,16 @@ public class UserValidationArgumentResolver implements HandlerMethodArgumentReso
 
 		final String jwt = parseTokenFromHeader();
 
+		if (jwtService.isTokenExpired(jwt)) {
+			throw new UnAuthorizedException("Access token is expired");
+		}
+
 		final UUID id = extractIdFromJWT(jwt);
 
-		final User user = userService
-			.validateUserExistWithId(id)
-			.orElseThrow(() -> {
-				throw new NotFoundException("User does not exist");
-			});
+		final User user = userService.validateUserExistWithId(id)
+									 .orElseThrow(() -> {
+										 throw new UnAuthorizedException("Please login again");
+									 });
 
 		return user;
 	}
