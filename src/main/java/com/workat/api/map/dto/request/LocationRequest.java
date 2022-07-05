@@ -1,4 +1,4 @@
-package com.workat.api.map.dto;
+package com.workat.api.map.dto.request;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,11 +9,8 @@ import lombok.NoArgsConstructor;
 public class LocationRequest {
 
 	private double x;
-
 	private double y;
-
 	private int radius;
-
 	private int page;
 
 	public static LocationRequest of(double x, double y, int radius, int page) {

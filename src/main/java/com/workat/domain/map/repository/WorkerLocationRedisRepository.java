@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
-
 import org.springframework.data.repository.CrudRepository;
 
 import com.workat.domain.map.entity.WorkerLocation;

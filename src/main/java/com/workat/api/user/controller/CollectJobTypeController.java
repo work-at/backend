@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.workat.api.user.dto.JobTypeListResponse;
+import com.workat.api.user.dto.response.JobTypeListResponse;
 import com.workat.api.user.service.CollectJobTypeService;
+
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/api/v1")

@@ -7,11 +7,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.workat.api.user.dto.DepartmentTypeDto;
-import com.workat.api.user.dto.JobTypeListResponse;
 import com.workat.api.user.dto.DurationTypeDto;
 import com.workat.api.user.dto.JobTypeDto;
-import com.workat.domain.user.job.DurationType;
+import com.workat.api.user.dto.response.JobTypeListResponse;
 import com.workat.domain.user.job.DepartmentType;
+import com.workat.domain.user.job.DurationType;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

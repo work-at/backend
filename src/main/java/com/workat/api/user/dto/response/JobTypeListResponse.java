@@ -1,6 +1,8 @@
-package com.workat.api.user.dto;
+package com.workat.api.user.dto.response;
 
 import java.util.List;
+
+import com.workat.api.user.dto.JobTypeDto;
 
 import lombok.AccessLevel;
 import lombok.Getter;

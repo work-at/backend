@@ -1,6 +1,8 @@
-package com.workat.api.map.dto;
+package com.workat.api.map.dto.response;
 
 import java.util.List;
+
+import com.workat.api.map.dto.WorkerDto;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,13 +12,13 @@ import lombok.NoArgsConstructor;
 @Getter
 public class WorkerListResponse {
 
-	private List<WorkerResponse> response;
+	private List<WorkerDto> response;
 
-	private WorkerListResponse(List<WorkerResponse> response) {
+	private WorkerListResponse(List<WorkerDto> response) {
 		this.response = response;
 	}
 
-	public static WorkerListResponse of(List<WorkerResponse> response) {
+	public static WorkerListResponse of(List<WorkerDto> response) {
 		return new WorkerListResponse(response);
 	}
 }

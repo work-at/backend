@@ -22,10 +22,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
-import com.workat.api.map.dto.LocationDto;
-import com.workat.api.map.dto.LocationRequest;
-import com.workat.api.map.dto.LocationResponse;
-import com.workat.api.map.dto.LocationUpdateRequest;
+import com.workat.api.map.dto.MapLocationDto;
+import com.workat.api.map.dto.request.LocationRequest;
+import com.workat.api.map.dto.request.LocationTriggerRequest;
+import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.config.MysqlContainerBaseTest;
@@ -66,7 +66,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertThrows(BadRequestException.class,
-			() -> locationService.getLocations("", LocationRequest.of(1.0, 1.0, 1, 1)));
+			() -> locationService.getLocations(null, LocationRequest.of(1.0, 1.0, 1, 1)));
 	}
 
 	@Test
@@ -77,7 +77,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertThrows(NotFoundException.class,
-			() -> locationService.getLocations("cafe", LocationRequest.of(1.0, 1.0, 1, 1)));
+			() -> locationService.getLocations(LocationCategory.CAFE, LocationRequest.of(1.0, 1.0, 1, 1)));
 	}
 
 	@Test
@@ -88,7 +88,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertThrows(NotFoundException.class,
-			() -> locationService.getLocations("food", LocationRequest.of(1.0, 1.0, 1, 1)));
+			() -> locationService.getLocations(LocationCategory.RESTAURANT, LocationRequest.of(1.0, 1.0, 1, 1)));
 	}
 
 	@Test
@@ -122,9 +122,9 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		LocationRequest givenRequest = LocationRequest.of(1.0, 1.0, 1, 1);
 
 		//when
-		LocationResponse response = locationService.getLocations("cafe", givenRequest);
-		List<LocationDto> givenDtos = givenLocations.stream()
-			.map(location -> LocationDto.builder()
+		LocationResponse response = locationService.getLocations(LocationCategory.CAFE, givenRequest);
+		List<MapLocationDto> givenDtos = givenLocations.stream()
+			.map(location -> MapLocationDto.builder()
 				.id(location.getId())
 				.category(location.getCategory())
 				.phone(location.getPhone())
@@ -139,8 +139,8 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		//then
 		assertEquals(givenSize, response.getLocations().size());
 		for(int i=0; i<givenSize; i++) {
-			LocationDto given = givenDtos.get(i);
-			LocationDto result = response.getLocations().get(i);
+			MapLocationDto given = givenDtos.get(i);
+			MapLocationDto result = response.getLocations().get(i);
 
 			assertAll(
 				() -> assertEquals(given.getId(), result.getId()),
@@ -158,7 +158,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	@Test
 	void updateLocations_success() {
 		//given
-		LocationUpdateRequest request = LocationUpdateRequest.of(1.0, 1.0, 1);
+		LocationTriggerRequest request = LocationTriggerRequest.of(1.0, 1.0, 1);
 
 		List<KakaoLocalDataDto> givenDocuments = IntStream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 			.boxed()
