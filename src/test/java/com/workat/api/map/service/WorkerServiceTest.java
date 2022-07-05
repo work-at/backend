@@ -42,7 +42,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		user = Users.builder()
 			.nickname("nickname1")
 			.oauthType(OauthType.KAKAO)
-			.oauthId(12345)
+			.oauthId(12345L)
 			.position(DepartmentType.ACCOUNTANT)
 			.workingYear(DurationType.JUNIOR)
 			.longitude(127.423084873712)
