@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @Getter
 public class WorkerListResponse {
 
-	private List<WorkerDto> response;
+	private List<WorkerResponse> response;
 
-	private WorkerListResponse(List<WorkerDto> response) {
+	private WorkerListResponse(List<WorkerResponse> response) {
 		this.response = response;
 	}
 
-	public static WorkerListResponse of(List<WorkerDto> response) {
+	public static WorkerListResponse of(List<WorkerResponse> response) {
 		return new WorkerListResponse(response);
 	}
 }

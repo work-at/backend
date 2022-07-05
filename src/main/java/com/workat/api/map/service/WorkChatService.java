@@ -10,10 +10,14 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 
+import com.workat.api.map.dto.WorkerDetailResponse;
 import com.workat.api.map.dto.WorkerListResponse;
-import com.workat.api.map.dto.WorkerDto;
+import com.workat.api.map.dto.WorkerResponse;
 import com.workat.api.user.repository.UserRepository;
+import com.workat.common.exception.NotFoundException;
+
 import com.workat.domain.map.repository.WorkerLocationRedisRepository;
+import com.workat.domain.user.Users;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,14 +36,24 @@ public class WorkChatService {
 
 	public WorkerListResponse findAllWorkerByLocationNear(double longitude, double latitude, double kilometer) {
 		// TODO: 토큰을 통해 본인 아이디 != WorkerLocation.getUserId() 인 값만 필터링
-		List<WorkerDto> list = workerLocationRedisRepository.findAllByLocationNear(new Point(longitude, latitude), new Distance(kilometer, KILOMETERS))
+		List<WorkerResponse> list = workerLocationRedisRepository.findAllByLocationNear(new Point(longitude, latitude), new Distance(kilometer, KILOMETERS))
 			.stream()
 			.map(workerLocation -> userRepository.findById(workerLocation.getUserId()))
 			.filter(Optional::isPresent)
 			.map(Optional::get)
-			.map(user -> WorkerDto.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear()))
+			.map(user -> WorkerResponse.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear()))
 			.collect(Collectors.toList());
 
 		return WorkerListResponse.of(list);
+	}
+
+	public WorkerDetailResponse findWorkerDetailById(Long userId) {
+		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
+		return WorkerDetailResponse.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear(), user.getStory());
+	}
+
+	public WorkerResponse findWorkerById(Long userId) {
+		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
+		return WorkerResponse.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear());
 	}
 }

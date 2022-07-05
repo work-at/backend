@@ -13,14 +13,13 @@ import com.workat.api.auth.service.KakaoOauthService;
 
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/api")
 @RequiredArgsConstructor
 @RestController
 public class AuthorizationController {
 
 	private final KakaoOauthService kakaoOauthService;
 
-	@PostMapping("/v1/auth/token")
+	@PostMapping("/api/v1/auth/token")
 	public ResponseEntity<KakaoOauthAccessTokenDto> issueToken(@RequestBody KakaoOauthTokenRequest request) {
 		KakaoOauthAccessTokenDto data = kakaoOauthService.getAccessToken(request.getCode());
 
