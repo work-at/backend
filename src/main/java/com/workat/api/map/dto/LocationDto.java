@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class MapLocationDto {
+public class LocationDto {
 
 	private long id;
 
@@ -28,7 +28,7 @@ public class MapLocationDto {
 	private double y;
 
 	@Builder
-	public MapLocationDto(long id, LocationCategory category, String placeId, String placeName, String placeUrl,
+	public LocationDto(long id, LocationCategory category, String placeId, String placeName, String placeUrl,
 		String phone, double x, double y) {
 		this.id = id;
 		this.category = category;
