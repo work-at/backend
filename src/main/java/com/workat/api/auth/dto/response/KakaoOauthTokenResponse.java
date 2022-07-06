@@ -1,4 +1,4 @@
-package com.workat.api.auth.dto;
+package com.workat.api.auth.dto.response;
 
 import static lombok.AccessLevel.*;
 
