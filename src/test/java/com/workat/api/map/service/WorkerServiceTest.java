@@ -63,8 +63,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		WorkerListResponse response = workerService.findAllWorkerByLocationNear(127.423084873712, 37.0789561558879,
-			5);
+		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, 5);
 
 		//then
 		Assertions.assertEquals(response.getResponse().size(), 1);
