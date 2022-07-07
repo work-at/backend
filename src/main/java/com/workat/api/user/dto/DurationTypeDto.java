@@ -12,15 +12,12 @@ public class DurationTypeDto implements JobTypeDto {
 
 	String content;
 
-	String description;
-
-	private DurationTypeDto(String name, String content, String description) {
+	private DurationTypeDto(String name, String content) {
 		this.name = name;
 		this.content = content;
-		this.description = description;
 	}
 
-	public static DurationTypeDto of(String name, String content, String description) {
-		return new DurationTypeDto(name, content, description);
+	public static DurationTypeDto of(String name, String content) {
+		return new DurationTypeDto(name, content);
 	}
 }

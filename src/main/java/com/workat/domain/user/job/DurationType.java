@@ -2,24 +2,18 @@ package com.workat.domain.user.job;
 
 public enum DurationType {
 
-	JUNIOR("주니어", "1~4년"),
+	JUNIOR("주니어(1~4년)"),
 
-	MID_LEVEL("미드레벨", "5~8년"),
+	MID_LEVEL("미드레벨(5~8년)"),
 
-	SENIOR("시니어", "9~12년"),
+	SENIOR("시니어(9~12년)"),
 
-	OVER("그 이상", "12년 이상");
+	OVER("그 이상(12년 이상)");
 
 	private String type;
-	private String description;
 
-	DurationType(String type, String description) {
+	DurationType(String type) {
 		this.type = type;
-		this.description = description;
-	}
-
-	public String getDescription() {
-		return description;
 	}
 
 	public String getType() {

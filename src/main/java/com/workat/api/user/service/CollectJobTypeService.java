@@ -31,7 +31,7 @@ public class CollectJobTypeService {
 
 	public JobTypeListResponse collectDurationTypes() {
 		List<JobTypeDto> list = Arrays.stream(DurationType.values())
-			.map(jobType -> DurationTypeDto.of(jobType.name(), jobType.getType(), jobType.getDescription()))
+			.map(jobType -> DurationTypeDto.of(jobType.name(), jobType.getType()))
 			.collect(Collectors.toList());
 
 		return JobTypeListResponse.of(list);
