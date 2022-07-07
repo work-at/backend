@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.workat.api.map.dto.WorkerDto;
 import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.service.WorkerService;
-
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 
+@Api(tags = "워케이셔너 api")
 @RequiredArgsConstructor
 @RestController
 public class WorkerController {

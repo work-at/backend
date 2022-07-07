@@ -2,6 +2,10 @@ package com.workat.api.map.service;
 
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,10 +19,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.workat.api.map.dto.request.NearWorkerCountRequest;
+import com.workat.api.map.dto.response.NearWorkerCountResponse;
+import com.workat.domain.auth.OauthType;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.repository.WorkerLocationRedisRepository;
+import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.job.DepartmentType;
+import com.workat.domain.user.job.DurationType;
 
 @ExtendWith(MockitoExtension.class)
 public class AddressServiceTest {
@@ -71,6 +81,37 @@ public class AddressServiceTest {
 	}
 
 	@Test
+	void countWorkerByLocationNear() throws JsonProcessingException {
+		//given
+		Users user = Users.builder()
+			.nickname("nickname1")
+			.oauthType(OauthType.KAKAO)
+			.oauthId(12345L)
+			.position(DepartmentType.ACCOUNTANT)
+			.workingYear(DurationType.JUNIOR)
+			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
+			.build();
+		WorkerLocation workerLocation = WorkerLocation.of(user.getId(), "127.423084873712", "37.0789561558879", "경기 안성시 죽산면 죽산리");
+		Mockito.when(workerLocationRedisRepository.findById(user.getId())).thenReturn(Optional.of(workerLocation));
+
+		String responseString = response.toPrettyString();
+		JsonNode responseJsonNode = mapper.readTree(responseString);
+		KakaoAddressResponse kakaoResponse = mapper.treeToValue(responseJsonNode, KakaoAddressResponse.class);
+		Mockito.when(locationHttpReceiver.getAddress("127.423084873712", "37.0789561558879")).thenReturn(kakaoResponse);
+		Mockito.when(workerLocationRedisRepository.save(any())).thenReturn(workerLocation);
+		Mockito.when(workerLocationRedisRepository.findAllByLocationNear(any(), any())).thenReturn(List.of(workerLocation));
+
+		//when
+		NearWorkerCountResponse response = addressService.getAddressAndNearWorkerCount(user, NearWorkerCountRequest.of("127.423084873712", "37.0789561558879", 5.0));
+
+		//then
+		Assertions.assertAll(
+			() -> Assertions.assertEquals(response.getAddress(), "경기 안성시 죽산면 죽산리"),
+			() -> Assertions.assertEquals(response.getCount(), 0)
+		);
+	}
+
+	@Test
 	void testSaveAddress() throws JsonProcessingException {
 		//given
 		WorkerLocation workerLocation = WorkerLocation.of(123L, "127.423084873712", "37.0789561558879", "경기 안성시 죽산면 죽산리");
@@ -85,6 +126,5 @@ public class AddressServiceTest {
 
 		//then
 		verify(workerLocationRedisRepository, times(1)).save(any());
-
 	}
 }

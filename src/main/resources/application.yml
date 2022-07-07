@@ -2,6 +2,22 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: password
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 50
+      pool-name: pool-work-at
+  redis:
+    host: localhost
+    port: 6379
+    password: password
 
 external:
   kakaoOauth:
@@ -11,7 +27,7 @@ external:
       "2scFfN6uVjhuRcXrj1DgGjslYn0wYJc7kvCOHHwOI/0kr1sjf2OqLLjq5SvCt3jKyr4JPHr/K3QGuXhvv6HYlQ=="
 
 jwt:
-  secret: JWT_SECRET_KEY
+  secret: But_man_is_not_made_for_defeat,_A_man_can_be_destroyed_but_not_defeated
 
 restTemplate:
   factory:

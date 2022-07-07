@@ -17,7 +17,6 @@ import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.repository.WorkerLocationRedisRepository;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,17 +29,12 @@ public class WorkerService {
 
 	private final UserRepository userRepository;
 
-	public int countWorkerByLocationNear(double longitude, double latitude, double kilometer) {
-		return workerLocationRedisRepository.findAllByLocationNear(new Point(longitude, latitude),
-			new Distance(kilometer, KILOMETERS)).size();
-	}
-
 	public WorkerListResponse findAllWorkerByLocationNear(double longitude, double latitude, double kilometer) {
 		// TODO: 토큰을 통해 본인 아이디 != WorkerLocation.getUserId() 인 값만 필터링
 		List<WorkerDto> list = workerLocationRedisRepository.findAllByLocationNear(new Point(longitude, latitude),
-				new Distance(kilometer, KILOMETERS))
+			new Distance(kilometer, KILOMETERS))
 			.stream()
-			.map(workerLocation -> userRepository.findById(workerLocation.getUserId()))
+			.map(workerLocation -> userRepository.findById(Long.parseLong(workerLocation.getUserId())))
 			.filter(Optional::isPresent)
 			.map(Optional::get)
 			.map(user -> WorkerDto.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear()))
