@@ -47,12 +47,6 @@ public class Users {
 	@Column
 	private DurationType workingYear;
 
-	@Column
-	private double latitude;
-
-	@Column
-	private double longitude;
-
 	// TODO: image 와 자기소개는 마이페이지에서 수정한다고 생각하고 일단 진행함
 
 	@Column
@@ -63,14 +57,12 @@ public class Users {
 
 	@Builder
 	public Users(String nickname, OauthType oauthType, Long oauthId, DepartmentType position, DurationType workingYear,
-		double latitude, double longitude, String imageUrl, String story) {
+		String imageUrl, String story) {
 		this.nickname = nickname;
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
 		this.position = position;
 		this.workingYear = workingYear;
-		this.latitude = latitude;
-		this.longitude = longitude;
 		this.imageUrl = imageUrl;
 		this.story = story;
 	}
