@@ -24,10 +24,11 @@ public class AddressController {
 
 	private final AddressService addressService;
 
-	@ApiOperation(value = "로그인한 사용자의 비밀번호 수정", authorizations = {@Authorization(value = "JWT 토큰")})
+	@ApiOperation(value = "getAddressAndNearWorkerCount", notes = "맵 첫 진입 시 유저 주소 반환 및 주위 워케이셔너 수 반환", authorizations = {@Authorization(value = "JWT 토큰")})
 	@PostMapping("/api/v1/map")
 	public ResponseEntity<NearWorkerCountResponse> getAddressAndNearWorkerCount(@UserValidation Users user, @RequestBody NearWorkerCountRequest request) {
 		NearWorkerCountResponse response = addressService.getAddressAndNearWorkerCount(user, request);
 		return ResponseEntity.ok(response);
 	}
+
 }
