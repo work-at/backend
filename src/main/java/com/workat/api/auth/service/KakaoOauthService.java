@@ -11,8 +11,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import com.workat.api.auth.dto.KakaoOauthTokenInfoResponse;
-import com.workat.api.auth.dto.KakaoOauthTokenResponse;
+import com.workat.api.auth.dto.response.KakaoOauthTokenInfoResponse;
+import com.workat.api.auth.dto.response.KakaoOauthTokenResponse;
 import com.workat.common.exception.InternalServerException;
 import com.workat.common.exception.base.BusinessException;
 
