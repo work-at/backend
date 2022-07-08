@@ -37,7 +37,7 @@ public class UserController {
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@ApiOperation(value = "isUserNicknameExists", notes = "유저 닉네임 확인, true=이미존재/false=닉네임가능")
-	@GetMapping("/api/v1/user")
+	@GetMapping("/api/v1/user/validation")
 	public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
 		boolean response = userService.isUserNicknameExists(nickname);
 		return ResponseEntity.ok(response);
