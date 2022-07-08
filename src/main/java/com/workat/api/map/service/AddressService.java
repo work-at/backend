@@ -32,7 +32,7 @@ public class AddressService {
 	private final WorkerLocationRedisRepository workerLocationRedisRepository;
 
 	public NearWorkerCountResponse getAddressAndNearWorkerCount(Users user, NearWorkerCountRequest request) {
-		saveAddress(user.getId(), request.getLongitude(), request.getLatitude());
+		getAddressAndSave(user.getId(), request.getLongitude(), request.getLatitude());
 
 		WorkerLocation worker = workerLocationRedisRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
 		int count = workerLocationRedisRepository.findAllByLocationNear(worker.getLocation(), new Distance(request.getKilometer(), KILOMETERS)).size();
@@ -41,9 +41,8 @@ public class AddressService {
 		return NearWorkerCountResponse.of(worker.getAddress(), count);
 	}
 
-	public void saveAddress(Long userId, String longitude, String latitude) {
+	private void getAddressAndSave(Long userId, String longitude, String latitude) {
 		KakaoAddressResponse response = locationHttpReceiver.getAddress(longitude, latitude);
-
 		if (response.getMeta().getTotalCount() == 0) {
 			throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "위도 경도를 주소로 바꿀 수 없습니다.");
 		}

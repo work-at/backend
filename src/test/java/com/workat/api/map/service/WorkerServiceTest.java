@@ -1,13 +1,14 @@
 package com.workat.api.map.service;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.workat.api.map.dto.WorkerDto;
@@ -23,13 +24,13 @@ import com.workat.domain.user.job.DurationType;
 import com.workat.domain.user.repository.UserRepository;
 
 @ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 
 	private static WorkerLocation workerLocation, workerLocation1, workerLocation2;
 	private static Users user;
+
 	@Autowired
 	private WorkerLocationRedisRepository workerLocationRedisRepository;
 	@Autowired
@@ -48,6 +49,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
 		userRepository.save(user);
+		System.out.println("!!!!!!!!!!!!!"+user.getId());
 
 		workerLocation = WorkerLocation.of(user.getId(), String.valueOf(127.423084873712),
 			String.valueOf(37.0789561558879), "경기 안성시 죽산면 죽산리");
@@ -56,6 +58,12 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		workerLocationRedisRepository.save(workerLocation);
 		workerLocationRedisRepository.save(workerLocation1);
 		workerLocationRedisRepository.save(workerLocation2);
+	}
+
+	@AfterAll
+	void teardown() {
+		userRepository.deleteAll();
+		workerLocationRedisRepository.deleteAll();
 	}
 
 	@Test

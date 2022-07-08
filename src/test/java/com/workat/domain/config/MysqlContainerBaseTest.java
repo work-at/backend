@@ -1,9 +1,11 @@
 package com.workat.domain.config;
 
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class MysqlContainerBaseTest {
 	static final String MYSQL_IMAGE = "mysql:5.7.37";
 	static final MySQLContainer<?> MYSQL_CONTAINER;
