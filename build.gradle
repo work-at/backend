@@ -23,8 +23,6 @@ editorconfig {
     excludes = ['build']
 }
 
-check.dependsOn editorconfigCheck
-
 dependencies {
     //Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
