@@ -12,7 +12,7 @@ import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.common.exception.ConflictException;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.user.entity.Users;
-import com.workat.domain.user.repository.UserRepository;
+import com.workat.domain.user.repository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UserService {
 
-	private final UserRepository userRepository;
+	private final UsersRepository userRepository;
 
 	private final AuthorizationService authorizationService;
 

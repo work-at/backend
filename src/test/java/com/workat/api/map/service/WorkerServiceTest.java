@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.workat.api.map.dto.WorkerDto;
@@ -21,7 +20,7 @@ import com.workat.domain.map.repository.WorkerLocationRedisRepository;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
-import com.workat.domain.user.repository.UserRepository;
+import com.workat.domain.user.repository.UsersRepository;
 
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
@@ -34,7 +33,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 	@Autowired
 	private WorkerLocationRedisRepository workerLocationRedisRepository;
 	@Autowired
-	private UserRepository userRepository;
+	private UsersRepository userRepository;
 	@Autowired
 	private WorkerService workerService;
 

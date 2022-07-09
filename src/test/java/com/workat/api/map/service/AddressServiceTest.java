@@ -29,7 +29,7 @@ import com.workat.domain.map.repository.WorkerLocationRedisRepository;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
-import com.workat.domain.user.repository.UserRepository;
+import com.workat.domain.user.repository.UsersRepository;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -38,7 +38,7 @@ import com.workat.domain.user.repository.UserRepository;
 public class AddressServiceTest extends MultipleDatasourceBaseTest {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UsersRepository userRepository;
 
 	@Autowired
 	private WorkerLocationRedisRepository workerLocationRedisRepository;
