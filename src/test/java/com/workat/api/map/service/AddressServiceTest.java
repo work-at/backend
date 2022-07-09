@@ -1,14 +1,10 @@
 package com.workat.api.map.service;
 
-import static org.mockito.BDDMockito.*;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -99,7 +95,7 @@ public class AddressServiceTest extends MultipleDatasourceBaseTest {
 		this.addressService = new AddressService(locationHttpReceiver, workerLocationRedisRepository);
 
 		user = Users.builder()
-			.nickname("nickname1")
+			.nickname("nickname")
 			.oauthType(OauthType.KAKAO)
 			.oauthId(12345L)
 			.position(DepartmentType.ACCOUNTANT)
