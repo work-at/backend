@@ -17,7 +17,7 @@ public class SignUpRequest {
 	@ApiModelProperty(name = "oauthType", notes = "oauth 로그인 타입", example = "\"KAKAO\"")
 	private OauthType oauthType;
 
-	@ApiModelProperty(name = "ouathId", notes = "카카오 유저 식별자", example = "2329023349")
+	@ApiModelProperty(name = "oauthId", notes = "카카오 유저 식별자", example = "2329023349")
 	private long oauthId;
 
 	@ApiModelProperty(name = "nickname", notes = "유저 닉네임", example = "\"나는스벅라떼좋아\"")
