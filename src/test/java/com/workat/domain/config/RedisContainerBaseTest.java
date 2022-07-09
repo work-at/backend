@@ -1,9 +1,11 @@
 package com.workat.domain.config;
 
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class RedisContainerBaseTest {
 	static final String REDIS_IMAGE = "redis:6-alpine";
 	static final GenericContainer REDIS_CONTAINER;

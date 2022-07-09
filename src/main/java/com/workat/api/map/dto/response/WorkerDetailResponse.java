@@ -28,7 +28,7 @@ public class WorkerDetailResponse {
 		this.id = id;
 		this.imageUrl = imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
-		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType(), workingYear.getDescription());
+		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
 		this.story = story;
 	}
 

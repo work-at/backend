@@ -26,7 +26,7 @@ public class SignUpRequest {
 	@ApiModelProperty(name = "position", notes = "직무 타입", example = "\"IT_ENGINEER\"")
 	private DepartmentType position;
 
-	@ApiModelProperty(name = "workingYear", notes = "연차 타입", example = "\"주니어\"")
+	@ApiModelProperty(name = "workingYear", notes = "연차 타입", example = "\"JUNIOR\"")
 	private DurationType workingYear;
 
 	public SignUpRequest(OauthType oauthType, long oauthId, String nickname, DepartmentType position,

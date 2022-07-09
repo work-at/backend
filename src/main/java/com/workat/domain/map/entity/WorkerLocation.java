@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class WorkerLocation {
 
 	@Id
-	private Long userId;
+	private String userId;
 
 	@GeoIndexed
 	private Point location;
@@ -23,7 +23,7 @@ public class WorkerLocation {
 	private String address;
 
 	private WorkerLocation(Long userId, String longitude, String latitude, String address) {
-		this.userId = userId;
+		this.userId = String.valueOf(userId);
 		this.location = new Point(Double.parseDouble(longitude), Double.parseDouble(latitude));
 		this.address = address;
 	}

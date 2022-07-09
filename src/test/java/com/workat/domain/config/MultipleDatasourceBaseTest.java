@@ -1,11 +1,13 @@
 package com.workat.domain.config;
 
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Testcontainers
 public class MultipleDatasourceBaseTest {
 	static final String MYSQL_IMAGE = "mysql:5.7.37";
