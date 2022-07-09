@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.geo.Distance;
-import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 
 import com.workat.api.map.dto.WorkerDto;
@@ -17,7 +16,7 @@ import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.WorkerLocationRedisRepository;
 import com.workat.domain.user.entity.Users;
-import com.workat.domain.user.repository.UserRepository;
+import com.workat.domain.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +27,7 @@ public class WorkerService {
 
 	private final WorkerLocationRedisRepository workerLocationRedisRepository;
 
-	private final UserRepository userRepository;
+	private final UsersRepository userRepository;
 
 	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer) {
 		// TODO: 토큰을 통해 본인 아이디 != WorkerLocation.getUserId() 인 값만 필터링
