@@ -67,6 +67,11 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
+	public boolean isUserNicknameExists(String nickname) {
+		return userRepository.findFirstByNickname(nickname).isPresent();
+	}
+
+	@Transactional(readOnly = true)
 	public boolean validateUserExistWithOauthId(OauthType oauthType, long oauthId) {
 		// ouath id 로 가입된 유저 있는지 확인
 		final Optional<Users> usersOptional = userRepository.findByOauthTypeAndOauthId(oauthType, oauthId);
@@ -76,12 +81,12 @@ public class UserService {
 
 	private Users convertUser(SignUpRequest signUpRequest) {
 		return Users.builder()
-					.oauthType(signUpRequest.getOauthType())
-					.oauthId(signUpRequest.getOauthId())
-					.nickname(signUpRequest.getNickname())
-					.position(signUpRequest.getPosition())
-					.workingYear(signUpRequest.getWorkingYear())
-					.build();
+			.oauthType(signUpRequest.getOauthType())
+			.oauthId(signUpRequest.getOauthId())
+			.nickname(signUpRequest.getNickname())
+			.position(signUpRequest.getPosition())
+			.workingYear(signUpRequest.getWorkingYear())
+			.build();
 	}
 
 }

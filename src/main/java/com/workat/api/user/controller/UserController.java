@@ -2,8 +2,10 @@ package com.workat.api.user.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,5 +33,13 @@ public class UserController {
 	public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
 		SignUpResponse signUpResponse = userService.signUp(signUpRequest);
 		return ResponseEntity.ok(signUpResponse);
+	}
+
+	@ResponseStatus(value = HttpStatus.OK)
+	@ApiOperation(value = "isUserNicknameExists", notes = "유저 닉네임 확인, true=이미존재/false=닉네임가능")
+	@GetMapping("/api/v1/user/validation")
+	public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
+		boolean response = userService.isUserNicknameExists(nickname);
+		return ResponseEntity.ok(response);
 	}
 }

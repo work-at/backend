@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.user.job.DepartmentType;
@@ -29,7 +31,9 @@ public class Users {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column
+	@NotNull
+	@Pattern(regexp = "^[가-힣|a-z|A-Z|0-9|]{2,8}$")
+	@Column(unique = true)
 	private String nickname;
 
 	@Enumerated(EnumType.STRING)

@@ -41,7 +41,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 	@BeforeAll
 	void setup() {
 		user = Users.builder()
-			.nickname("nickname1")
+			.nickname("nickname")
 			.oauthType(OauthType.KAKAO)
 			.oauthId(12345L)
 			.position(DepartmentType.ACCOUNTANT)
