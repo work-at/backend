@@ -49,7 +49,6 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
 		userRepository.save(user);
-		System.out.println("!!!!!!!!!!!!!"+user.getId());
 
 		workerLocation = WorkerLocation.of(user.getId(), String.valueOf(127.423084873712),
 			String.valueOf(37.0789561558879), "경기 안성시 죽산면 죽산리");
