@@ -18,12 +18,12 @@ public class AuthResponse {
 	@ApiModelProperty(name = "accessToken", notes = "카카오 토큰", example = "AMIoqoP83hO99P3aI8lnxA74ffgx4iQUr0dgEQirCilwEwAAAYHPFZGB")
 	private String accessToken;
 
-	@ApiModelProperty(name = "ouathId", notes = "카카오 유저 식별자", example = "2329023349")
-	private long ouathId;
+	@ApiModelProperty(name = "oauthId", notes = "카카오 유저 식별자", example = "2329023349")
+	private long oauthId;
 
-	private AuthResponse(AuthCode code, long ouathId) {
+	private AuthResponse(AuthCode code, long oauthId) {
 		this.code = code;
-		this.ouathId = ouathId;
+		this.oauthId = oauthId;
 	}
 
 	private AuthResponse(AuthCode code, String accessToken) {
@@ -35,8 +35,8 @@ public class AuthResponse {
 		return new AuthResponse(AuthCode.WORK01, accessToken);
 	}
 
-	public static AuthResponse ResponseForSignup(long ouathId) {
-		return new AuthResponse(AuthCode.WORK02, ouathId);
+	public static AuthResponse ResponseForSignup(long oauthId) {
+		return new AuthResponse(AuthCode.WORK02, oauthId);
 	}
 
 }
