@@ -35,8 +35,8 @@ public class WorkerController {
 	}
 
 	@GetMapping("/api/v1/map/workers")
-	public ResponseEntity<WorkerListResponse> findNearWorker(@UserValidation Users user, @RequestParam double kilometer) {
-		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, kilometer);
+	public ResponseEntity<WorkerListResponse> findNearWorker(@UserValidation Users user, @RequestParam(defaultValue = "5.0") double kilometer, @RequestParam(defaultValue = "false") boolean metaOnly) {
+		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, kilometer, metaOnly);
 		return ResponseEntity.ok(response);
 	}
 }

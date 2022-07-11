@@ -29,20 +29,26 @@ public class WorkerService {
 
 	private final UsersRepository userRepository;
 
-	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer) {
-		// TODO: 토큰을 통해 본인 아이디 != WorkerLocation.getUserId() 인 값만 필터링
+	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer, boolean metaOnly) {
 		WorkerLocation userLocation = workerLocationRedisRepository.findById(user.getId())
 			.orElseThrow(() -> new NotFoundException("user need to update address"));
 
-		List<WorkerDto> list = workerLocationRedisRepository.findAllByLocationNear(userLocation.getLocation(), new Distance(kilometer, KILOMETERS))
+		List<WorkerLocation> workerLocations = workerLocationRedisRepository.findAllByLocationNear(userLocation.getLocation(), new Distance(kilometer, KILOMETERS));
+
+		if (metaOnly) {
+			return WorkerListResponse.metaDataOf(Math.max(workerLocations.size() - 1, 0));
+		}
+
+		List<WorkerDto> workerDtos = workerLocations
 			.stream()
+			.filter(workerLocation -> user.getId() != Long.parseLong(workerLocation.getUserId()))
 			.map(workerLocation -> userRepository.findById(Long.parseLong(workerLocation.getUserId())))
 			.filter(Optional::isPresent)
 			.map(Optional::get)
 			.map(worker -> WorkerDto.of(worker.getId(), worker.getImageUrl(), worker.getPosition(), worker.getWorkingYear()))
 			.collect(Collectors.toList());
 
-		return WorkerListResponse.of(list);
+		return WorkerListResponse.of(workerDtos);
 	}
 
 	public WorkerDetailResponse findWorkerDetailById(Long userId) {

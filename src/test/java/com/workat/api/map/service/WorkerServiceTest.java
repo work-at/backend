@@ -49,9 +49,18 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 			.build();
 		userRepository.save(user);
 
-		workerLocation = WorkerLocation.of(user.getId(), String.valueOf(127.423084873712),
-			String.valueOf(37.0789561558879), "경기 안성시 죽산면 죽산리");
-		workerLocation1 = WorkerLocation.of(124L, "127.40", "37.07895", "경기 안성시 삼죽면 내장리");
+		Users user2 = Users.builder()
+			.nickname("nick")
+			.oauthType(OauthType.KAKAO)
+			.oauthId(12346L)
+			.position(DepartmentType.ACCOUNTANT)
+			.workingYear(DurationType.JUNIOR)
+			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
+			.build();
+		userRepository.save(user2);
+
+		workerLocation = WorkerLocation.of(user.getId(), String.valueOf(127.423084873712), String.valueOf(37.0789561558879), "경기 안성시 죽산면 죽산리");
+		workerLocation1 = WorkerLocation.of(user2.getId(), "127.40", "37.07895", "경기 안성시 삼죽면 내장리");
 		workerLocation2 = WorkerLocation.of(125L, "127.51", "37.078", "경기 안성시 일죽면 산북리");
 		workerLocationRedisRepository.save(workerLocation);
 		workerLocationRedisRepository.save(workerLocation1);
@@ -69,10 +78,21 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, 5);
+		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, 5, false);
 
 		//then
 		Assertions.assertEquals(response.getResponse().size(), 1);
+	}
+
+	@Test
+	void findAllWorkerByLocationNearMetaOnly() {
+		//given
+
+		//when
+		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, 5, true);
+
+		//then
+		Assertions.assertEquals(response.getCount(), 1);
 	}
 
 	@Test
