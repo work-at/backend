@@ -16,6 +16,8 @@ import com.workat.domain.auth.OauthType;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,34 +31,42 @@ public class Users {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@ApiModelProperty(hidden = true)
 	private Long id;
 
 	@NotNull
 	@Pattern(regexp = "^[가-힣|a-z|A-Z|0-9|]{2,8}$")
 	@Column(unique = true)
+	@ApiModelProperty(hidden = true)
 	private String nickname;
 
 	@Enumerated(EnumType.STRING)
 	@Column
+	@ApiModelProperty(hidden = true)
 	private OauthType oauthType;
 
 	@Column(unique = true)
+	@ApiModelProperty(hidden = true)
 	private Long oauthId;
 
 	@Enumerated(EnumType.STRING)
 	@Column
+	@ApiModelProperty(hidden = true)
 	private DepartmentType position;
 
 	@Enumerated(EnumType.STRING)
 	@Column
+	@ApiModelProperty(hidden = true)
 	private DurationType workingYear;
 
 	// TODO: image 와 자기소개는 마이페이지에서 수정한다고 생각하고 일단 진행함
 
 	@Column
+	@ApiModelProperty(hidden = true)
 	private String imageUrl;
 
 	@Column
+	@ApiModelProperty(hidden = true)
 	private String story;
 
 	@Builder
