@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.workat.api.review.dto.ReviewTypeListResponse;
-import com.workat.api.review.dto.ReviewTypeResponse;
+import com.workat.api.review.dto.ReviewTypeDto;
+import com.workat.api.review.dto.response.ReviewTypeListResponse;
 import com.workat.domain.review.CafeReviewType;
 import com.workat.domain.review.FoodReviewType;
 
@@ -20,17 +20,17 @@ import lombok.extern.slf4j.Slf4j;
 public class CollectReviewTypeService {
 
 	public ReviewTypeListResponse collectCafeReviewTypes() {
-		List<ReviewTypeResponse> list = Arrays.stream(CafeReviewType.values())
-			.map(ReviewTypeResponse::of)
-			.collect(Collectors.toList());
+		List<ReviewTypeDto> list = Arrays.stream(CafeReviewType.values())
+										 .map(ReviewTypeDto::of)
+										 .collect(Collectors.toList());
 
 		return ReviewTypeListResponse.of(list);
 	}
 
 	public ReviewTypeListResponse collectFoodReviewTypes() {
-		List<ReviewTypeResponse> list = Arrays.stream(FoodReviewType.values())
-			.map(ReviewTypeResponse::of)
-			.collect(Collectors.toList());
+		List<ReviewTypeDto> list = Arrays.stream(FoodReviewType.values())
+										 .map(ReviewTypeDto::of)
+										 .collect(Collectors.toList());
 
 		return ReviewTypeListResponse.of(list);
 	}
