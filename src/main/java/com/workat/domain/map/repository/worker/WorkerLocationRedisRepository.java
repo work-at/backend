@@ -1,4 +1,4 @@
-package com.workat.domain.map.repository;
+package com.workat.domain.map.repository.worker;
 
 import java.util.List;
 
