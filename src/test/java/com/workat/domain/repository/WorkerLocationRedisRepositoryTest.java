@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.workat.domain.config.RedisContainerBaseTest;
 import com.workat.domain.map.entity.WorkerLocation;
-import com.workat.domain.map.repository.WorkerLocationRedisRepository;
+import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")

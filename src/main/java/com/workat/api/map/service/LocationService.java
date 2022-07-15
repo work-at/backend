@@ -5,7 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.workat.api.map.dto.LocationDto;
+import com.workat.api.map.dto.LocationDetailDto;
+import com.workat.api.map.dto.LocationPinDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.common.exception.BadRequestException;
@@ -14,7 +15,8 @@ import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
-import com.workat.domain.map.repository.LocationRepository;
+import com.workat.domain.map.repository.location.LocationRepository;
+import com.workat.domain.map.vo.MapPoint;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,51 +30,63 @@ public class LocationService {
 
 	private final LocationRepository locationRepository;
 
-	public LocationResponse getLocations(LocationCategory category, double longitude, double latitude, int radius,
-		int page) {
-		// TODO: 2022/07/06  longitude, latitude, radius, page 추후 작업에서 사용하도록 변경할 예정
+	public LocationResponse getLocations(boolean isPin, LocationCategory category, double longitude, double latitude,
+		int radius) {
 
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
 		}
 
-		List<Location> locations = locationRepository.findAllByCategory(category);
+		// TODO: 2022/07/13 거리 로직 확정 후 적용 예정
+		MapPoint minPoint = MapPoint.of(longitude, latitude);
+		MapPoint maxPoint = MapPoint.of(longitude, latitude);
+
+		List<Location> locations = locationRepository.findAllByRadius(minPoint, maxPoint);
 
 		if (locations.isEmpty()) {
 			throw new NotFoundException("location not found exception");
 		}
 
-		List<LocationDto> locationDtos = locations.stream()
-			.map(location -> LocationDto.builder()
-				.id(location.getId())
-				.category(location.getCategory())
-				.phone(location.getPhone())
-				.placeId(location.getPlaceId())
-				.placeUrl(location.getPlaceUrl())
-				.placeName(location.getPlaceName())
-				.x(location.getX())
-				.y(location.getY())
-				.build())
-			.collect(Collectors.toList());
+		if (isPin) {
+			List<LocationPinDto> locationPinDtos = locations.stream()
+				.map(location -> LocationPinDto.of(location.getId(), location.getPlaceId(), location.getLongitude(),
+					location.getLatitude()))
+				.collect(Collectors.toList());
 
-		return LocationResponse.of(locationDtos);
+			return LocationResponse.of(locationPinDtos);
+		} else {
+			List<LocationDetailDto> locationDetailDtos = locations.stream()
+				.map(location -> LocationDetailDto.builder()
+					.id(location.getId())
+					.category(location.getCategory())
+					.phone(location.getPhone())
+					.placeId(location.getPlaceId())
+					.placeUrl(location.getPlaceUrl())
+					.placeName(location.getPlaceName())
+					.longitude(location.getLongitude())
+					.latitude(location.getLatitude())
+					.build())
+				.collect(Collectors.toList());
+
+			return LocationResponse.of(locationDetailDtos);
+		}
 	}
 
-	public LocationDto getLocationById(LocationCategory category, long locationId) {
+	public LocationDetailDto getLocationById(LocationCategory category, long locationId) {
 		// TODO: 2022/07/06  추후 Cafe와 Restaurant 분리 예정이라 그때 코드 수정
 		Location location = locationRepository.findById(locationId).orElseThrow(() -> {
 			throw new NotFoundException("location is not found");
 		});
 
-		return LocationDto.builder()
+		return LocationDetailDto.builder()
 			.id(location.getId())
 			.category(location.getCategory())
 			.phone(location.getPhone())
 			.placeId(location.getPlaceId())
 			.placeUrl(location.getPlaceUrl())
 			.placeName(location.getPlaceName())
-			.x(location.getX())
-			.y(location.getY())
+			.longitude(location.getLongitude())
+			.latitude(location.getLatitude())
 			.build();
 	}
 

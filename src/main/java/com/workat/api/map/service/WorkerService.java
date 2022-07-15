@@ -14,7 +14,7 @@ import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.WorkerLocation;
-import com.workat.domain.map.repository.WorkerLocationRedisRepository;
+import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;

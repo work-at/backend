@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.workat.api.map.dto.LocationDto;
+import com.workat.api.map.dto.LocationDetailDto;
+import com.workat.api.map.dto.LocationPinDto;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.map.service.LocationService;
 import com.workat.domain.map.entity.LocationCategory;
@@ -21,15 +22,22 @@ public class LocationController {
 
 	@GetMapping("/api/v1/map/cafes")
 	public ResponseEntity<LocationResponse> getCafes(@RequestParam double longitude, @RequestParam double latitude,
-		@RequestParam int radius, @RequestParam int page) {
+		@RequestParam int radius) {
+		LocationResponse response = locationService.getLocations(false, LocationCategory.CAFE, longitude, latitude, radius);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/api/v1/map/cafes/pin")
+	public ResponseEntity<LocationResponse> getCafesPin(@RequestParam double longitude, @RequestParam double latitude,
+		@RequestParam int radius) {
 		LocationResponse response =
-			locationService.getLocations(LocationCategory.CAFE, longitude, latitude, radius, page);
+			locationService.getLocations(true, LocationCategory.CAFE, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/api/v1/map/cafes/{locationId}")
-	public ResponseEntity<LocationDto> getCafeById(@PathVariable("locationId") long locationId) {
-		LocationDto dto =
+	public ResponseEntity<LocationDetailDto> getCafeById(@PathVariable("locationId") long locationId) {
+		LocationDetailDto dto =
 			locationService.getLocationById(LocationCategory.CAFE, locationId);
 		return ResponseEntity.ok(dto);
 	}
@@ -37,15 +45,24 @@ public class LocationController {
 	@GetMapping("/api/v1/map/restaurants")
 	public ResponseEntity<LocationResponse> getRestaurants(@RequestParam double longitude,
 		@RequestParam double latitude,
-		@RequestParam int radius, @RequestParam int page) {
+		@RequestParam int radius) {
 		LocationResponse response =
-			locationService.getLocations(LocationCategory.RESTAURANT, longitude, latitude, radius, page);
+			locationService.getLocations(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/api/v1/map/restaurants/pin")
+	public ResponseEntity<LocationResponse> getRestaurantsPin(@RequestParam double longitude,
+		@RequestParam double latitude,
+		@RequestParam int radius) {
+		LocationResponse response =
+			locationService.getLocations(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/api/v1/map/restaurants/{locationId}")
-	public ResponseEntity<LocationDto> getRestaurantById(@PathVariable("locationId") long locationId) {
-		LocationDto dto =
+	public ResponseEntity<LocationDetailDto> getRestaurantById(@PathVariable("locationId") long locationId) {
+		LocationDetailDto dto =
 			locationService.getLocationById(LocationCategory.RESTAURANT, locationId);
 		return ResponseEntity.ok(dto);
 	}

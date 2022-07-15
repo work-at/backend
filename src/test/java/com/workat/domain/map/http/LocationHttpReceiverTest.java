@@ -58,8 +58,8 @@ class LocationHttpReceiverTest {
 				String i = String.valueOf(index);
 				return KakaoLocalDataDto.builder()
 					.id(i)
-					.x(i)
-					.y(i)
+					.longitude(i)
+					.latitude(i)
 					.phone(i)
 					.placeName(i)
 					.placeUrl(i)
@@ -93,8 +93,8 @@ class LocationHttpReceiverTest {
 				() -> assertEquals(given.getId(), result.getId()),
 				() -> assertEquals(given.getPlaceName(), result.getPlaceName()),
 				() -> assertEquals(given.getPlaceUrl(), result.getPlaceUrl()),
-				() -> assertEquals(given.getX(), result.getX()),
-				() -> assertEquals(given.getY(), result.getY()),
+				() -> assertEquals(given.getLongitude(), result.getLongitude()),
+				() -> assertEquals(given.getLatitude(), result.getLatitude()),
 				() -> assertEquals(given.getPhone(), result.getPhone()),
 				() -> assertEquals(given.getAddressName(), result.getAddressName()),
 				() -> assertEquals(given.getRoadAddressName(), result.getRoadAddressName())

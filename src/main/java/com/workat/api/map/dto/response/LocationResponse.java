@@ -5,18 +5,18 @@ import java.util.List;
 import com.workat.api.map.dto.LocationDto;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class LocationResponse {
+public class LocationResponse<T extends LocationDto> {
 
-	private List<LocationDto> locations;
+	private List<T> data;
 
-	public static LocationResponse of(List<LocationDto> locations) {
-		LocationResponse response = new LocationResponse();
-		response.locations = locations;
-		return response;
+	public static <T extends LocationDto> LocationResponse of(List<T> list) {
+		return new LocationResponse<T>(list);
 	}
 }

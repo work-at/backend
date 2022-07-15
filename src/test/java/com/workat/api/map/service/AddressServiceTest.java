@@ -25,7 +25,7 @@ import com.workat.domain.config.MultipleDatasourceBaseTest;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
-import com.workat.domain.map.repository.WorkerLocationRedisRepository;
+import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
