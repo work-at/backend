@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class LocationPinDto extends LocationDto {
+public class LocationPinDto implements LocationDto {
 
 	private long id;
 

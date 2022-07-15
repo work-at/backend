@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class LocationDetailDto extends LocationDto {
+public class LocationDetailDto implements LocationDto {
 
 	private long id;
 
