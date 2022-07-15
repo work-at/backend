@@ -91,6 +91,21 @@ public class LocationService {
 		}
 	}
 
+	public void out() {
+		//시작지점 longitude(경도) : 126.734086 / latitude(위도) : 37.413294
+		// 끝지점 longitude(경도) : 127.269311 / latitude(위도) : 37.715133
+		//1. 시작 지점을 정한다.
+		//2. 그 곳을 기준으로 반경 250미터의 중심의 좌표를 구한다.
+		//3. 그 반경을 탐색하고 local db에 저장한다.
+		//4. 끝 지점까지 반복한다.
+
+
+	}
+
+	private void secondLogic() {
+
+	}
+
 	private Location parseDtoToLocation(LocationCategory category, KakaoLocalDataDto dto) {
 		return Location.builder()
 			.category(category)
