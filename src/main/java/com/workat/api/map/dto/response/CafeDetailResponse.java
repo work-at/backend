@@ -1,6 +1,6 @@
 package com.workat.api.map.dto.response;
 
-import com.workat.api.map.dto.LocationDto;
+import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.review.dto.CafeReviewsDto;
 
 import lombok.AccessLevel;
@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CafeDetailResponse {
 
-	private LocationDto locationDto;
+	private LocationDetailDto locationDetailDto;
 
 	private CafeReviewsDto cafeReviewDtos;
 
-	public static CafeDetailResponse of(LocationDto locationDto, CafeReviewsDto cafeReviewDtos) {
+	public static CafeDetailResponse of(LocationDetailDto locationDetailDto, CafeReviewsDto cafeReviewDtos) {
 		final CafeDetailResponse cafeDetailResponse = new CafeDetailResponse();
 
-		cafeDetailResponse.locationDto = locationDto;
+		cafeDetailResponse.locationDetailDto = locationDetailDto;
 		cafeDetailResponse.cafeReviewDtos = cafeReviewDtos;
 
 		return cafeDetailResponse;

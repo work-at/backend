@@ -26,7 +26,7 @@ import com.workat.domain.config.MysqlContainerBaseTest;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
-import com.workat.domain.map.repository.LocationRepository;
+import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.review.CafeReviewType;
 import com.workat.domain.review.entity.CafeReview;
 import com.workat.domain.review.repository.CafeReviewRepository;
@@ -68,8 +68,8 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 						.placeUrl(value)
 						.addressName(value)
 						.roadAddressName(value)
-						.x(value)
-						.y(value)
+						.longitude(value)
+						.latitude(value)
 						.build();
 
 					Location location = Location.builder()

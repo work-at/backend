@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.workat.api.map.dto.LocationDetailDto;
-import com.workat.api.map.dto.LocationPinDto;
-import com.workat.api.map.dto.LocationDto;
 import com.workat.api.map.dto.response.CafeDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.map.service.LocationService;
@@ -30,7 +28,8 @@ public class LocationController {
 	@GetMapping("/api/v1/map/cafes")
 	public ResponseEntity<LocationResponse> getCafes(@RequestParam double longitude, @RequestParam double latitude,
 		@RequestParam int radius) {
-		LocationResponse response = locationService.getLocations(false, LocationCategory.CAFE, longitude, latitude, radius);
+		LocationResponse response = locationService.getLocations(false, LocationCategory.CAFE, longitude, latitude,
+			radius);
 		return ResponseEntity.ok(response);
 	}
 
@@ -43,9 +42,10 @@ public class LocationController {
 	}
 
 	@GetMapping("/api/v1/map/cafes/{locationId}")
-	public ResponseEntity<LocationDetailDto> getCafeById(@PathVariable("locationId") long locationId) {
-		LocationDetailDto dto =
-			locationService.getLocationById(LocationCategory.CAFE, locationId);
+	public ResponseEntity<CafeDetailResponse> getCafeById(@PathVariable("locationId") long locationId,
+		@UserValidation Users user) {
+		CafeDetailResponse dto =
+			locationService.getCafeById(LocationCategory.CAFE, locationId, user);
 		return ResponseEntity.ok(dto);
 	}
 

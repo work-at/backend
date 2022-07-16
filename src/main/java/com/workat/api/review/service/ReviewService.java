@@ -17,7 +17,7 @@ import com.workat.api.review.dto.request.CafeReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
-import com.workat.domain.map.repository.LocationRepository;
+import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.review.CafeReviewType;
 import com.workat.domain.review.entity.CafeReview;
 import com.workat.domain.review.repository.CafeReviewRepository;

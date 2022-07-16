@@ -36,30 +36,6 @@ public class LocationService {
 
 	private final ReviewService reviewService;
 
-	public CafeDetailResponse getCafeById(long locationId, Users user) {
-		final Location location = locationRepository.findById(locationId).orElseThrow(() -> {
-			throw new NotFoundException("location is not found");
-		});
-
-		final CafeReviewsDto cafeReviews = reviewService.getCafeReviews(locationId, user);
-
-		final LocationDetailDto locationDetailDto = LocationDetailDto.builder()
-			.id(location.getId())
-			.category(location.getCategory())
-			.phone(location.getPhone())
-			.placeId(location.getPlaceId())
-			.placeUrl(location.getPlaceUrl())
-			.placeName(location.getPlaceName())
-			.longitude(location.getLongitude())
-			.latitude(location.getLatitude())
-			.build();
-
-		return CafeDetailResponse.of(
-			locationDetailDto,
-			cafeReviews
-		);
-	}
-
 	public LocationResponse getLocations(boolean isPin, LocationCategory category, double longitude, double latitude,
 		int radius) {
 
@@ -100,6 +76,36 @@ public class LocationService {
 
 			return LocationResponse.of(locationDetailDtos);
 		}
+	}
+
+	// TODO: 식당 추가되면 getLocationById 에 통합
+	public CafeDetailResponse getCafeById(LocationCategory category, long locationId, Users user) {
+		// TODO: 2022/07/06  추후 Cafe와 Restaurant 분리 예정이라 그때 코드 수정
+		if (category == null) {
+			throw new BadRequestException("category must be food or cafe");
+		}
+
+		Location location = locationRepository.findById(locationId).orElseThrow(() -> {
+			throw new NotFoundException("location is not found");
+		});
+
+		final LocationDetailDto locationDetailDto = LocationDetailDto.builder()
+			.id(location.getId())
+			.category(location.getCategory())
+			.phone(location.getPhone())
+			.placeId(location.getPlaceId())
+			.placeUrl(location.getPlaceUrl())
+			.placeName(location.getPlaceName())
+			.longitude(location.getLongitude())
+			.latitude(location.getLatitude())
+			.build();
+
+		final CafeReviewsDto cafeReviews = reviewService.getCafeReviews(locationId, user);
+
+		return CafeDetailResponse.of(
+			locationDetailDto,
+			cafeReviews
+		);
 	}
 
 	public LocationDetailDto getLocationById(LocationCategory category, long locationId) {
