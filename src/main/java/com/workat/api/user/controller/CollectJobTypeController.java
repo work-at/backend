@@ -12,7 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
-@Api(tags = "직무 및 연차 타입 조회")
+@Api(tags = "User JobType Api")
 @RequiredArgsConstructor
 @RestController
 public class CollectJobTypeController {

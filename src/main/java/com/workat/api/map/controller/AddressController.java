@@ -16,7 +16,7 @@ import io.swagger.annotations.Authorization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Api(tags = "유저 위치 api")
+@Api(tags = "User Address Api")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
