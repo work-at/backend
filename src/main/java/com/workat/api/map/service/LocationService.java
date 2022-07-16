@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.LocationPinDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
+import com.workat.api.map.dto.response.CafeDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
+import com.workat.api.review.dto.CafeReviewsDto;
+import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
@@ -17,6 +20,7 @@ import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.map.vo.MapPoint;
+import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +33,32 @@ public class LocationService {
 	private final LocationHttpReceiver locationHttpReceiver;
 
 	private final LocationRepository locationRepository;
+
+	private final ReviewService reviewService;
+
+	public CafeDetailResponse getCafeById(long locationId, Users user) {
+		final Location location = locationRepository.findById(locationId).orElseThrow(() -> {
+			throw new NotFoundException("location is not found");
+		});
+
+		final CafeReviewsDto cafeReviews = reviewService.getCafeReviews(locationId, user);
+
+		final LocationDetailDto locationDetailDto = LocationDetailDto.builder()
+			.id(location.getId())
+			.category(location.getCategory())
+			.phone(location.getPhone())
+			.placeId(location.getPlaceId())
+			.placeUrl(location.getPlaceUrl())
+			.placeName(location.getPlaceName())
+			.longitude(location.getLongitude())
+			.latitude(location.getLatitude())
+			.build();
+
+		return CafeDetailResponse.of(
+			locationDetailDto,
+			cafeReviews
+		);
+	}
 
 	public LocationResponse getLocations(boolean isPin, LocationCategory category, double longitude, double latitude,
 		int radius) {
@@ -112,7 +142,6 @@ public class LocationService {
 		//2. 그 곳을 기준으로 반경 250미터의 중심의 좌표를 구한다.
 		//3. 그 반경을 탐색하고 local db에 저장한다.
 		//4. 끝 지점까지 반복한다.
-
 
 	}
 

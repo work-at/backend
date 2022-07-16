@@ -8,9 +8,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.LocationPinDto;
+import com.workat.api.map.dto.LocationDto;
+import com.workat.api.map.dto.response.CafeDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.map.service.LocationService;
+import com.workat.api.review.service.ReviewService;
+import com.workat.common.annotation.UserValidation;
 import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 public class LocationController {
 
 	private final LocationService locationService;
+
+	private final ReviewService reviewService;
 
 	@GetMapping("/api/v1/map/cafes")
 	public ResponseEntity<LocationResponse> getCafes(@RequestParam double longitude, @RequestParam double latitude,
