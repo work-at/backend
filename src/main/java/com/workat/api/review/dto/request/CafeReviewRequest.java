@@ -1,6 +1,6 @@
 package com.workat.api.review.dto.request;
 
-import java.util.List;
+import java.util.HashSet;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CafeReviewRequest {
 
-	private List<String> reviewTypeNames;
+	private HashSet<String> reviewTypeNames;
 
-	private CafeReviewRequest(List<String> reviewTypeNames) {
+	private CafeReviewRequest(HashSet<String> reviewTypeNames) {
 		this.reviewTypeNames = reviewTypeNames;
 	}
 
-	public static CafeReviewRequest of(List<String> reviewTypeNames) {
+	public static CafeReviewRequest of(HashSet<String> reviewTypeNames) {
 		return new CafeReviewRequest(reviewTypeNames);
 	}
 }

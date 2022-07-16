@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.*;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,7 +76,7 @@ public class ReviewService {
 		final Optional<CafeReview> reviewMatchedUser = cafeReviews.stream()
 			.filter(review -> review.getUser().getId() == user.getId())
 			.findFirst();
-		
+
 		return reviewMatchedUser.isPresent();
 	}
 
@@ -93,11 +94,10 @@ public class ReviewService {
 			throw new BadRequestException("There is already a review posted with this user id.");
 		}
 
-		final List<String> reviewTypeNames = cafeReviewRequest.getReviewTypeNames();
+		final HashSet<String> reviewTypeNames = cafeReviewRequest.getReviewTypeNames();
 
 		final List<CafeReview> cafeReviews = reviewTypeNames.stream()
 			.map(name -> CafeReviewType.of(name))
-			.distinct()
 			.map(reviewType -> CafeReview.of(reviewType, location, user))
 			.collect(toList());
 

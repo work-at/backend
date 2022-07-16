@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -220,7 +221,8 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		final Long locationId = saveLocations(1).get(0).getId();
 		final Users user = saveUsers(1).get(0);
 
-		CafeReviewRequest reviewRequest = CafeReviewRequest.of(Arrays.asList("PARKING", "WIFI", "NIGHT_VIEW"));
+		CafeReviewRequest reviewRequest = CafeReviewRequest.of(
+			new HashSet<>(Arrays.asList("PARKING", "WIFI", "NIGHT_VIEW")));
 
 		// when
 		reviewService.addCafeReview(locationId, reviewRequest, user);
@@ -240,8 +242,8 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		final Location location = saveLocations(1).get(0);
 		final Users user = saveUsers(1).get(0);
 
-		CafeReviewRequest reviewRequest1 = CafeReviewRequest.of(Arrays.asList("PARKING"));
-		CafeReviewRequest reviewRequest2 = CafeReviewRequest.of(Arrays.asList("WIFI"));
+		CafeReviewRequest reviewRequest1 = CafeReviewRequest.of(new HashSet<>(Arrays.asList("PARKING")));
+		CafeReviewRequest reviewRequest2 = CafeReviewRequest.of(new HashSet<>(Arrays.asList("WIFI")));
 
 		// when
 
