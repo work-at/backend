@@ -73,9 +73,9 @@ public class ReviewService {
 
 	private boolean checkUserReviewed(List<CafeReview> cafeReviews, Users user) {
 		final Optional<CafeReview> reviewMatchedUser = cafeReviews.stream()
-			.filter(review -> review.getUser() == user)
+			.filter(review -> review.getUser().getId() == user.getId())
 			.findFirst();
-
+		
 		return reviewMatchedUser.isPresent();
 	}
 
