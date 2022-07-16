@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 
 import com.google.common.collect.Sets;
+import com.workat.domain.user.entity.Users;
 
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -27,6 +28,7 @@ public class SwaggerConfig {
 	@Bean
 	public Docket api() {
 		return new Docket(DocumentationType.SWAGGER_2)
+			.ignoredParameterTypes(Users.class)
 			.apiInfo(getApiInfo())
 			.produces(Sets.newHashSet(MediaType.APPLICATION_JSON_VALUE))
 			.consumes(Sets.newHashSet(MediaType.APPLICATION_JSON_VALUE))

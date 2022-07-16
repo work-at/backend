@@ -17,7 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
-@Api(tags = "Authorization")
+@Api(tags = "Authorization Api")
 @RequiredArgsConstructor
 @RestController
 public class AuthorizationController {
