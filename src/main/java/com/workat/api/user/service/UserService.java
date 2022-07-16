@@ -10,6 +10,7 @@ import com.workat.api.auth.service.AuthorizationService;
 import com.workat.api.user.dto.SignUpResponse;
 import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.common.exception.ConflictException;
+import com.workat.common.exception.NotFoundException;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UsersRepository;
@@ -32,8 +33,8 @@ public class UserService {
 		if (!userExist) {
 			return AuthResponse.ResponseForSignup(oauthId);
 		}
-
-		final String accessToken = authorizationService.createAccessToken(oauthId);
+		final Users user = userRepository.findByOauthTypeAndOauthId(oauthType, oauthId).orElseThrow(() -> new NotFoundException("user not found"));
+		final String accessToken = authorizationService.createAccessToken(user.getId());
 
 		return AuthResponse.ResponseForLogin(accessToken);
 	}
