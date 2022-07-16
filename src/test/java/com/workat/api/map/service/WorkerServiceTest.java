@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.workat.api.map.dto.WorkerDto;
 import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
+import com.workat.api.map.dto.response.WorkerSizeResponse;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.MultipleDatasourceBaseTest;
 import com.workat.domain.map.entity.WorkerLocation;
@@ -78,18 +79,18 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, 5, false);
+		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, 5);
 
 		//then
 		Assertions.assertEquals(response.getResponse().size(), 1);
 	}
 
 	@Test
-	void findAllWorkerByLocationNearMetaOnly() {
+	void countAllWorkerByLocationNear() {
 		//given
 
 		//when
-		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, 5, true);
+		WorkerSizeResponse response = workerService.countAllWorkerByLocationNear(user, 5);
 
 		//then
 		Assertions.assertEquals(response.getCount(), 1);

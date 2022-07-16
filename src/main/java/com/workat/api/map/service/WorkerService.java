@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.workat.api.map.dto.WorkerDto;
 import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
+import com.workat.api.map.dto.response.WorkerSizeResponse;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.WorkerLocationRedisRepository;
@@ -29,15 +30,8 @@ public class WorkerService {
 
 	private final UsersRepository userRepository;
 
-	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer, boolean metaOnly) {
-		WorkerLocation userLocation = workerLocationRedisRepository.findById(user.getId())
-			.orElseThrow(() -> new NotFoundException("user need to update address"));
-
-		List<WorkerLocation> workerLocations = workerLocationRedisRepository.findAllByLocationNear(userLocation.getLocation(), new Distance(kilometer, KILOMETERS));
-
-		if (metaOnly) {
-			return WorkerListResponse.metaDataOf(Math.max(workerLocations.size() - 1, 0));
-		}
+	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer) {
+		List<WorkerLocation> workerLocations = getWorkerByLocationNear(user, kilometer);
 
 		List<WorkerDto> workerDtos = workerLocations
 			.stream()
@@ -51,6 +45,12 @@ public class WorkerService {
 		return WorkerListResponse.of(workerDtos);
 	}
 
+	public WorkerSizeResponse countAllWorkerByLocationNear(Users user, double kilometer) {
+		List<WorkerLocation> workerLocations = getWorkerByLocationNear(user, kilometer);
+
+		return WorkerSizeResponse.of(Math.max(workerLocations.size() - 1, 0));
+	}
+
 	public WorkerDetailResponse findWorkerDetailById(Long userId) {
 		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		return WorkerDetailResponse.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear(),
@@ -60,5 +60,12 @@ public class WorkerService {
 	public WorkerDto findWorkerById(Long userId) {
 		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		return WorkerDto.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear());
+	}
+
+	private List<WorkerLocation> getWorkerByLocationNear(Users user, double kilometer) {
+		WorkerLocation userLocation = workerLocationRedisRepository.findById(user.getId())
+			.orElseThrow(() -> new NotFoundException("user need to update address"));
+
+		return workerLocationRedisRepository.findAllByLocationNear(userLocation.getLocation(), new Distance(kilometer, KILOMETERS));
 	}
 }
