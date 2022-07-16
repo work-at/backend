@@ -8,7 +8,9 @@ import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.api.map.service.LocationService;
 
 import lombok.RequiredArgsConstructor;
+import springfox.documentation.annotations.ApiIgnore;
 
+@ApiIgnore
 @RequiredArgsConstructor
 @RestController
 public class MapBatchController {

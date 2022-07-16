@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
-@Api(tags = "유저 기능")
+@Api(tags = "User Api")
 @RequiredArgsConstructor
 @RestController
 public class UserController {
