@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.api.map.dto.response.LocationResponse;
+import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.config.MysqlContainerBaseTest;
@@ -45,6 +46,8 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 	private LocationHttpReceiver locationHttpReceiver;
 
+	private ReviewService reviewService;
+
 	@Mock
 	private RestTemplate restTemplate;
 
@@ -54,7 +57,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	@BeforeEach
 	void setUp() {
 		this.locationHttpReceiver = new LocationHttpReceiver(restTemplate);
-		this.locationService = new LocationService(locationHttpReceiver, locationRepository);
+		this.locationService = new LocationService(locationHttpReceiver, locationRepository, reviewService);
 	}
 
 	@Test
