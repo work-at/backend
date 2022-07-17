@@ -1,5 +1,9 @@
 package com.workat.domain.review;
 
+import java.util.EnumSet;
+
+import com.workat.common.exception.NotFoundException;
+
 public enum FoodReviewType implements BaseReviewType {
 
 	PARKING("주차하기 편해요~"),
@@ -13,10 +17,20 @@ public enum FoodReviewType implements BaseReviewType {
 	DESIGN("인테리어가 예뻐요"),
 	SNACK("간단하게 먹기 좋아요");
 
-	private String content;
+	private final String content;
 
 	FoodReviewType(String content) {
 		this.content = content;
+	}
+
+	public static FoodReviewType of(String typeName) {
+		return EnumSet.allOf(FoodReviewType.class)
+			.stream()
+			.filter(typeEnum -> typeEnum.getName().equals(typeName))
+			.findFirst()
+			.orElseThrow(() -> new NotFoundException(
+				String.format("Unsupported type %s", typeName)));
+
 	}
 
 	@Override
