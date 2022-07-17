@@ -35,4 +35,4 @@ jobs:
         run: |
           docker build -f ./Dockerfile.dev --tag ${{secrets.DOCKER_USERNAME}}/workat:dev .
           docker push ${{secrets.DOCKER_USERNAME}}/workat:dev
-        if: contains(github.ref, 'develop')
+        # if: contains(github.ref, 'develop')
