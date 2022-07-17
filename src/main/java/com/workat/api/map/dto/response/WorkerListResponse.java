@@ -2,9 +2,7 @@ package com.workat.api.map.dto.response;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.workat.api.map.dto.WorkerDto;
-
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
