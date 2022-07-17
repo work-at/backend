@@ -39,13 +39,13 @@ public class ReviewService {
 	private final LocationRepository locationRepository;
 
 	@Transactional(readOnly = true)
-	public ReviewsDto getLocationReviews(long locationId, Users user) {
+	public ReviewsDto getLocationReviews(long locationId, long userId) {
 		final List<CafeReview> cafeReviews = cafeReviewRepository.findAllByLocation_Id(locationId);
 
 		HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(cafeReviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
-		final boolean userReviewed = checkUserReviewed(cafeReviews, user);
+		final boolean userReviewed = checkUserReviewed(cafeReviews, userId);
 
 		return ReviewsDto.of(
 			sortedReviewDtos,
@@ -73,9 +73,9 @@ public class ReviewService {
 			.collect(toList());
 	}
 
-	private boolean checkUserReviewed(List<CafeReview> cafeReviews, Users user) {
+	private boolean checkUserReviewed(List<CafeReview> cafeReviews, long userId) {
 		final Optional<CafeReview> reviewMatchedUser = cafeReviews.stream()
-			.filter(review -> review.getUser().getId() == user.getId())
+			.filter(review -> review.getUser().getId() == userId)
 			.findFirst();
 
 		return reviewMatchedUser.isPresent();

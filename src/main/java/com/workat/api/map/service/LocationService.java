@@ -20,7 +20,6 @@ import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.map.vo.MapPoint;
-import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,7 +77,7 @@ public class LocationService {
 		}
 	}
 
-	public LocationDetailResponse getLocationById(LocationCategory category, long locationId, Users user) {
+	public LocationDetailResponse getLocationById(LocationCategory category, long locationId, long userId) {
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
 		}
@@ -99,11 +98,11 @@ public class LocationService {
 			.latitude(location.getLatitude())
 			.build();
 
-		final ReviewsDto locationReviews = reviewService.getLocationReviews(locationId, user);
+		final ReviewsDto locationReviewsDto = reviewService.getLocationReviews(locationId, userId);
 
 		return LocationDetailResponse.of(
 			locationDetailDto,
-			locationReviews
+			locationReviewsDto
 		);
 	}
 

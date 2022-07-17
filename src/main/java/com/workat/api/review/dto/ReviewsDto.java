@@ -10,16 +10,16 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ReviewsDto {
 
-	private List<ReviewDto> reviews;
+	private List<ReviewDto> reviewDtos;
 
 	private boolean userReviewed;
 
-	private ReviewsDto(List<ReviewDto> reviews, boolean userReviewed) {
-		this.reviews = reviews;
+	private ReviewsDto(List<ReviewDto> reviewDtos, boolean userReviewed) {
+		this.reviewDtos = reviewDtos;
 		this.userReviewed = userReviewed;
 	}
 
-	public static ReviewsDto of(List<ReviewDto> reviews, boolean userReviewed) {
-		return new ReviewsDto(reviews, userReviewed);
+	public static ReviewsDto of(List<ReviewDto> reviewDtos, boolean userReviewed) {
+		return new ReviewsDto(reviewDtos, userReviewed);
 	}
 }
