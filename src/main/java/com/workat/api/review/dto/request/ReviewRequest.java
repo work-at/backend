@@ -8,15 +8,15 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class CafeReviewRequest {
+public class ReviewRequest {
 
 	private HashSet<String> reviewTypeNames;
 
-	private CafeReviewRequest(HashSet<String> reviewTypeNames) {
+	private ReviewRequest(HashSet<String> reviewTypeNames) {
 		this.reviewTypeNames = reviewTypeNames;
 	}
 
-	public static CafeReviewRequest of(HashSet<String> reviewTypeNames) {
-		return new CafeReviewRequest(reviewTypeNames);
+	public static ReviewRequest of(HashSet<String> reviewTypeNames) {
+		return new ReviewRequest(reviewTypeNames);
 	}
 }

@@ -14,16 +14,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.workat.api.review.dto.ReviewDto;
 import com.workat.api.review.dto.ReviewsDto;
-import com.workat.api.review.dto.request.CafeReviewRequest;
+import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.review.BaseReviewType;
 import com.workat.domain.review.CafeReviewType;
+import com.workat.domain.review.FoodReviewType;
 import com.workat.domain.review.entity.BaseReview;
 import com.workat.domain.review.entity.CafeReview;
+import com.workat.domain.review.entity.RestaurantReview;
 import com.workat.domain.review.repository.CafeReviewRepository;
+import com.workat.domain.review.repository.RestaurantReviewRepository;
 import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
@@ -35,6 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ReviewService {
 
 	private final CafeReviewRepository cafeReviewRepository;
+
+	private final RestaurantReviewRepository restaurantReviewRepository;
 
 	private final LocationRepository locationRepository;
 
@@ -82,7 +87,7 @@ public class ReviewService {
 	}
 
 	@Transactional
-	public void addCafeReview(long locationId, CafeReviewRequest cafeReviewRequest, Users user) {
+	public void addCafeReview(long locationId, ReviewRequest reviewRequest, Users user) {
 
 		final Location location = locationRepository.findById(locationId)
 			.orElseThrow(() -> new NotFoundException("No location found for the id"));
@@ -95,7 +100,7 @@ public class ReviewService {
 			throw new BadRequestException("There is already a review posted with this user id.");
 		}
 
-		final HashSet<String> reviewTypeNames = cafeReviewRequest.getReviewTypeNames();
+		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
 
 		final List<CafeReview> cafeReviews = reviewTypeNames.stream()
 			.map(name -> CafeReviewType.of(name))
@@ -103,5 +108,29 @@ public class ReviewService {
 			.collect(toList());
 
 		cafeReviewRepository.saveAll(cafeReviews);
+	}
+
+	@Transactional
+	public void addRestaurantReview(long locationId, ReviewRequest reviewRequest, Users user) {
+
+		final Location location = locationRepository.findById(locationId)
+			.orElseThrow(() -> new NotFoundException("No location found for the id"));
+
+		final Optional<RestaurantReview> optionalRestaurantReview = restaurantReviewRepository.findByLocation_IdAndUser_Id(
+			locationId,
+			user.getId());
+
+		if (optionalRestaurantReview.isPresent()) {
+			throw new BadRequestException("There is already a review posted with this user id.");
+		}
+
+		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
+
+		final List<RestaurantReview> RestaurantReviews = reviewTypeNames.stream()
+			.map(name -> FoodReviewType.of(name))
+			.map(reviewType -> RestaurantReview.of(reviewType, location, user))
+			.collect(toList());
+
+		restaurantReviewRepository.saveAll(RestaurantReviews);
 	}
 }
