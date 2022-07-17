@@ -24,26 +24,25 @@ public class KakaoLocalDataDto {
 
 	private String placeUrl;
 
-	private String longitude;
+	private String x;
 
-	private String latitude;
+	private String y;
 
 	private String addressName;
 
 	private String roadAddressName;
 
 	@Builder
-	public KakaoLocalDataDto(String id, String phone, String placeName, String placeUrl, String longitude, String latitude,
+	public KakaoLocalDataDto(String id, String phone, String placeName, String placeUrl, String x, String y,
 		String addressName, String roadAddressName) {
 		this.id = id;
 		this.phone = phone;
 		this.placeName = placeName;
 		this.placeUrl = placeUrl;
-		this.longitude = longitude;
-		this.latitude = latitude;
+		this.x = x;
+		this.y = y;
 		this.addressName = addressName;
 		this.roadAddressName = roadAddressName;
-
 	}
 
 }

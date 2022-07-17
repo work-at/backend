@@ -1,19 +1,24 @@
 package com.workat.api.map.service;
 
+import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.LocationPinDto;
-import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.api.map.dto.response.LocationDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
+import com.workat.common.util.FileReadUtils;
+import com.workat.domain.area.entity.Area;
+import com.workat.domain.area.repository.AreaRepository;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.LocationHttpReceiver;
@@ -31,9 +36,11 @@ public class LocationService {
 
 	private final LocationHttpReceiver locationHttpReceiver;
 
+	private final ReviewService reviewService;
+
 	private final LocationRepository locationRepository;
 
-	private final ReviewService reviewService;
+	private final AreaRepository areaRepository;
 
 	public LocationResponse getLocations(boolean isPin, LocationCategory category, double longitude, double latitude,
 		int radius) {
@@ -108,33 +115,55 @@ public class LocationService {
 		);
 	}
 
-	public void updateLocations(LocationTriggerRequest request) {
+	@Transactional
+	public void updateLocations() {
+		createAreaFromCsv();
+
 		for (LocationCategory category : LocationCategory.values()) {
-			List<KakaoLocalDataDto> locationDtos = locationHttpReceiver.updateLocations(category, request);
-			List<Location> locations = locationDtos.stream()
-				.distinct()
-				.map(dto -> {
-					Location location = locationRepository.findByPlaceId(dto.getId())
-						.orElseGet(() -> parseDtoToLocation(category, dto));
-					return location.update(dto);
-				})
-				.collect(Collectors.toList());
-			locationRepository.saveAll(locations);
+			List<Area> areas = areaRepository.findAll();
+			for (Area area : areas) {
+				log.info(area.getName() + " batch start");
+				List<KakaoLocalDataDto> locationDtos = locationHttpReceiver.updateLocations(category,
+					MapPoint.of(area.getLongitude(), area.getLatitude()), 5000);
+				List<Location> locations = locationDtos.stream()
+					.distinct()
+					.map(dto -> {
+						Location location = locationRepository.findByPlaceId(dto.getId())
+							.orElseGet(() -> parseDtoToLocation(category, dto));
+						return location.update(dto);
+					})
+					.collect(Collectors.toList());
+				locationRepository.saveAll(locations);
+			}
 		}
 	}
 
-	public void out() {
-		//시작지점 longitude(경도) : 126.734086 / latitude(위도) : 37.413294
-		// 끝지점 longitude(경도) : 127.269311 / latitude(위도) : 37.715133
-		//1. 시작 지점을 정한다.
-		//2. 그 곳을 기준으로 반경 250미터의 중심의 좌표를 구한다.
-		//3. 그 반경을 탐색하고 local db에 저장한다.
-		//4. 끝 지점까지 반복한다.
-
+	private void createAreaFromCsv() {
+		areaRepository.deleteAll();
+		readSeoulSubwayCsv();
 	}
 
-	private void secondLogic() {
+	private void readSeoulSubwayCsv() {
+		//호선, 역명, 주소, lat, long
+		String seoulSubwayCsvPath = "/csv/seoul_subway.csv";
+		URL url = getClass().getResource(seoulSubwayCsvPath);
 
+		if (url == null || url.getPath() == null) {
+			throw new NotFoundException(seoulSubwayCsvPath + " not exist");
+		}
+		File file = new File(url.getPath());
+
+		List<Area> result = FileReadUtils.readCSV(file).stream()
+			.map(line -> {
+				String stationName = line.get(1) + "역";
+				String stationAddress = line.get(2);
+				String latitude = line.get(3);
+				String longitude = line.get(4);
+				return Area.of(stationName, stationAddress, Double.parseDouble(longitude), Double.parseDouble(latitude));
+			})
+			.collect(Collectors.toList());
+
+		areaRepository.saveAll(result);
 	}
 
 	private Location parseDtoToLocation(LocationCategory category, KakaoLocalDataDto dto) {
