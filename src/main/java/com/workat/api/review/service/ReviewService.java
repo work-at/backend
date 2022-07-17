@@ -12,16 +12,21 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.workat.api.review.dto.CafeReviewDto;
-import com.workat.api.review.dto.CafeReviewsDto;
-import com.workat.api.review.dto.request.CafeReviewRequest;
+import com.workat.api.review.dto.LocationReviewDto;
+import com.workat.api.review.dto.ReviewDto;
+import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.repository.location.LocationRepository;
+import com.workat.domain.review.BaseReviewType;
 import com.workat.domain.review.CafeReviewType;
+import com.workat.domain.review.FoodReviewType;
+import com.workat.domain.review.entity.BaseReview;
 import com.workat.domain.review.entity.CafeReview;
+import com.workat.domain.review.entity.RestaurantReview;
 import com.workat.domain.review.repository.CafeReviewRepository;
+import com.workat.domain.review.repository.RestaurantReviewRepository;
 import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
@@ -34,54 +39,56 @@ public class ReviewService {
 
 	private final CafeReviewRepository cafeReviewRepository;
 
+	private final RestaurantReviewRepository restaurantReviewRepository;
+
 	private final LocationRepository locationRepository;
 
 	@Transactional(readOnly = true)
-	public CafeReviewsDto getCafeReviews(long locationId, Users user) {
+	public LocationReviewDto getLocationReviews(long locationId, long userId) {
+
 		final List<CafeReview> cafeReviews = cafeReviewRepository.findAllByLocation_Id(locationId);
 
-		final HashMap<CafeReviewType, Long> cafeReviewCountMap = convertReviewCountMap(cafeReviews);
-		final List<CafeReviewDto> sortedReviewDtos = getSortedReviewDtos(cafeReviewCountMap);
+		HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(cafeReviews);
+		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
-		final boolean userReviewed = checkUserReviewed(cafeReviews, user);
+		final boolean userReviewed = checkUserReviewed(cafeReviews, userId);
 
-		return CafeReviewsDto.of(
+		return LocationReviewDto.of(
 			sortedReviewDtos,
 			userReviewed
 		);
 	}
 
-	// TODO: 추후 Review 상속 관계 고려해보기
-	private HashMap<CafeReviewType, Long> convertReviewCountMap(List<CafeReview> reviews) {
+	private <T extends BaseReview> HashMap<BaseReviewType, Long> convertReviewCountMap(List<T> reviews) {
 
-		final HashMap<CafeReviewType, Long> reviewCountMap = reviews.stream()
-			.collect(groupingBy(CafeReview::getReviewType, HashMap::new, counting()));
+		final HashMap<BaseReviewType, Long> reviewCountMap = reviews.stream()
+			.collect(groupingBy(BaseReview::getReviewType, HashMap::new, counting()));
 
 		return reviewCountMap;
 	}
 
-	private List<CafeReviewDto> getSortedReviewDtos(Map<CafeReviewType, Long> map) {
+	private <T extends BaseReviewType> List<ReviewDto> getSortedReviewDtos(Map<T, Long> map) {
 
 		return map.entrySet()
 			.stream()
-			.map(entry -> CafeReviewDto.of(
+			.map(entry -> ReviewDto.of(
 				entry.getKey(),
 				entry.getValue()))
-			.sorted(Comparator.comparingLong(CafeReviewDto::getCount) // count 역순으로 정렬
+			.sorted(Comparator.comparingLong(ReviewDto::getCount) // count 역순으로 정렬
 				.reversed())
 			.collect(toList());
 	}
 
-	private boolean checkUserReviewed(List<CafeReview> cafeReviews, Users user) {
+	private boolean checkUserReviewed(List<CafeReview> cafeReviews, long userId) {
 		final Optional<CafeReview> reviewMatchedUser = cafeReviews.stream()
-			.filter(review -> review.getUser().getId() == user.getId())
+			.filter(review -> review.getUser().getId() == userId)
 			.findFirst();
 
 		return reviewMatchedUser.isPresent();
 	}
 
 	@Transactional
-	public void addCafeReview(long locationId, CafeReviewRequest cafeReviewRequest, Users user) {
+	public void addCafeReview(long locationId, ReviewRequest reviewRequest, Users user) {
 
 		final Location location = locationRepository.findById(locationId)
 			.orElseThrow(() -> new NotFoundException("No location found for the id"));
@@ -94,7 +101,7 @@ public class ReviewService {
 			throw new BadRequestException("There is already a review posted with this user id.");
 		}
 
-		final HashSet<String> reviewTypeNames = cafeReviewRequest.getReviewTypeNames();
+		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
 
 		final List<CafeReview> cafeReviews = reviewTypeNames.stream()
 			.map(name -> CafeReviewType.of(name))
@@ -102,5 +109,29 @@ public class ReviewService {
 			.collect(toList());
 
 		cafeReviewRepository.saveAll(cafeReviews);
+	}
+
+	@Transactional
+	public void addRestaurantReview(long locationId, ReviewRequest reviewRequest, Users user) {
+
+		final Location location = locationRepository.findById(locationId)
+			.orElseThrow(() -> new NotFoundException("No location found for the id"));
+
+		final Optional<RestaurantReview> optionalRestaurantReview = restaurantReviewRepository.findByLocation_IdAndUser_Id(
+			locationId,
+			user.getId());
+
+		if (optionalRestaurantReview.isPresent()) {
+			throw new BadRequestException("There is already a review posted with this user id.");
+		}
+
+		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
+
+		final List<RestaurantReview> RestaurantReviews = reviewTypeNames.stream()
+			.map(name -> FoodReviewType.of(name))
+			.map(reviewType -> RestaurantReview.of(reviewType, location, user))
+			.collect(toList());
+
+		restaurantReviewRepository.saveAll(RestaurantReviews);
 	}
 }

@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.LocationPinDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
-import com.workat.api.map.dto.response.CafeDetailResponse;
+import com.workat.api.map.dto.response.LocationDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
-import com.workat.api.review.dto.CafeReviewsDto;
+import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
@@ -20,7 +20,6 @@ import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.map.vo.MapPoint;
-import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,13 +77,12 @@ public class LocationService {
 		}
 	}
 
-	// TODO: 식당 추가되면 getLocationById 에 통합
-	public CafeDetailResponse getCafeById(LocationCategory category, long locationId, Users user) {
-		// TODO: 2022/07/06  추후 Cafe와 Restaurant 분리 예정이라 그때 코드 수정
+	public LocationDetailResponse getLocationById(LocationCategory category, long locationId, long userId) {
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
 		}
 
+		// TODO: 2022/07/06  추후 Cafe와 Restaurant 분리 예정이라 그때 코드 수정
 		Location location = locationRepository.findById(locationId).orElseThrow(() -> {
 			throw new NotFoundException("location is not found");
 		});
@@ -100,30 +98,14 @@ public class LocationService {
 			.latitude(location.getLatitude())
 			.build();
 
-		final CafeReviewsDto cafeReviews = reviewService.getCafeReviews(locationId, user);
+		log.error("테스트에요");
 
-		return CafeDetailResponse.of(
+		final LocationReviewDto locationLocationReviewDto = reviewService.getLocationReviews(locationId, userId);
+
+		return LocationDetailResponse.of(
 			locationDetailDto,
-			cafeReviews
+			locationLocationReviewDto
 		);
-	}
-
-	public LocationDetailDto getLocationById(LocationCategory category, long locationId) {
-		// TODO: 2022/07/06  추후 Cafe와 Restaurant 분리 예정이라 그때 코드 수정
-		Location location = locationRepository.findById(locationId).orElseThrow(() -> {
-			throw new NotFoundException("location is not found");
-		});
-
-		return LocationDetailDto.builder()
-			.id(location.getId())
-			.category(location.getCategory())
-			.phone(location.getPhone())
-			.placeId(location.getPlaceId())
-			.placeUrl(location.getPlaceUrl())
-			.placeName(location.getPlaceName())
-			.longitude(location.getLongitude())
-			.latitude(location.getLatitude())
-			.build();
 	}
 
 	public void updateLocations(LocationTriggerRequest request) {

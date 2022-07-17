@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,10 +23,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
-import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
+import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.MysqlContainerBaseTest;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
@@ -36,6 +35,11 @@ import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.http.dto.KakaoLocalMetaDto;
 import com.workat.domain.map.http.dto.KakaoLocalResponse;
 import com.workat.domain.map.repository.location.LocationRepository;
+import com.workat.domain.review.repository.CafeReviewRepository;
+import com.workat.domain.review.repository.RestaurantReviewRepository;
+import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.job.DepartmentType;
+import com.workat.domain.user.job.DurationType;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -54,9 +58,16 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	@Autowired
 	private LocationRepository locationRepository;
 
+	@Autowired
+	private CafeReviewRepository cafeReviewRepository;
+
+	@Autowired
+	private RestaurantReviewRepository restaurantReviewRepository;
+
 	@BeforeEach
 	void setUp() {
 		this.locationHttpReceiver = new LocationHttpReceiver(restTemplate);
+		this.reviewService = new ReviewService(cafeReviewRepository, restaurantReviewRepository, locationRepository);
 		this.locationService = new LocationService(locationHttpReceiver, locationRepository, reviewService);
 	}
 
@@ -93,7 +104,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			() -> locationService.getLocations(false, LocationCategory.RESTAURANT, 1.0, 1.0, 1));
 	}
 
-	// TODO: 2022/07/13 거리 관련 로직 확정전이라 exception이 무조건 발생 
+	// TODO: 2022/07/13 거리 관련 로직 확정전이라 exception이 무조건 발생
 	// @Test
 	// void getLocations_success() {
 	// 	//given
@@ -160,11 +171,10 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	@Test
 	void getLocationById_fail_not_found() {
 		//given
-
 		//when
 
 		//then
-		assertThrows(NotFoundException.class, () -> locationService.getLocationById(LocationCategory.CAFE, 1L));
+		assertThrows(NotFoundException.class, () -> locationService.getLocationById(LocationCategory.CAFE, 1L, 1L));
 	}
 
 	@Test
@@ -187,10 +197,20 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.dto(dto)
 			.build();
 
+		Users user = Users.builder()
+			.nickname(String.format("holden"))
+			.oauthType(OauthType.KAKAO)
+			.oauthId(1L)
+			.position(DepartmentType.ACCOUNTANT)
+			.workingYear(DurationType.JUNIOR)
+			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
+			.build();
+
 		long locationid = locationRepository.save(given).getId();
 
 		//when
-		LocationDetailDto result = locationService.getLocationById(LocationCategory.CAFE, locationid);
+		LocationDetailDto result = locationService.getLocationById(LocationCategory.CAFE, locationid, 1L)
+			.getLocationDetail();
 
 		//then
 		LocationDetailDto givenDto = LocationDetailDto.builder()

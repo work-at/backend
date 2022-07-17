@@ -6,7 +6,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 import com.workat.domain.map.entity.Location;
-import com.workat.domain.review.CafeReviewType;
+import com.workat.domain.review.FoodReviewType;
 import com.workat.domain.user.entity.Users;
 
 import lombok.AccessLevel;
@@ -15,24 +15,25 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DiscriminatorValue("C")
+@DiscriminatorValue("R")
 @Entity
-public class CafeReview extends BaseReview {
+public class RestaurantReview extends BaseReview {
 
 	@Enumerated(EnumType.STRING)
-	private CafeReviewType reviewType;
+	private FoodReviewType reviewType;
 
-	private CafeReview(CafeReviewType reviewType, Location location, Users user) {
+	private RestaurantReview(FoodReviewType reviewType, Location location, Users user) {
 		super(location, user);
 		this.reviewType = reviewType;
 	}
 
-	static public CafeReview of(CafeReviewType reviewType, Location location, Users user) {
-		return new CafeReview(reviewType, location, user);
+	static public RestaurantReview of(FoodReviewType reviewType, Location location, Users user) {
+		return new RestaurantReview(reviewType, location, user);
 	}
 
 	@Override
-	public CafeReviewType getReviewType() {
+	public FoodReviewType getReviewType() {
 		return this.reviewType;
 	}
 }
+

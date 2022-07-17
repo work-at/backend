@@ -29,7 +29,7 @@ public class UserController {
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@ApiOperation(value = "sign up", notes = "회원 가입")
-	@PostMapping("/api/v1/signup")
+	@PostMapping("/api/v1/user/signup")
 	public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
 		SignUpResponse signUpResponse = userService.signUp(signUpRequest);
 		return ResponseEntity.ok(signUpResponse);
