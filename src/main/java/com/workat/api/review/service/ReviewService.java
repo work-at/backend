@@ -12,14 +12,16 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.workat.api.review.dto.CafeReviewDto;
-import com.workat.api.review.dto.CafeReviewsDto;
+import com.workat.api.review.dto.ReviewDto;
+import com.workat.api.review.dto.ReviewsDto;
 import com.workat.api.review.dto.request.CafeReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.repository.location.LocationRepository;
+import com.workat.domain.review.BaseReviewType;
 import com.workat.domain.review.CafeReviewType;
+import com.workat.domain.review.entity.BaseReview;
 import com.workat.domain.review.entity.CafeReview;
 import com.workat.domain.review.repository.CafeReviewRepository;
 import com.workat.domain.user.entity.Users;
@@ -37,37 +39,36 @@ public class ReviewService {
 	private final LocationRepository locationRepository;
 
 	@Transactional(readOnly = true)
-	public CafeReviewsDto getCafeReviews(long locationId, Users user) {
+	public ReviewsDto getLocationReviews(long locationId, Users user) {
 		final List<CafeReview> cafeReviews = cafeReviewRepository.findAllByLocation_Id(locationId);
 
-		final HashMap<CafeReviewType, Long> cafeReviewCountMap = convertReviewCountMap(cafeReviews);
-		final List<CafeReviewDto> sortedReviewDtos = getSortedReviewDtos(cafeReviewCountMap);
+		HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(cafeReviews);
+		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
 		final boolean userReviewed = checkUserReviewed(cafeReviews, user);
 
-		return CafeReviewsDto.of(
+		return ReviewsDto.of(
 			sortedReviewDtos,
 			userReviewed
 		);
 	}
 
-	// TODO: 추후 Review 상속 관계 고려해보기
-	private HashMap<CafeReviewType, Long> convertReviewCountMap(List<CafeReview> reviews) {
+	private <T extends BaseReview> HashMap<BaseReviewType, Long> convertReviewCountMap(List<T> reviews) {
 
-		final HashMap<CafeReviewType, Long> reviewCountMap = reviews.stream()
-			.collect(groupingBy(CafeReview::getReviewType, HashMap::new, counting()));
+		final HashMap<BaseReviewType, Long> reviewCountMap = reviews.stream()
+			.collect(groupingBy(BaseReview::getReviewType, HashMap::new, counting()));
 
 		return reviewCountMap;
 	}
 
-	private List<CafeReviewDto> getSortedReviewDtos(Map<CafeReviewType, Long> map) {
+	private <T extends BaseReviewType> List<ReviewDto> getSortedReviewDtos(Map<T, Long> map) {
 
 		return map.entrySet()
 			.stream()
-			.map(entry -> CafeReviewDto.of(
+			.map(entry -> ReviewDto.of(
 				entry.getKey(),
 				entry.getValue()))
-			.sorted(Comparator.comparingLong(CafeReviewDto::getCount) // count 역순으로 정렬
+			.sorted(Comparator.comparingLong(ReviewDto::getCount) // count 역순으로 정렬
 				.reversed())
 			.collect(toList());
 	}
