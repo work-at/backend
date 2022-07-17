@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.LocationPinDto;
+import com.workat.api.map.dto.response.CafeDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.map.service.LocationService;
 import com.workat.common.annotation.UserValidation;
@@ -68,10 +69,10 @@ public class LocationController {
 	@ApiOperation("카페의 상세 정보를 가져오기")
 	@ApiImplicitParam(name = "locationId", value = "카페의 Id", required = true, dataType = "long", example = "1")
 	@GetMapping("/api/v1/map/cafes/{locationId}")
-	public ResponseEntity<LocationDetailDto> getCafeById(@UserValidation Users user,
-		@PathVariable("locationId") long locationId) {
-		LocationDetailDto dto =
-			locationService.getLocationById(LocationCategory.CAFE, locationId);
+	public ResponseEntity<CafeDetailResponse> getCafeById(@PathVariable("locationId") long locationId,
+		@UserValidation Users user) {
+		CafeDetailResponse dto =
+			locationService.getCafeById(LocationCategory.CAFE, locationId, user);
 		return ResponseEntity.ok(dto);
 	}
 

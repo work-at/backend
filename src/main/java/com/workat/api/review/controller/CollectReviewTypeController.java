@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.workat.api.review.dto.ReviewTypeListResponse;
+import com.workat.api.review.dto.response.ReviewTypeListResponse;
 import com.workat.api.review.service.CollectReviewTypeService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;

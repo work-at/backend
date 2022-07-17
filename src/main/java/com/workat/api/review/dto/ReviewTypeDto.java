@@ -8,17 +8,17 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ReviewTypeResponse {
+public class ReviewTypeDto {
 
 	private String name;
 	private String content;
 
-	private ReviewTypeResponse(String name, String content) {
+	private ReviewTypeDto(String name, String content) {
 		this.name = name;
 		this.content = content;
 	}
 
-	public static ReviewTypeResponse of(BaseReviewType baseReviewData) {
-		return new ReviewTypeResponse(baseReviewData.getName(), baseReviewData.getContent());
+	public static ReviewTypeDto of(BaseReviewType baseReviewData) {
+		return new ReviewTypeDto(baseReviewData.getName(), baseReviewData.getContent());
 	}
 }
