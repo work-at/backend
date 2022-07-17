@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.workat.api.map.dto.WorkerDto;
 import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
+import com.workat.api.map.dto.response.WorkerSizeResponse;
 import com.workat.api.map.service.WorkerService;
 import com.workat.common.annotation.UserValidation;
 import com.workat.domain.user.entity.Users;
@@ -35,8 +36,14 @@ public class WorkerController {
 	}
 
 	@GetMapping("/api/v1/map/workers")
-	public ResponseEntity<WorkerListResponse> findNearWorker(@UserValidation Users user, @RequestParam double kilometer) {
+	public ResponseEntity<WorkerListResponse> findNearWorker(@UserValidation Users user, @RequestParam(defaultValue = "5.0") double kilometer) {
 		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, kilometer);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/api/v1/map/workers/counting")
+	public ResponseEntity<WorkerSizeResponse> countNearWorker(@UserValidation Users user, @RequestParam(defaultValue = "5.0") double kilometer) {
+		WorkerSizeResponse response = workerService.countAllWorkerByLocationNear(user, kilometer);
 		return ResponseEntity.ok(response);
 	}
 }

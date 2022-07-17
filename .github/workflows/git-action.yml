@@ -27,3 +27,15 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew --info clean build
+
+      - name: docker login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+      - name: Build and push the Docker image for develop deployment
+        run: |
+          docker build -f ./Dockerfile.dev --tag ${{secrets.DOCKER_USERNAME}}/workat:dev .
+          docker push ${{secrets.DOCKER_USERNAME}}/workat:dev
+        if: contains(github.ref, 'develop')

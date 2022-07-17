@@ -18,8 +18,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.workat.api.map.dto.request.NearWorkerCountRequest;
-import com.workat.api.map.dto.response.NearWorkerCountResponse;
+import com.workat.api.map.dto.request.UserAddressRequest;
+import com.workat.api.map.dto.response.UserAddressResponse;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.MultipleDatasourceBaseTest;
 import com.workat.domain.map.entity.WorkerLocation;
@@ -123,12 +123,11 @@ public class AddressServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		NearWorkerCountResponse response = addressService.getAddressAndNearWorkerCount(user, NearWorkerCountRequest.of("127.423084873712", "37.0789561558879", 5.0));
+		UserAddressResponse response = addressService.saveUserAddress(user, UserAddressRequest.of("127.423084873712", "37.0789561558879"));
 
 		//then
 		Assertions.assertAll(
-			() -> Assertions.assertEquals(response.getAddress(), "경기 안성시 죽산면 죽산리"),
-			() -> Assertions.assertEquals(response.getCount(), 1)
+			() -> Assertions.assertEquals(response.getAddress(), "경기 안성시 죽산면 죽산리")
 		);
 	}
 }

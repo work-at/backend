@@ -1,12 +1,13 @@
 package com.workat.api.map.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.workat.api.map.dto.request.NearWorkerCountRequest;
-import com.workat.api.map.dto.response.NearWorkerCountResponse;
+import com.workat.api.map.dto.request.UserAddressRequest;
+import com.workat.api.map.dto.response.UserAddressResponse;
 import com.workat.api.map.service.AddressService;
 import com.workat.common.annotation.UserValidation;
 import com.workat.domain.user.entity.Users;
@@ -24,10 +25,10 @@ public class AddressController {
 
 	private final AddressService addressService;
 
-	@ApiOperation(value = "getAddressAndNearWorkerCount", notes = "맵 첫 진입 시 유저 주소 반환 및 주위 워케이셔너 수 반환", authorizations = {@Authorization(value = "JWT 토큰")})
-	@PostMapping("/api/v1/map")
-	public ResponseEntity<NearWorkerCountResponse> getAddressAndNearWorkerCount(@UserValidation Users user, @RequestBody NearWorkerCountRequest request) {
-		NearWorkerCountResponse response = addressService.getAddressAndNearWorkerCount(user, request);
+	@ApiOperation(value = "save user address", notes = "유저 위도 경도 저장 및 주소 변환", authorizations = {@Authorization(value = "JWT 토큰")})
+	@PostMapping("/api/v1/users/address")
+	public ResponseEntity<UserAddressResponse> saveUserAddress(@UserValidation Users user, @RequestBody UserAddressRequest request) {
+		UserAddressResponse response = addressService.saveUserAddress(user, request);
 		return ResponseEntity.ok(response);
 	}
 

@@ -8,8 +8,8 @@ import org.springframework.data.geo.Distance;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.workat.api.map.dto.request.NearWorkerCountRequest;
-import com.workat.api.map.dto.response.NearWorkerCountResponse;
+import com.workat.api.map.dto.request.UserAddressRequest;
+import com.workat.api.map.dto.response.UserAddressResponse;
 import com.workat.common.exception.NotFoundException;
 import com.workat.common.exception.base.BusinessException;
 import com.workat.domain.map.entity.WorkerLocation;
@@ -31,14 +31,12 @@ public class AddressService {
 
 	private final WorkerLocationRedisRepository workerLocationRedisRepository;
 
-	public NearWorkerCountResponse getAddressAndNearWorkerCount(Users user, NearWorkerCountRequest request) {
+	public UserAddressResponse saveUserAddress(Users user, UserAddressRequest request) {
 		getAddressAndSave(user.getId(), request.getLongitude(), request.getLatitude());
 
 		WorkerLocation worker = workerLocationRedisRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
-		int count = workerLocationRedisRepository.findAllByLocationNear(worker.getLocation(), new Distance(request.getKilometer(), KILOMETERS)).size();
-		count = Math.max(count - 1, 0);
 
-		return NearWorkerCountResponse.of(worker.getAddress(), count);
+		return UserAddressResponse.of(worker.getAddress());
 	}
 
 	private void getAddressAndSave(Long userId, String longitude, String latitude) {
