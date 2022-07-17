@@ -1,8 +1,9 @@
 package com.workat.api.map.dto.response;
 
 import com.workat.api.map.dto.LocationDetailDto;
-import com.workat.api.review.dto.ReviewsDto;
+import com.workat.api.review.dto.LocationReviewDto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,15 +12,17 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LocationDetailResponse {
 
-	private LocationDetailDto locationDetailDto;
+	@ApiModelProperty(name = "locationDetail", notes = "로케이션 상세 정보")
+	private LocationDetailDto locationDetail;
 
-	private ReviewsDto reviewsDto;
+	@ApiModelProperty(name = "locationReview", notes = "로케이션 리뷰")
+	private LocationReviewDto locationReview;
 
-	public static LocationDetailResponse of(LocationDetailDto locationDetailDto, ReviewsDto reviewsDto) {
+	public static LocationDetailResponse of(LocationDetailDto locationDetailDto, LocationReviewDto locationReviewDto) {
 		final LocationDetailResponse locationDetailResponse = new LocationDetailResponse();
 
-		locationDetailResponse.locationDetailDto = locationDetailDto;
-		locationDetailResponse.reviewsDto = reviewsDto;
+		locationDetailResponse.locationDetail = locationDetailDto;
+		locationDetailResponse.locationReview = locationReviewDto;
 
 		return locationDetailResponse;
 	}

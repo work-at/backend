@@ -12,8 +12,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.dto.ReviewDto;
-import com.workat.api.review.dto.ReviewsDto;
 import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
@@ -44,7 +44,8 @@ public class ReviewService {
 	private final LocationRepository locationRepository;
 
 	@Transactional(readOnly = true)
-	public ReviewsDto getLocationReviews(long locationId, long userId) {
+	public LocationReviewDto getLocationReviews(long locationId, long userId) {
+
 		final List<CafeReview> cafeReviews = cafeReviewRepository.findAllByLocation_Id(locationId);
 
 		HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(cafeReviews);
@@ -52,7 +53,7 @@ public class ReviewService {
 
 		final boolean userReviewed = checkUserReviewed(cafeReviews, userId);
 
-		return ReviewsDto.of(
+		return LocationReviewDto.of(
 			sortedReviewDtos,
 			userReviewed
 		);

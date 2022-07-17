@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.dto.ReviewDto;
-import com.workat.api.review.dto.ReviewsDto;
 import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.domain.auth.OauthType;
@@ -128,12 +128,12 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 		// when
 		final long locationId = location.getId();
-		final List<ReviewDto> reviewDtos = reviewService.getLocationReviews(locationId, user1.getId()).getReviewDtos();
+		final List<ReviewDto> reviewDtos = reviewService.getLocationReviews(locationId, user1.getId()).getReviews();
 
 		final Map<String, Long> reviewCountMap = reviewDtos.stream()
 			.collect(
 				Collectors.toMap(
-					dto -> dto.getReviewTypeDto().getName(),
+					dto -> dto.getReviewType().getName(),
 					ReviewDto::getCount));
 		// then
 		assertAll(
@@ -173,7 +173,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		// when
 		final long locationId = location.getId();
 		final Users user = users.get(0);
-		final List<ReviewDto> reviewDtos = reviewService.getLocationReviews(locationId, user.getId()).getReviewDtos();
+		final List<ReviewDto> reviewDtos = reviewService.getLocationReviews(locationId, user.getId()).getReviews();
 
 		// then
 		assertEquals(reviewDtos.size(), 3); // PARKING, WIFI, NIGHT_VIEW
@@ -206,9 +206,9 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		// when
 		final long locationId = location.getId();
 
-		final ReviewsDto locationReviews1 = reviewService.getLocationReviews(locationId, user1.getId());
-		final ReviewsDto locationReviews2 = reviewService.getLocationReviews(locationId, user2.getId());
-		final ReviewsDto locationReviews3 = reviewService.getLocationReviews(locationId, user3.getId());
+		final LocationReviewDto locationReviews1 = reviewService.getLocationReviews(locationId, user1.getId());
+		final LocationReviewDto locationReviews2 = reviewService.getLocationReviews(locationId, user2.getId());
+		final LocationReviewDto locationReviews3 = reviewService.getLocationReviews(locationId, user3.getId());
 
 		// then
 		assertAll(

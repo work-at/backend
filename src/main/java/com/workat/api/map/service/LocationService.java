@@ -10,7 +10,7 @@ import com.workat.api.map.dto.LocationPinDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.api.map.dto.response.LocationDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
-import com.workat.api.review.dto.ReviewsDto;
+import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
@@ -98,11 +98,13 @@ public class LocationService {
 			.latitude(location.getLatitude())
 			.build();
 
-		final ReviewsDto locationReviewsDto = reviewService.getLocationReviews(locationId, userId);
+		log.error("테스트에요");
+
+		final LocationReviewDto locationLocationReviewDto = reviewService.getLocationReviews(locationId, userId);
 
 		return LocationDetailResponse.of(
 			locationDetailDto,
-			locationReviewsDto
+			locationLocationReviewDto
 		);
 	}
 

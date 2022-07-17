@@ -35,10 +35,11 @@ import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.http.dto.KakaoLocalMetaDto;
 import com.workat.domain.map.http.dto.KakaoLocalResponse;
 import com.workat.domain.map.repository.location.LocationRepository;
+import com.workat.domain.review.repository.CafeReviewRepository;
+import com.workat.domain.review.repository.RestaurantReviewRepository;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
-import com.workat.domain.user.repository.UsersRepository;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -58,11 +59,15 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	private LocationRepository locationRepository;
 
 	@Autowired
-	private UsersRepository usersRepository;
+	private CafeReviewRepository cafeReviewRepository;
+
+	@Autowired
+	private RestaurantReviewRepository restaurantReviewRepository;
 
 	@BeforeEach
 	void setUp() {
 		this.locationHttpReceiver = new LocationHttpReceiver(restTemplate);
+		this.reviewService = new ReviewService(cafeReviewRepository, restaurantReviewRepository, locationRepository);
 		this.locationService = new LocationService(locationHttpReceiver, locationRepository, reviewService);
 	}
 
@@ -201,13 +206,11 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
 
-		long userId = usersRepository.save(user).getId();
-
 		long locationid = locationRepository.save(given).getId();
 
 		//when
-		LocationDetailDto result = locationService.getLocationById(LocationCategory.CAFE, locationid, userId)
-			.getLocationDetailDto();
+		LocationDetailDto result = locationService.getLocationById(LocationCategory.CAFE, locationid, 1L)
+			.getLocationDetail();
 
 		//then
 		LocationDetailDto givenDto = LocationDetailDto.builder()
