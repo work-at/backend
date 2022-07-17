@@ -1,14 +1,9 @@
 package com.workat.domain.review.entity;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.review.CafeReviewType;
@@ -18,33 +13,26 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DiscriminatorValue("C")
 @Entity
-public class CafeReview {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
-	@JoinColumn(name = "location_id")
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Location location;
-
-	@JoinColumn(name = "user_id")
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Users user;
+public class CafeReview extends BaseReview {
 
 	@Enumerated(EnumType.STRING)
 	private CafeReviewType reviewType;
 
 	private CafeReview(CafeReviewType reviewType, Location location, Users user) {
+		super(location, user);
 		this.reviewType = reviewType;
-		this.location = location;
-		this.user = user;
 	}
 
 	static public CafeReview of(CafeReviewType reviewType, Location location, Users user) {
 		return new CafeReview(reviewType, location, user);
+	}
+
+	@Override
+	public CafeReviewType getReviewType() {
+		return this.reviewType;
 	}
 }
