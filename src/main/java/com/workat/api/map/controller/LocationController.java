@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.LocationPinDto;
-import com.workat.api.map.dto.response.CafeDetailResponse;
+import com.workat.api.map.dto.response.LocationDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.map.service.LocationService;
 import com.workat.common.annotation.UserValidation;
@@ -28,9 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class LocationController {
 
-	private final LocationService locationService;
-
 	private static final String DEFAULT_RADIUS = "2000";
+	private final LocationService locationService;
 
 	@ApiOperation("현재 위치 기준으로 반경(radius) 내 카페 정보를 가져오기")
 	@ApiImplicitParams(value = {
@@ -69,10 +68,10 @@ public class LocationController {
 	@ApiOperation("카페의 상세 정보를 가져오기")
 	@ApiImplicitParam(name = "locationId", value = "카페의 Id", required = true, dataType = "long", example = "1")
 	@GetMapping("/api/v1/map/cafes/{locationId}")
-	public ResponseEntity<CafeDetailResponse> getCafeById(@PathVariable("locationId") long locationId,
+	public ResponseEntity<LocationDetailResponse> getCafeById(@PathVariable("locationId") long locationId,
 		@UserValidation Users user) {
-		CafeDetailResponse dto =
-			locationService.getCafeById(LocationCategory.CAFE, locationId, user);
+		LocationDetailResponse dto =
+			locationService.getLocationById(LocationCategory.CAFE, locationId, user);
 		return ResponseEntity.ok(dto);
 	}
 
@@ -114,10 +113,10 @@ public class LocationController {
 	@ApiOperation("음식점의 상세 정보를 가져오기")
 	@ApiImplicitParam(name = "locationId", value = "음식점의 Id", required = true, dataType = "long", example = "1")
 	@GetMapping("/api/v1/map/restaurants/{locationId}")
-	public ResponseEntity<LocationDetailDto> getRestaurantById(@UserValidation Users user,
+	public ResponseEntity<LocationDetailResponse> getRestaurantById(@UserValidation Users user,
 		@PathVariable("locationId") long locationId) {
-		LocationDetailDto dto =
-			locationService.getLocationById(LocationCategory.RESTAURANT, locationId);
+		LocationDetailResponse dto =
+			locationService.getLocationById(LocationCategory.CAFE, locationId, user);
 		return ResponseEntity.ok(dto);
 	}
 }
