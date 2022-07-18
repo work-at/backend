@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.data.geo.Distance;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.workat.api.map.dto.WorkerPinDto;
+import com.workat.api.map.dto.WorkerPin;
 import com.workat.domain.config.RedisContainerBaseTest;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
@@ -43,11 +43,11 @@ class WorkerLocationRedisRepositoryTest extends RedisContainerBaseTest {
 		// given
 
 		// when
-		List<WorkerPinDto> workerPinDtos = workerLocationRedisRepository.findWorkerPinsByLocationNear(workerLocation.getLocation(), 5);
+		List<WorkerPin> workerPins = workerLocationRedisRepository.findWorkerPinsByLocationNear(workerLocation.getLocation(), 5);
 
 		// then
 		Assertions.assertAll(
-			() -> Assertions.assertEquals(workerPinDtos.size(), 2)
+			() -> Assertions.assertEquals(workerPins.size(), 2)
 		);
 	}
 

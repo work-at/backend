@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.workat.api.map.dto.WorkerDto;
+import com.workat.api.map.dto.WorkerPin;
 import com.workat.api.map.dto.WorkerPinDto;
 import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
@@ -56,7 +57,8 @@ public class WorkerService {
 
 		List<WorkerPinDto> workerPinDtos = workerLocationRedisRepository.findWorkerPinsByLocationNear(userLocation.getLocation(), kilometer)
 			.stream()
-			.filter(workerPinDto -> user.getId() != Long.parseLong(workerPinDto.getUserId()))
+			.filter(workerPin -> !user.getId().equals(workerPin.getUserId()))
+			.map(WorkerPinDto::of)
 			.collect(Collectors.toList());
 
 		return WorkerPinResponse.of(workerPinDtos);

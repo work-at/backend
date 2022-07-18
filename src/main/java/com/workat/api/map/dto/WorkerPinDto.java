@@ -1,10 +1,24 @@
 package com.workat.api.map.dto;
 
-import org.springframework.data.geo.Point;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public interface WorkerPinDto {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+public class WorkerPinDto {
 
-	String getUserId();
+	long id;
+	double longitude;
+	double latitude;
 
-	Point getLocation();
+	private WorkerPinDto(long id, double longitude, double latitude) {
+		this.id = id;
+		this.longitude = longitude;
+		this.latitude = latitude;
+	}
+
+	public static WorkerPinDto of(WorkerPin workerPin) {
+		return new WorkerPinDto(workerPin.getUserId(), workerPin.getLocation().getX(), workerPin.getLocation().getY());
+	}
 }
