@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthorizationService {
 
 	// private final long ACCESS_TOKEN_VALIDATION_TIME = 60 * 60 * 6; // kakao access token 만료 시간과 동일
-	private final long ACCESS_TOKEN_VALIDATION_TIME = 60 * 60 * 1000; // 개발용으로 길게
+	private final long ACCESS_TOKEN_VALIDATION_TIME = 60 * 60 * 100000L; // 개발용으로 길게
 
 	private final JwtService jwtService;
 
