@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,10 +24,12 @@ import org.springframework.web.client.RestTemplate;
 
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
+import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.area.repository.AreaRepository;
 import com.workat.domain.config.MysqlContainerBaseTest;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
@@ -59,6 +62,9 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	private LocationRepository locationRepository;
 
 	@Autowired
+	private AreaRepository areaRepository;
+
+	@Autowired
 	private CafeReviewRepository cafeReviewRepository;
 
 	@Autowired
@@ -68,7 +74,8 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	void setUp() {
 		this.locationHttpReceiver = new LocationHttpReceiver(restTemplate);
 		this.reviewService = new ReviewService(cafeReviewRepository, restaurantReviewRepository, locationRepository);
-		this.locationService = new LocationService(locationHttpReceiver, locationRepository, reviewService);
+		this.locationService = new LocationService(locationHttpReceiver, reviewService, locationRepository,
+			areaRepository);
 	}
 
 	@Test
@@ -171,6 +178,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	@Test
 	void getLocationById_fail_not_found() {
 		//given
+
 		//when
 
 		//then
@@ -188,8 +196,8 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.placeUrl(value)
 			.addressName(value)
 			.roadAddressName(value)
-			.longitude(value)
-			.latitude(value)
+			.x(value)
+			.y(value)
 			.build();
 
 		Location given = Location.builder()
@@ -247,8 +255,8 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 				String i = String.valueOf(index);
 				return KakaoLocalDataDto.builder()
 					.id(i)
-					.longitude(i)
-					.latitude(i)
+					.x(i)
+					.y(i)
 					.phone(i)
 					.placeName(i)
 					.placeUrl(i)
@@ -269,7 +277,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//when
 		assertEquals(0, locationRepository.findAll().size());
-		locationService.updateLocations(request);
+		locationService.updateLocations();
 
 		//then
 		assertEquals(10, locationRepository.findAll().size());

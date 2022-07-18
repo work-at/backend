@@ -23,12 +23,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.http.dto.KakaoLocalMetaDto;
 import com.workat.domain.map.http.dto.KakaoLocalResponse;
+import com.workat.domain.map.vo.MapPoint;
 
 @ExtendWith(MockitoExtension.class)
 class LocationHttpReceiverTest {
@@ -51,15 +51,15 @@ class LocationHttpReceiverTest {
 	void updateLocation() {
 		//given
 		LocationCategory givenLocationCategory = LocationCategory.CAFE;
-		LocationTriggerRequest givenLocationTriggerRequest = LocationTriggerRequest.of(1.0f, 1.0f, 1);
+		MapPoint point = MapPoint.of(1.0, 1.0);
 		List<KakaoLocalDataDto> givenDocuments = IntStream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 			.boxed()
 			.map(index -> {
 				String i = String.valueOf(index);
 				return KakaoLocalDataDto.builder()
 					.id(i)
-					.longitude(i)
-					.latitude(i)
+					.x(i)
+					.y(i)
 					.phone(i)
 					.placeName(i)
 					.placeUrl(i)
@@ -80,8 +80,7 @@ class LocationHttpReceiverTest {
 			.willReturn(ResponseEntity.ok(givenResponse));
 
 		//when
-		List<KakaoLocalDataDto> response = locationHttpReceiver.updateLocations(givenLocationCategory,
-			givenLocationTriggerRequest);
+		List<KakaoLocalDataDto> response = locationHttpReceiver.updateLocations(givenLocationCategory, point, 1);
 
 		//then
 		assertEquals(givenResponse.getDocuments().size(), response.size());
@@ -93,8 +92,8 @@ class LocationHttpReceiverTest {
 				() -> assertEquals(given.getId(), result.getId()),
 				() -> assertEquals(given.getPlaceName(), result.getPlaceName()),
 				() -> assertEquals(given.getPlaceUrl(), result.getPlaceUrl()),
-				() -> assertEquals(given.getLongitude(), result.getLongitude()),
-				() -> assertEquals(given.getLatitude(), result.getLatitude()),
+				() -> assertEquals(given.getX(), result.getX()),
+				() -> assertEquals(given.getY(), result.getY()),
 				() -> assertEquals(given.getPhone(), result.getPhone()),
 				() -> assertEquals(given.getAddressName(), result.getAddressName()),
 				() -> assertEquals(given.getRoadAddressName(), result.getRoadAddressName())

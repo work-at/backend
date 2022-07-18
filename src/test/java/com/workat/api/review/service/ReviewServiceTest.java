@@ -74,8 +74,8 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 						.placeUrl(value)
 						.addressName(value)
 						.roadAddressName(value)
-						.longitude(value)
-						.latitude(value)
+						.x(value)
+						.y(value)
 						.build();
 
 					Location location = Location.builder()

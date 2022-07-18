@@ -21,6 +21,7 @@ import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.http.dto.KakaoLocalResponse;
+import com.workat.domain.map.vo.MapPoint;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,15 +44,15 @@ public class LocationHttpReceiver {
 
 	private final RestTemplate restTemplate;
 
-	public List<KakaoLocalDataDto> updateLocations(LocationCategory category, LocationTriggerRequest request) {
+	public List<KakaoLocalDataDto> updateLocations(LocationCategory category, MapPoint point, int radius) {
 		ArrayList<KakaoLocalDataDto> result = new ArrayList<>();
 
 		try {
 			HttpHeaders headers = getKakaoLocalHeader();
 			String url = KAKAO_LOCAL_BASE_URI + KAKAO_CATEGORY_SEARCH_PATH;
-			int pageCount = 1;
+			int pageCount = 0;
 			while (true) {
-				String uri = convertToUri(url, category, request, pageCount);
+				String uri = convertToUri(url, category, point, radius, ++pageCount);
 
 				KakaoLocalResponse response = restTemplate.exchange(uri, HttpMethod.GET,
 					new HttpEntity<>(headers), KakaoLocalResponse.class).getBody();
@@ -59,10 +60,11 @@ public class LocationHttpReceiver {
 				log.info("get local data from kakao success : page count {}, data size {}", (pageCount), data.size());
 				result.addAll(data);
 
-				if (response.getMeta().getPageableCount() == pageCount++) {
+				if (response.getMeta().isEnd() || response.getMeta().getPageableCount() == pageCount) {
 					log.info("get local data from kakao stop");
 					break;
 				}
+
 			}
 		} catch (HttpStatusCodeException e) {
 			throw new BusinessException(e.getStatusCode(), e.getMessage());
@@ -100,18 +102,18 @@ public class LocationHttpReceiver {
 			.toUriString();
 	}
 
-	private String convertToUri(String url, LocationCategory category, LocationTriggerRequest request, int page) {
+	private String convertToUri(String url, LocationCategory category, MapPoint point, int radius, int page) {
 		String categoryCode = category.getValue();
-		double x = request.getX();
-		double y = request.getY();
-		int radius = request.getRadius();
+		double longitude = point.getLongitude();
+		double latitude = point.getLatitude();
 
 		return UriComponentsBuilder.fromHttpUrl(url)
 			.queryParam("category_group_code", categoryCode)
-			.queryParam("x", String.valueOf(x))
-			.queryParam("y", String.valueOf(y))
+			.queryParam("x", String.valueOf(longitude))
+			.queryParam("y", String.valueOf(latitude))
 			.queryParam("radius", String.valueOf(radius))
 			.queryParam("page", String.valueOf(page))
-			.queryParam("size", "15").toUriString();
+			.queryParam("size", "15")
+			.queryParam("sort", "distance").toUriString();
 	}
 }

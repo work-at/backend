@@ -63,8 +63,8 @@ public class Location {
 		this.placeUrl = dto.getPlaceUrl();
 		this.addressName = dto.getAddressName();
 		this.roadAddressName = dto.getRoadAddressName();
-		this.longitude = Float.parseFloat(dto.getLongitude());
-		this.latitude = Float.parseFloat(dto.getLatitude());
+		this.longitude = Double.parseDouble(dto.getX());
+		this.latitude = Double.parseDouble(dto.getY());
 	}
 
 	public Location update(KakaoLocalDataDto dto) {
@@ -73,8 +73,8 @@ public class Location {
 		this.placeUrl = dto.getPlaceUrl();
 		this.addressName = dto.getAddressName();
 		this.roadAddressName = dto.getRoadAddressName();
-		this.longitude = Double.parseDouble(dto.getLongitude());
-		this.latitude = Double.parseDouble(dto.getLatitude());
+		this.longitude = Double.parseDouble(dto.getX());
+		this.latitude = Double.parseDouble(dto.getY());
 		return this;
 	}
 }
