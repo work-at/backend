@@ -8,10 +8,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.geo.Distance;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.workat.api.map.dto.WorkerDto;
+import com.workat.api.map.dto.WorkerPin;
+import com.workat.api.map.dto.WorkerPinDto;
 import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
+import com.workat.api.map.dto.response.WorkerPinResponse;
 import com.workat.api.map.dto.response.WorkerSizeResponse;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.WorkerLocation;
@@ -30,6 +34,7 @@ public class WorkerService {
 
 	private final UsersRepository userRepository;
 
+	@Transactional(readOnly = true)
 	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer) {
 		List<WorkerLocation> workerLocations = getWorkerByLocationNear(user, kilometer);
 
@@ -45,18 +50,35 @@ public class WorkerService {
 		return WorkerListResponse.of(workerDtos);
 	}
 
+	@Transactional(readOnly = true)
+	public WorkerPinResponse findAllWorkerPinsByLocationNear(Users user, double kilometer) {
+		WorkerLocation userLocation = workerLocationRedisRepository.findById(user.getId())
+			.orElseThrow(() -> new NotFoundException("user need to update address"));
+
+		List<WorkerPinDto> workerPinDtos = workerLocationRedisRepository.findWorkerPinsByLocationNear(userLocation.getLocation(), kilometer)
+			.stream()
+			.filter(workerPin -> !user.getId().equals(workerPin.getUserId()))
+			.map(WorkerPinDto::of)
+			.collect(Collectors.toList());
+
+		return WorkerPinResponse.of(workerPinDtos);
+	}
+
+	@Transactional(readOnly = true)
 	public WorkerSizeResponse countAllWorkerByLocationNear(Users user, double kilometer) {
 		List<WorkerLocation> workerLocations = getWorkerByLocationNear(user, kilometer);
 
 		return WorkerSizeResponse.of(Math.max(workerLocations.size() - 1, 0));
 	}
 
+	@Transactional(readOnly = true)
 	public WorkerDetailResponse findWorkerDetailById(Long userId) {
 		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		return WorkerDetailResponse.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear(),
 			user.getStory());
 	}
 
+	@Transactional(readOnly = true)
 	public WorkerDto findWorkerById(Long userId) {
 		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		return WorkerDto.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear());
