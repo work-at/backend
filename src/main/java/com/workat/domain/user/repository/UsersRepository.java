@@ -8,7 +8,6 @@ import com.workat.domain.auth.OauthType;
 import com.workat.domain.user.entity.Users;
 
 public interface UsersRepository extends JpaRepository<Users, Long> {
-	Optional<Users> findFirstByNickname(String nickname);
 
 	Optional<Users> findByOauthTypeAndOauthId(OauthType oauthType, Long oauthId);
 }

@@ -26,9 +26,11 @@ import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
 @ActiveProfiles("test")
@@ -39,6 +41,9 @@ public class AddressServiceTest extends MultipleDatasourceBaseTest {
 
 	@Autowired
 	private UsersRepository userRepository;
+
+	@Autowired
+	private UserProfileRepository userProfileRepository;
 
 	@Autowired
 	private WorkerLocationRedisRepository workerLocationRedisRepository;
@@ -94,14 +99,15 @@ public class AddressServiceTest extends MultipleDatasourceBaseTest {
 
 		this.addressService = new AddressService(locationHttpReceiver, workerLocationRedisRepository);
 
-		user = Users.builder()
+		user = Users.of(OauthType.KAKAO, 12345L);
+		UserProfile userProfile = UserProfile.builder()
 			.nickname("nickname")
-			.oauthType(OauthType.KAKAO)
-			.oauthId(12345L)
 			.position(DepartmentType.ACCOUNTANT)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
+		user.setUserProfile(userProfile);
+		userProfileRepository.save(userProfile);
 		userRepository.save(user);
 
 		workerLocation = WorkerLocation.of(user.getId(), "127.423084873712", "37.0789561558879", "경기 안성시 죽산면 죽산리");
@@ -115,6 +121,7 @@ public class AddressServiceTest extends MultipleDatasourceBaseTest {
 	@AfterAll
 	void teardown() {
 		userRepository.deleteAll();
+		userProfileRepository.deleteAll();
 		workerLocationRedisRepository.deleteAll();
 	}
 

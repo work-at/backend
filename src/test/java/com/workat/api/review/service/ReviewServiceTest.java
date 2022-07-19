@@ -33,9 +33,11 @@ import com.workat.domain.review.entity.CafeReview;
 import com.workat.domain.review.entity.RestaurantReview;
 import com.workat.domain.review.repository.CafeReviewRepository;
 import com.workat.domain.review.repository.RestaurantReviewRepository;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
 @DisplayName("ReviewService 테스트")
@@ -56,6 +58,9 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 	@Autowired
 	private UsersRepository userRepository;
+
+	@Autowired
+	private UserProfileRepository userProfileRepository;
 
 	@BeforeEach
 	void setUp() {
@@ -93,15 +98,15 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 	private List<Users> saveUsers(int size) {
 		return IntStream.range(0, size)
 			.mapToObj(idx -> {
-					Users user = Users.builder()
+					Users user = Users.of(OauthType.KAKAO, (long)idx);
+					UserProfile userProfile = UserProfile.builder()
 						.nickname(String.format("name%d", idx))
-						.oauthType(OauthType.KAKAO)
-						.oauthId(Long.valueOf(idx))
 						.position(DepartmentType.ACCOUNTANT)
 						.workingYear(DurationType.JUNIOR)
 						.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 						.build();
-
+					user.setUserProfile(userProfile);
+					userProfileRepository.save(userProfile);
 					userRepository.save(user);
 					return user;
 				}

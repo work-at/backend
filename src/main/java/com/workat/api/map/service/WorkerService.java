@@ -20,6 +20,7 @@ import com.workat.api.map.dto.response.WorkerSizeResponse;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class WorkerService {
 			.map(workerLocation -> userRepository.findById(Long.parseLong(workerLocation.getUserId())))
 			.filter(Optional::isPresent)
 			.map(Optional::get)
-			.map(worker -> WorkerDto.of(worker.getId(), worker.getImageUrl(), worker.getPosition(), worker.getWorkingYear()))
+			.map(worker -> WorkerDto.of(worker.getId(), worker.getUserProfile()))
 			.collect(Collectors.toList());
 
 		return WorkerListResponse.of(workerDtos);
@@ -74,14 +75,13 @@ public class WorkerService {
 	@Transactional(readOnly = true)
 	public WorkerDetailResponse findWorkerDetailById(Long userId) {
 		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
-		return WorkerDetailResponse.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear(),
-			user.getStory());
+		return WorkerDetailResponse.of(user.getId(), user.getUserProfile());
 	}
 
 	@Transactional(readOnly = true)
 	public WorkerDto findWorkerById(Long userId) {
 		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
-		return WorkerDto.of(user.getId(), user.getImageUrl(), user.getPosition(), user.getWorkingYear());
+		return WorkerDto.of(user.getId(), user.getUserProfile());
 	}
 
 	private List<WorkerLocation> getWorkerByLocationNear(Users user, double kilometer) {

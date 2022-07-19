@@ -11,6 +11,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.workat.domain.BaseEntity;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.review.BaseReviewType;
 import com.workat.domain.user.entity.Users;
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "DTYPE")
 @Entity
-public abstract class BaseReview {
+public abstract class BaseReview extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

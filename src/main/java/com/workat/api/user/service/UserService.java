@@ -12,7 +12,9 @@ import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
 
 	private final UsersRepository userRepository;
+
+	private final UserProfileRepository userProfileRepository;
 
 	private final AuthorizationService authorizationService;
 
@@ -52,10 +56,17 @@ public class UserService {
 			throw new ConflictException("user already exists");
 		}
 
-		final Users user = convertUser(signUpRequest);
-		userRepository.save(user);
+		Users users = Users.of(signUpRequest.getOauthType(), signUpRequest.getOauthId());
+		UserProfile userProfile = UserProfile.builder()
+			.nickname(signUpRequest.getNickname())
+			.position(signUpRequest.getPosition())
+			.workingYear(signUpRequest.getWorkingYear())
+			.build();
+		userProfileRepository.save(userProfile);
+		users.setUserProfile(userProfile);
+		userRepository.save(users);
 
-		final long id = user.getId();
+		final long id = users.getId();
 		final String accessToken = authorizationService.createAccessToken(id);
 
 		return SignUpResponse.of(accessToken);
@@ -69,25 +80,12 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public boolean isUserNicknameExists(String nickname) {
-		return userRepository.findFirstByNickname(nickname).isPresent();
+		return userProfileRepository.findFirstByNickname(nickname).isPresent();
 	}
 
 	@Transactional(readOnly = true)
 	public boolean validateUserExistWithOauthId(OauthType oauthType, long oauthId) {
-		// ouath id 로 가입된 유저 있는지 확인
-		final Optional<Users> usersOptional = userRepository.findByOauthTypeAndOauthId(oauthType, oauthId);
-
-		return usersOptional.isPresent();
-	}
-
-	private Users convertUser(SignUpRequest signUpRequest) {
-		return Users.builder()
-			.oauthType(signUpRequest.getOauthType())
-			.oauthId(signUpRequest.getOauthId())
-			.nickname(signUpRequest.getNickname())
-			.position(signUpRequest.getPosition())
-			.workingYear(signUpRequest.getWorkingYear())
-			.build();
+		return userRepository.findByOauthTypeAndOauthId(oauthType, oauthId).isPresent();
 	}
 
 }

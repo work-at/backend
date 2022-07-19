@@ -2,6 +2,7 @@ package com.workat.api.map.dto.response;
 
 import com.workat.api.user.dto.DepartmentTypeDto;
 import com.workat.api.user.dto.DurationTypeDto;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
 
@@ -32,9 +33,8 @@ public class WorkerDetailResponse {
 		this.story = story;
 	}
 
-	public static WorkerDetailResponse of(long id, String imageUrl, DepartmentType position, DurationType workingYear,
-		String story) {
-		return new WorkerDetailResponse(id, imageUrl, position, workingYear, story);
+	public static WorkerDetailResponse of(long id, UserProfile userProfile) {
+		return new WorkerDetailResponse(id, userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getStory());
 	}
 
 }

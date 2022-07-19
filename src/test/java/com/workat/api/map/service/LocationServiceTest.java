@@ -37,6 +37,7 @@ import com.workat.domain.map.http.dto.KakaoLocalResponse;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.review.repository.CafeReviewRepository;
 import com.workat.domain.review.repository.RestaurantReviewRepository;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
@@ -197,14 +198,14 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.dto(dto)
 			.build();
 
-		Users user = Users.builder()
+		UserProfile userProfile = UserProfile.builder()
 			.nickname(String.format("holden"))
-			.oauthType(OauthType.KAKAO)
-			.oauthId(1L)
 			.position(DepartmentType.ACCOUNTANT)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
+		Users user = Users.of(OauthType.KAKAO, 1L);
+		user.setUserProfile(userProfile);
 
 		long locationid = locationRepository.save(given).getId();
 

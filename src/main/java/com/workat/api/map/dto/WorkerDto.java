@@ -2,6 +2,7 @@ package com.workat.api.map.dto;
 
 import com.workat.api.user.dto.DepartmentTypeDto;
 import com.workat.api.user.dto.DurationTypeDto;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
 
@@ -33,8 +34,8 @@ public class WorkerDto {
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
 	}
 
-	public static WorkerDto of(long id, String imageUrl, DepartmentType position, DurationType workingYear) {
-		return new WorkerDto(id, imageUrl, position, workingYear);
+	public static WorkerDto of(long id, UserProfile userProfile) {
+		return new WorkerDto(id, userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear());
 	}
 
 }

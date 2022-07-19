@@ -18,9 +18,11 @@ import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.MultipleDatasourceBaseTest;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
 @ActiveProfiles("test")
@@ -36,28 +38,32 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 	@Autowired
 	private UsersRepository userRepository;
 	@Autowired
+	private UserProfileRepository userProfileRepository;
+	@Autowired
 	private WorkerService workerService;
 
 	@BeforeAll
 	void setup() {
-		user = Users.builder()
+		user = Users.of(OauthType.KAKAO, 12345L);
+		UserProfile userProfile = UserProfile.builder()
 			.nickname("nickname")
-			.oauthType(OauthType.KAKAO)
-			.oauthId(12345L)
 			.position(DepartmentType.ACCOUNTANT)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
+		user.setUserProfile(userProfile);
+		userProfileRepository.save(userProfile);
 		userRepository.save(user);
 
-		Users user2 = Users.builder()
+		Users user2 = Users.of(OauthType.KAKAO, 12346L);
+		UserProfile userProfile2 = UserProfile.builder()
 			.nickname("nick")
-			.oauthType(OauthType.KAKAO)
-			.oauthId(12346L)
 			.position(DepartmentType.ACCOUNTANT)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
+		user2.setUserProfile(userProfile2);
+		userProfileRepository.save(userProfile2);
 		userRepository.save(user2);
 
 		workerLocation = WorkerLocation.of(user.getId(), String.valueOf(127.423084873712), String.valueOf(37.0789561558879), "경기 안성시 죽산면 죽산리");
@@ -71,6 +77,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 	@AfterAll
 	void teardown() {
 		userRepository.deleteAll();
+		userProfileRepository.deleteAll();
 		workerLocationRedisRepository.deleteAll();
 	}
 
@@ -106,10 +113,10 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		//then
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(response.getId(), user.getId()),
-			() -> Assertions.assertEquals(response.getImageUrl(), user.getImageUrl()),
-			() -> Assertions.assertEquals(response.getPosition().getName(), user.getPosition().name()),
-			() -> Assertions.assertEquals(response.getWorkingYear().getName(), user.getWorkingYear().name()),
-			() -> Assertions.assertEquals(response.getStory(), user.getStory())
+			() -> Assertions.assertEquals(response.getImageUrl(), user.getUserProfile().getImageUrl()),
+			() -> Assertions.assertEquals(response.getPosition().getName(), user.getUserProfile().getPosition().name()),
+			() -> Assertions.assertEquals(response.getWorkingYear().getName(), user.getUserProfile().getWorkingYear().name()),
+			() -> Assertions.assertEquals(response.getStory(), user.getUserProfile().getStory())
 		);
 	}
 
@@ -123,9 +130,9 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		//then
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(response.getId(), user.getId()),
-			() -> Assertions.assertEquals(response.getImageUrl(), user.getImageUrl()),
-			() -> Assertions.assertEquals(response.getPosition().getName(), user.getPosition().name()),
-			() -> Assertions.assertEquals(response.getWorkingYear().getName(), user.getWorkingYear().name())
+			() -> Assertions.assertEquals(response.getImageUrl(), user.getUserProfile().getImageUrl()),
+			() -> Assertions.assertEquals(response.getPosition().getName(), user.getUserProfile().getPosition().name()),
+			() -> Assertions.assertEquals(response.getWorkingYear().getName(), user.getUserProfile().getWorkingYear().name())
 		);
 	}
 }
