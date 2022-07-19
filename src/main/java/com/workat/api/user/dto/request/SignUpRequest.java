@@ -2,6 +2,8 @@ package com.workat.api.user.dto.request;
 
 import static lombok.AccessLevel.*;
 
+import javax.validation.constraints.Pattern;
+
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
@@ -20,6 +22,7 @@ public class SignUpRequest {
 	@ApiModelProperty(name = "oauthId", notes = "카카오 유저 식별자", example = "2329023349")
 	private long oauthId;
 
+	@Pattern(regexp = "^[가-힣|a-z|A-Z|0-9|]{2,8}$", message = "닉네임은 2~8글자, 한글/영어/숫자만 가능합니다")
 	@ApiModelProperty(name = "nickname", notes = "유저 닉네임", example = "\"나는스벅라떼좋아\"")
 	private String nickname;
 
