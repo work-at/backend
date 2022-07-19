@@ -36,7 +36,7 @@ public class Users extends BaseEntity {
 	private Long oauthId;
 
 	@OneToOne
-	@JoinColumn(name = "id")
+	@JoinColumn(name = "profile_id")
 	private UserProfile userProfile;
 
 	private Users(OauthType oauthType, Long oauthId) {
