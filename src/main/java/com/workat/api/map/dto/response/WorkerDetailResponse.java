@@ -33,8 +33,8 @@ public class WorkerDetailResponse {
 		this.story = story;
 	}
 
-	public static WorkerDetailResponse of(long id, UserProfile userProfile) {
-		return new WorkerDetailResponse(id, userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getStory());
+	public static WorkerDetailResponse of(UserProfile userProfile) {
+		return new WorkerDetailResponse(userProfile.getId(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getStory());
 	}
 
 }

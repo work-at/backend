@@ -34,8 +34,8 @@ public class WorkerDto {
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
 	}
 
-	public static WorkerDto of(long id, UserProfile userProfile) {
-		return new WorkerDto(id, userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear());
+	public static WorkerDto of(UserProfile userProfile) {
+		return new WorkerDto(userProfile.getId(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear());
 	}
 
 }

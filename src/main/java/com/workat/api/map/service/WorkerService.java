@@ -22,6 +22,7 @@ import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class WorkerService {
 
 	private final WorkerLocationRedisRepository workerLocationRedisRepository;
 
-	private final UsersRepository userRepository;
+	private final UserProfileRepository userProfileRepository;
 
 	@Transactional(readOnly = true)
 	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer) {
@@ -42,10 +43,10 @@ public class WorkerService {
 		List<WorkerDto> workerDtos = workerLocations
 			.stream()
 			.filter(workerLocation -> user.getId() != Long.parseLong(workerLocation.getUserId()))
-			.map(workerLocation -> userRepository.findById(Long.parseLong(workerLocation.getUserId())))
+			.map(workerLocation -> userProfileRepository.findById(Long.parseLong(workerLocation.getUserId())))
 			.filter(Optional::isPresent)
 			.map(Optional::get)
-			.map(worker -> WorkerDto.of(worker.getId(), worker.getUserProfile()))
+			.map(WorkerDto::of)
 			.collect(Collectors.toList());
 
 		return WorkerListResponse.of(workerDtos);
@@ -74,14 +75,14 @@ public class WorkerService {
 
 	@Transactional(readOnly = true)
 	public WorkerDetailResponse findWorkerDetailById(Long userId) {
-		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
-		return WorkerDetailResponse.of(user.getId(), user.getUserProfile());
+		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
+		return WorkerDetailResponse.of(userProfile);
 	}
 
 	@Transactional(readOnly = true)
 	public WorkerDto findWorkerById(Long userId) {
-		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
-		return WorkerDto.of(user.getId(), user.getUserProfile());
+		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
+		return WorkerDto.of(userProfile);
 	}
 
 	private List<WorkerLocation> getWorkerByLocationNear(Users user, double kilometer) {

@@ -198,14 +198,14 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.dto(dto)
 			.build();
 
+		Users user = Users.of(OauthType.KAKAO, 1L);
 		UserProfile userProfile = UserProfile.builder()
-			.nickname(String.format("holden"))
+			.user(user)
+			.nickname("holden")
 			.position(DepartmentType.ACCOUNTANT)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
-		Users user = Users.of(OauthType.KAKAO, 1L);
-		user.setUserProfile(userProfile);
 
 		long locationid = locationRepository.save(given).getId();
 

@@ -8,8 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.workat.domain.BaseEntity;
@@ -35,10 +33,6 @@ public class Users extends BaseEntity {
 	@Column(unique = true)
 	private Long oauthId;
 
-	@OneToOne
-	@JoinColumn(name = "profile_id")
-	private UserProfile userProfile;
-
 	private Users(OauthType oauthType, Long oauthId) {
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
@@ -46,9 +40,5 @@ public class Users extends BaseEntity {
 
 	public static Users of(OauthType oauthType, Long oauthId) {
 		return new Users(oauthType, oauthId);
-	}
-
-	public void setUserProfile(UserProfile userProfile){
-		this.userProfile = userProfile;
 	}
 }

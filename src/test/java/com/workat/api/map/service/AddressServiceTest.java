@@ -101,14 +101,13 @@ public class AddressServiceTest extends MultipleDatasourceBaseTest {
 
 		user = Users.of(OauthType.KAKAO, 12345L);
 		UserProfile userProfile = UserProfile.builder()
+			.user(user)
 			.nickname("nickname")
 			.position(DepartmentType.ACCOUNTANT)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
-		user.setUserProfile(userProfile);
 		userProfileRepository.save(userProfile);
-		userRepository.save(user);
 
 		workerLocation = WorkerLocation.of(user.getId(), "127.423084873712", "37.0789561558879", "경기 안성시 죽산면 죽산리");
 		workerLocation1 = WorkerLocation.of(124L, "127.40", "37.07895", "경기 안성시 삼죽면 내장리");
@@ -120,8 +119,8 @@ public class AddressServiceTest extends MultipleDatasourceBaseTest {
 
 	@AfterAll
 	void teardown() {
-		userRepository.deleteAll();
 		userProfileRepository.deleteAll();
+		userRepository.deleteAll();
 		workerLocationRedisRepository.deleteAll();
 	}
 

@@ -100,14 +100,13 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 			.mapToObj(idx -> {
 					Users user = Users.of(OauthType.KAKAO, (long)idx);
 					UserProfile userProfile = UserProfile.builder()
+						.user(user)
 						.nickname(String.format("name%d", idx))
 						.position(DepartmentType.ACCOUNTANT)
 						.workingYear(DurationType.JUNIOR)
 						.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 						.build();
-					user.setUserProfile(userProfile);
 					userProfileRepository.save(userProfile);
-					userRepository.save(user);
 					return user;
 				}
 			).collect(Collectors.toList());

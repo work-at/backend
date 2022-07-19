@@ -58,13 +58,12 @@ public class UserService {
 
 		Users users = Users.of(signUpRequest.getOauthType(), signUpRequest.getOauthId());
 		UserProfile userProfile = UserProfile.builder()
+			.user(users)
 			.nickname(signUpRequest.getNickname())
 			.position(signUpRequest.getPosition())
 			.workingYear(signUpRequest.getWorkingYear())
 			.build();
 		userProfileRepository.save(userProfile);
-		users.setUserProfile(userProfile);
-		userRepository.save(users);
 
 		final long id = users.getId();
 		final String accessToken = authorizationService.createAccessToken(id);
