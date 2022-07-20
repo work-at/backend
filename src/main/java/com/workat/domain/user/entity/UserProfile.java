@@ -70,4 +70,11 @@ public class UserProfile extends BaseEntity {
 		this.story = story;
 		this.certified = certified;
 	}
+
+	public void updateProfile(String nickname, DepartmentType position, DurationType workingYear, String story) {
+		this.nickname = nickname;
+		this.position = position;
+		this.workingYear = workingYear;
+		this.story = story;
+	}
 }

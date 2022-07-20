@@ -9,4 +9,6 @@ import com.workat.domain.user.entity.UserProfile;
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
 
 	Optional<UserProfile> findFirstByNickname(String nickname);
+
+	Optional<UserProfile> findFirstByNicknameAndIdNot(String nickname, Long id);
 }
