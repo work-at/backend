@@ -11,7 +11,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.workat.api.map.dto.WorkerDto;
-import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
 import com.workat.api.map.dto.response.WorkerSizeResponse;
 import com.workat.domain.auth.OauthType;
@@ -101,23 +100,6 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 
 		//then
 		Assertions.assertEquals(response.getCount(), 1);
-	}
-
-	@Test
-	void findWorkerDetailById() {
-		//given
-
-		//when
-		WorkerDetailResponse response = workerService.findWorkerDetailById(user.getId());
-
-		//then
-		Assertions.assertAll(
-			() -> Assertions.assertEquals(response.getId(), user.getId()),
-			() -> Assertions.assertEquals(response.getImageUrl(), userProfile.getImageUrl()),
-			() -> Assertions.assertEquals(response.getPosition().getName(), userProfile.getPosition().name()),
-			() -> Assertions.assertEquals(response.getWorkingYear().getName(), userProfile.getWorkingYear().name()),
-			() -> Assertions.assertEquals(response.getStory(), userProfile.getStory())
-		);
 	}
 
 	@Test

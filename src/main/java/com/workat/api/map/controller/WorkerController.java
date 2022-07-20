@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.workat.api.map.dto.WorkerDto;
-import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
 import com.workat.api.map.dto.response.WorkerPinResponse;
 import com.workat.api.map.dto.response.WorkerSizeResponse;
@@ -23,12 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class WorkerController {
 
 	private final WorkerService workerService;
-
-	@GetMapping("/api/v1/map/workers/{userId}/detail")
-	public ResponseEntity<WorkerDetailResponse> findWorkerDetailById(@PathVariable("userId") Long userId) {
-		WorkerDetailResponse response = workerService.findWorkerDetailById(userId);
-		return ResponseEntity.ok(response);
-	}
 
 	@GetMapping("/api/v1/map/workers/{userId}")
 	public ResponseEntity<WorkerDto> findWorkerById(@PathVariable("userId") Long userId) {

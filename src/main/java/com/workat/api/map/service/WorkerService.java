@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.workat.api.map.dto.WorkerDto;
-import com.workat.api.map.dto.WorkerPin;
 import com.workat.api.map.dto.WorkerPinDto;
-import com.workat.api.map.dto.response.WorkerDetailResponse;
 import com.workat.api.map.dto.response.WorkerListResponse;
 import com.workat.api.map.dto.response.WorkerPinResponse;
 import com.workat.api.map.dto.response.WorkerSizeResponse;
@@ -23,7 +21,6 @@ import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UserProfileRepository;
-import com.workat.domain.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,12 +68,6 @@ public class WorkerService {
 		List<WorkerLocation> workerLocations = getWorkerByLocationNear(user, kilometer);
 
 		return WorkerSizeResponse.of(Math.max(workerLocations.size() - 1, 0));
-	}
-
-	@Transactional(readOnly = true)
-	public WorkerDetailResponse findWorkerDetailById(Long userId) {
-		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
-		return WorkerDetailResponse.of(userProfile);
 	}
 
 	@Transactional(readOnly = true)
