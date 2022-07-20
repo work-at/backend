@@ -11,12 +11,18 @@ import javax.persistence.Id;
 import com.workat.domain.BaseEntity;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 // 나중에 사용할 예정 현재는 주석으로 처리해둠
 // @Table(uniqueConstraints = {@UniqueConstraint(name = "location_unique", columnNames = "placeId")})
+@Builder
 @Getter
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Location extends BaseEntity {
 
@@ -51,21 +57,18 @@ public class Location extends BaseEntity {
 	@Column
 	private double latitude;
 
-	protected Location() {
-
-	}
-
-	@Builder
-	public Location(LocationCategory category, KakaoLocalDataDto dto) {
-		this.category = category;
-		this.phone = dto.getPhone();
-		this.placeId = dto.getId();
-		this.placeName = dto.getPlaceName();
-		this.placeUrl = dto.getPlaceUrl();
-		this.addressName = dto.getAddressName();
-		this.roadAddressName = dto.getRoadAddressName();
-		this.longitude = Double.parseDouble(dto.getX());
-		this.latitude = Double.parseDouble(dto.getY());
+	public static Location of(LocationCategory category, KakaoLocalDataDto dto) {
+		return Location.builder()
+			.category(category)
+			.phone(dto.getPhone())
+			.placeId(dto.getId())
+			.placeName(dto.getPlaceName())
+			.placeUrl(dto.getPlaceUrl())
+			.addressName(dto.getAddressName())
+			.roadAddressName(dto.getRoadAddressName())
+			.longitude(Double.parseDouble(dto.getX()))
+			.latitude(Double.parseDouble(dto.getY()))
+			.build();
 	}
 
 	public Location update(KakaoLocalDataDto dto) {

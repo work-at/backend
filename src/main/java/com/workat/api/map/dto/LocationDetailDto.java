@@ -7,6 +7,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class LocationDetailDto implements LocationDto {
@@ -23,20 +30,11 @@ public class LocationDetailDto implements LocationDto {
 
 	private String phone;
 
+	private String fullImageUrl;
+
+	private String thumbnailImageUrl;
+
 	private double longitude;
 
 	private double latitude;
-
-	@Builder
-	public LocationDetailDto(long id, LocationCategory category, String placeId, String placeName, String placeUrl,
-		String phone, double longitude, double latitude) {
-		this.id = id;
-		this.category = category;
-		this.placeId = placeId;
-		this.placeName = placeName;
-		this.placeUrl = placeUrl;
-		this.phone = phone;
-		this.longitude = longitude;
-		this.latitude = latitude;
-	}
 }
