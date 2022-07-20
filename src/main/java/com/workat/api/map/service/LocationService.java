@@ -2,8 +2,10 @@ package com.workat.api.map.service;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,6 +86,52 @@ public class LocationService {
 		}
 	}
 
+	public LocationResponse getLocationsTest(boolean isPin, LocationCategory category, double longitude,
+		double latitude, int radius) {
+
+		locationRepository.deleteAll();
+		locationRepository.flush();
+
+		List<Location> locations = IntStream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+			.boxed()
+			.map(n -> Location.builder()
+				.category(category)
+				.placeId("TEST" + n)
+				.placeUrl("https://www.naver.com")
+				.placeName("TEST" + n)
+				.addressName("TEST" + n)
+				.roadAddressName("TEST" + n)
+				.longitude(longitude + (n / 100.0))
+				.latitude(latitude + (n / 100.0))
+				.build()
+			).collect(Collectors.toList());
+		locationRepository.saveAll(locations);
+
+		if (isPin) {
+			List<LocationPinDto> locationPinDtos = locations.stream()
+				.map(location -> LocationPinDto.of(location.getId(), location.getPlaceId(), location.getLongitude(),
+					location.getLatitude()))
+				.collect(Collectors.toList());
+
+			return LocationResponse.of(locationPinDtos);
+		} else {
+			List<LocationDetailDto> locationDetailDtos = locations.stream()
+				.map(location -> LocationDetailDto.builder()
+					.id(location.getId())
+					.category(location.getCategory())
+					.phone(location.getPhone())
+					.placeId(location.getPlaceId())
+					.placeUrl(location.getPlaceUrl())
+					.placeName(location.getPlaceName())
+					.longitude(location.getLongitude())
+					.latitude(location.getLatitude())
+					.build())
+				.collect(Collectors.toList());
+
+			return LocationResponse.of(locationDetailDtos);
+		}
+	}
+
 	public LocationDetailResponse getLocationById(LocationCategory category, long locationId, long userId) {
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
@@ -129,7 +177,7 @@ public class LocationService {
 					.distinct()
 					.map(dto -> {
 						Location location = locationRepository.findByPlaceId(dto.getId())
-							.orElseGet(() -> parseDtoToLocation(category, dto));
+							.orElseGet(() -> Location.of(category, dto));
 						return location.update(dto);
 					})
 					.collect(Collectors.toList());
@@ -159,17 +207,11 @@ public class LocationService {
 				String stationAddress = line.get(2);
 				String latitude = line.get(3);
 				String longitude = line.get(4);
-				return Area.of(stationName, stationAddress, Double.parseDouble(longitude), Double.parseDouble(latitude));
+				return Area.of(stationName, stationAddress, Double.parseDouble(longitude),
+					Double.parseDouble(latitude));
 			})
 			.collect(Collectors.toList());
 
 		areaRepository.saveAll(result);
-	}
-
-	private Location parseDtoToLocation(LocationCategory category, KakaoLocalDataDto dto) {
-		return Location.builder()
-			.category(category)
-			.dto(dto)
-			.build();
 	}
 }

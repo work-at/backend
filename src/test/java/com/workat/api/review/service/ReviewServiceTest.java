@@ -83,10 +83,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 						.y(value)
 						.build();
 
-					Location location = Location.builder()
-						.category(category)
-						.dto(dto)
-						.build();
+					Location location = Location.of(category, dto);
 
 					locationRepository.save(location);
 

@@ -201,11 +201,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.y(value)
 			.build();
 
-		Location given = Location.builder()
-			.category(LocationCategory.CAFE)
-			.dto(dto)
-			.build();
-
+		Location given = Location.of(LocationCategory.CAFE, dto);
 		Users user = Users.of(OauthType.KAKAO, 1L);
 		UserProfile userProfile = UserProfile.builder()
 			.user(user)

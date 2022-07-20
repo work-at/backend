@@ -1,6 +1,9 @@
 package com.workat.api.map.controller;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +27,7 @@ import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 @Api(tags = "Map Location Api")
+@Validated
 @RequiredArgsConstructor
 @RestController
 public class LocationController {
@@ -41,8 +45,10 @@ public class LocationController {
 		@ApiResponse(code = 200, message = "success", response = LocationDetailDto.class)
 	})
 	@GetMapping("/api/v1/map/cafes")
-	public ResponseEntity<LocationResponse> getCafes(@UserValidation Users user, @RequestParam double longitude,
-		@RequestParam double latitude, @RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+	public ResponseEntity<LocationResponse> getCafes(@UserValidation Users user,
+		@NotNull @RequestParam double longitude,
+		@NotNull @RequestParam double latitude,
+		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		LocationResponse response = locationService.getLocations(false, LocationCategory.CAFE, longitude, latitude,
 			radius);
 		return ResponseEntity.ok(response);
@@ -58,8 +64,10 @@ public class LocationController {
 		@ApiResponse(code = 200, message = "success", response = LocationPinDto.class)
 	})
 	@GetMapping("/api/v1/map/cafes/pin")
-	public ResponseEntity<LocationResponse> getCafesPin(@UserValidation Users user, @RequestParam double longitude,
-		@RequestParam double latitude, @RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+	public ResponseEntity<LocationResponse> getCafesPin(@UserValidation Users user,
+		@NotNull @RequestParam double longitude,
+		@NotNull @RequestParam double latitude,
+		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		LocationResponse response =
 			locationService.getLocations(true, LocationCategory.CAFE, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
@@ -85,8 +93,10 @@ public class LocationController {
 		@ApiResponse(code = 200, message = "success", response = LocationDetailDto.class)
 	})
 	@GetMapping("/api/v1/map/restaurants")
-	public ResponseEntity<LocationResponse> getRestaurants(@UserValidation Users user, @RequestParam double longitude,
-		@RequestParam double latitude, @RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+	public ResponseEntity<LocationResponse> getRestaurants(@UserValidation Users user,
+		@NotNull @RequestParam double longitude,
+		@NotNull @RequestParam double latitude,
+		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		LocationResponse response =
 			locationService.getLocations(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
@@ -103,7 +113,7 @@ public class LocationController {
 	})
 	@GetMapping("/api/v1/map/restaurants/pin")
 	public ResponseEntity<LocationResponse> getRestaurantsPin(@UserValidation Users user,
-		@RequestParam double longitude, @RequestParam double latitude,
+		@NotNull @RequestParam double longitude, @NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		LocationResponse response =
 			locationService.getLocations(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
@@ -119,4 +129,42 @@ public class LocationController {
 			locationService.getLocationById(LocationCategory.CAFE, locationId, user.getId());
 		return ResponseEntity.ok(dto);
 	}
+
+	// TODO: 2022/07/21 테스트 데이터가 올라가면 지울 예정
+	@GetMapping("/api/v1/map/cafes/test")
+	public ResponseEntity<LocationResponse> getCafesTest(@NotNull @RequestParam double longitude,
+		@NotNull @RequestParam double latitude,
+		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+		LocationResponse response = locationService.getLocationsTest(false, LocationCategory.CAFE, longitude, latitude,
+			radius);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/api/v1/map/cafes/pin/test")
+	public ResponseEntity<LocationResponse> getCafesPinTest(@NotNull @RequestParam double longitude,
+		@NotNull @RequestParam double latitude,
+		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+		LocationResponse response =
+			locationService.getLocationsTest(true, LocationCategory.CAFE, longitude, latitude, radius);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/api/v1/map/restaurants/test")
+	public ResponseEntity<LocationResponse> getRestaurantsTest(@NotNull @RequestParam double longitude,
+		@NotNull @RequestParam double latitude,
+		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+		LocationResponse response =
+			locationService.getLocationsTest(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/api/v1/map/restaurants/pin/test")
+	public ResponseEntity<LocationResponse> getRestaurantsPinTest(@NotNull @RequestParam double longitude,
+		@NotNull @RequestParam double latitude,
+		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+		LocationResponse response =
+			locationService.getLocationsTest(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
+		return ResponseEntity.ok(response);
+	}
+
 }
