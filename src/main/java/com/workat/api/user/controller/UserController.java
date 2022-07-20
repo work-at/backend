@@ -1,5 +1,7 @@
 package com.workat.api.user.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +32,7 @@ public class UserController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@ApiOperation(value = "sign up", notes = "회원 가입")
 	@PostMapping("/api/v1/user/signup")
-	public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
+	public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
 		SignUpResponse signUpResponse = userService.signUp(signUpRequest);
 		return ResponseEntity.ok(signUpResponse);
 	}

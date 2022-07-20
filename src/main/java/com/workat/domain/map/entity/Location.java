@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.workat.domain.BaseEntity;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 
 import lombok.Builder;
@@ -17,7 +18,7 @@ import lombok.Getter;
 // @Table(uniqueConstraints = {@UniqueConstraint(name = "location_unique", columnNames = "placeId")})
 @Getter
 @Entity
-public class Location {
+public class Location extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
