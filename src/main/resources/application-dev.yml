@@ -18,3 +18,7 @@ spring:
     host: 34.64.37.69
     port: 6379
     password: workat@1234
+
+resources:
+  upload-folder: /home/work_at_tour/images
+  upload-uri: /upload
