@@ -21,4 +21,4 @@ spring:
 
 resources:
   upload-folder: /home/work_at_tour/images
-  upload-uri: /upload
+  upload-uri: /uploaded
