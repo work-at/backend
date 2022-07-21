@@ -4,9 +4,12 @@ import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.workat.api.mypage.dto.request.UserUpdateRequest;
 import com.workat.api.mypage.dto.response.MyProfileResponse;
@@ -33,5 +36,11 @@ public class MyPageController {
 	public ResponseEntity<?> updateMyProfile(@UserValidation Users user, @Valid @RequestBody UserUpdateRequest request) {
 		myPageService.updateMyPage(user.getId(), request);
 		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/api/v1/my-page/images")
+	public String uploadProfileImage(@UserValidation Users user, @RequestParam("file") MultipartFile multipartFile) {
+		String redirectURI = myPageService.uploadProfileImage(user.getId(), multipartFile);
+		return "redirect:" + redirectURI;
 	}
 }

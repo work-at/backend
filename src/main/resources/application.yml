@@ -43,4 +43,4 @@ restTemplate:
 
 resources:
   upload-folder: /Users/work_at_tour/images
-  upload-uri: /upload
+  upload-uri: /uploaded
