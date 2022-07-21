@@ -89,25 +89,25 @@ public class LocationService {
 	public LocationResponse getLocationsTest(boolean isPin, LocationCategory category, double longitude,
 		double latitude, int radius) {
 
-		locationRepository.deleteAll();
-		locationRepository.flush();
-
-		List<Location> locations = IntStream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-			.boxed()
-			.map(n -> Location.builder()
-				.category(category)
-				.placeId("TEST" + n)
-				.placeUrl("https://www.naver.com")
-				.placeName("TEST" + n)
-				.addressName("TEST" + n)
-				.roadAddressName("TEST" + n)
-				.longitude(longitude + (n / 100.0))
-				.latitude(latitude + (n / 100.0))
-				.build()
-			).collect(Collectors.toList());
-		locationRepository.saveAll(locations);
-
 		if (isPin) {
+			locationRepository.deleteAll();
+			locationRepository.flush();
+
+			List<Location> locations = IntStream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+				.boxed()
+				.map(n -> Location.builder()
+					.category(category)
+					.placeId("TEST" + n)
+					.placeUrl("https://www.naver.com")
+					.placeName("TEST" + n)
+					.addressName("TEST" + n)
+					.roadAddressName("TEST" + n)
+					.longitude(longitude + (n / 100.0))
+					.latitude(latitude + (n / 100.0))
+					.build()
+				).collect(Collectors.toList());
+			locationRepository.saveAll(locations);
+
 			List<LocationPinDto> locationPinDtos = locations.stream()
 				.map(location -> LocationPinDto.of(location.getId(), location.getPlaceId(), location.getLongitude(),
 					location.getLatitude()))
@@ -115,7 +115,7 @@ public class LocationService {
 
 			return LocationResponse.of(locationPinDtos);
 		} else {
-			List<LocationDetailDto> locationDetailDtos = locations.stream()
+			List<LocationDetailDto> locationDetailDtos = locationRepository.findAll().stream()
 				.map(location -> LocationDetailDto.builder()
 					.id(location.getId())
 					.category(location.getCategory())
