@@ -1,4 +1,4 @@
-package com.workat.api.mypage.dto.response;
+package com.workat.api.user.dto.response;
 
 import com.workat.api.user.dto.DepartmentTypeDto;
 import com.workat.api.user.dto.DurationTypeDto;
