@@ -77,4 +77,8 @@ public class UserProfile extends BaseEntity {
 		this.workingYear = workingYear;
 		this.story = story;
 	}
+
+	public void updateImage(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 }

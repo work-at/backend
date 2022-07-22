@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -36,3 +40,7 @@ restTemplate:
   httpClient:
     maxConnTotal: 100
     maxConnPerRoute: 5
+
+resources:
+  upload-folder: /Users/work_at_tour/images
+  upload-uri: /uploaded

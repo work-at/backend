@@ -3,6 +3,7 @@ package com.workat.common.config;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -13,6 +14,11 @@ import com.workat.common.annotation.argumentResolver.UserValidationArgumentResol
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+	@Value("${resources.upload-folder:/home/work_at_tour/images}")
+	private String resourcesLocation;
+	@Value("${resources.upload-uri:/uploaded}")
+	private String uploadUri;
 
 	@Autowired
 	private UserValidationArgumentResolver validationArgumentResolver;
@@ -36,5 +42,6 @@ public class WebConfig implements WebMvcConfigurer {
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/swagger-ui.html**").addResourceLocations("classpath:/META-INF/resources/swagger-ui.html");
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+		registry.addResourceHandler(uploadUri + "/**").addResourceLocations("file:///" + resourcesLocation + "/");
 	}
 }
