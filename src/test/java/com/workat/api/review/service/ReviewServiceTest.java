@@ -166,7 +166,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 		List<CafeReview> cafeReviews3 = users.subList(18, 20) // 3rd
 			.stream()
-			.map(user -> CafeReview.of(CafeReviewType.NIGHT_VIEW, location, user))
+			.map(user -> CafeReview.of(CafeReviewType.VIEW, location, user))
 			.collect(Collectors.toList());
 
 		final ArrayList<CafeReview> cafeReviews = new ArrayList<>();
@@ -180,7 +180,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		final List<ReviewDto> reviewDtos = reviewService.getLocationReviews(locationId, user.getId()).getReviews();
 
 		// then
-		assertEquals(reviewDtos.size(), 3); // PARKING, WIFI, NIGHT_VIEW
+		assertEquals(reviewDtos.size(), 3); // PARKING, WIFI, VIEW
 
 		for (int i = 0; i < reviewDtos.size() - 1; i++) {
 			ReviewDto curDto = reviewDtos.get(i);
@@ -230,7 +230,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		final Users user = saveUsers(1).get(0);
 
 		ReviewRequest reviewRequest = ReviewRequest.of(
-			new HashSet<>(Arrays.asList("PARKING", "WIFI", "NIGHT_VIEW")));
+			new HashSet<>(Arrays.asList("PARKING", "WIFI", "VIEW")));
 
 		// when
 		reviewService.addCafeReview(locationId, reviewRequest, user);
