@@ -32,9 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UserService {
 
-	@Value("${resources.upload-folder}")
+	@Value("${resources.upload-folder:/home/work_at_tour/images}")
 	private String resourcesLocation;
-	@Value("${resources.upload-uri}")
+	@Value("${resources.upload-uri:/uploaded}")
 	private String uploadUri;
 
 	private final UsersRepository userRepository;

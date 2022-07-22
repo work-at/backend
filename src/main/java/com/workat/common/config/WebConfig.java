@@ -15,9 +15,9 @@ import com.workat.common.annotation.argumentResolver.UserValidationArgumentResol
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-	@Value("${resources.upload-folder}")
+	@Value("${resources.upload-folder:/home/work_at_tour/images}")
 	private String resourcesLocation;
-	@Value("${resources.upload-uri}")
+	@Value("${resources.upload-uri:/uploaded}")
 	private String uploadUri;
 
 	@Autowired
