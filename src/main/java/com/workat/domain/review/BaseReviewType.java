@@ -4,4 +4,5 @@ public interface BaseReviewType {
 
 	String getName();
 	String getContent();
+	String getIconType();
 }
