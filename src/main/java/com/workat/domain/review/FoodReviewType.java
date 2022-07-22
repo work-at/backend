@@ -6,16 +6,16 @@ import com.workat.common.exception.NotFoundException;
 
 public enum FoodReviewType implements BaseReviewType {
 
-	PARKING("주차하기 편해요~"),
 	VIEW("뷰가 좋아요"),
-	NOT_CROWDED("한적해요~"),
-	NIGHT_VIEW("야경이 예뻐요~"),
-	SPACE("넓고 깨끗해요~"),
+	COST("가성비가 좋아요"),
+	PARKING("주차하기 편해요"),
+	SPACE("넓고 깨끗해요"),
+	NOT_CROWDED("사람이 많이 없어요"),
 	QUICK_FOOD("음식이 빨리 나와요"),
-	EAT_ALONE("혼밥하기 좋아요"),
+	EAT_ALONE("혼밥 가능해요"),
+	MUST_GO("맛집이에요"),
 	QUIET("조용해요"),
-	DESIGN("인테리어가 예뻐요"),
-	SNACK("간단하게 먹기 좋아요");
+	SNACK("간단히 먹기 좋아요");
 
 	private final String content;
 
