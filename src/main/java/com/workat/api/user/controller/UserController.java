@@ -86,6 +86,7 @@ public class UserController {
 	@ApiIgnore
 	@GetMapping("/api/v1/user/email-verified")
 	public String verifyUser(@Param("code") String code) {
+		// TODO: 메일 인증 후 redirect 페이지 여부에 따라 변경 가능
 		if (userService.verify(code)) {
 			return "verify_success";
 		} else {
