@@ -22,6 +22,17 @@ spring:
     host: localhost
     port: 6379
     password: password
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: workat.test.mail@gmail.com
+    password: uzthqynsdmqsgofi
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 external:
   kakaoOauth:

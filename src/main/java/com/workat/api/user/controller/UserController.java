@@ -1,7 +1,12 @@
 package com.workat.api.user.controller;
 
+import java.io.UnsupportedEncodingException;
+
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.workat.api.user.dto.SignUpResponse;
+import com.workat.api.user.dto.request.EmailCertifyRequest;
 import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.api.user.dto.request.UserUpdateRequest;
 import com.workat.api.user.dto.response.MyProfileResponse;
@@ -23,6 +29,7 @@ import com.workat.domain.user.entity.Users;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = "User Api")
 @RequiredArgsConstructor
@@ -63,5 +70,26 @@ public class UserController {
 	public String uploadProfileImage(@UserValidation Users user, @RequestParam("file") MultipartFile multipartFile) {
 		String redirectURI = userService.uploadProfileImage(user.getId(), multipartFile);
 		return "redirect:" + redirectURI;
+	}
+
+	@PostMapping("/api/v1/user/verify")
+	public ResponseEntity<?> sendCompanyVerifyEmail(@UserValidation Users user, @Valid @RequestBody EmailCertifyRequest emailCertifyRequest, HttpServletRequest request) throws UnsupportedEncodingException, MessagingException {
+		userService.sendCompanyVerifyEmail(user.getId(), emailCertifyRequest, getSiteURL(request));
+		return ResponseEntity.ok().build();
+	}
+
+	private String getSiteURL(HttpServletRequest request) {
+		String siteURL = request.getRequestURL().toString();
+		return siteURL.replace(request.getServletPath(), "");
+	}
+
+	@ApiIgnore
+	@GetMapping("/api/v1/user/email-verified")
+	public String verifyUser(@Param("code") String code) {
+		if (userService.verify(code)) {
+			return "verify_success";
+		} else {
+			return "verify_fail";
+		}
 	}
 }

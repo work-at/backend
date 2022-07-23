@@ -10,4 +10,6 @@ import com.workat.domain.user.entity.Users;
 public interface UsersRepository extends JpaRepository<Users, Long> {
 
 	Optional<Users> findByOauthTypeAndOauthId(OauthType oauthType, Long oauthId);
+
+	Optional<Users> findUsersByVerificationCode(String verificationCode);
 }

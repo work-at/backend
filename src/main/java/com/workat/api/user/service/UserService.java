@@ -1,8 +1,14 @@
 package com.workat.api.user.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.workat.api.auth.dto.response.AuthResponse;
 import com.workat.api.auth.service.AuthorizationService;
 import com.workat.api.user.dto.SignUpResponse;
+import com.workat.api.user.dto.request.EmailCertifyRequest;
 import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.api.user.dto.request.UserUpdateRequest;
 import com.workat.api.user.dto.response.MyProfileResponse;
@@ -23,7 +30,6 @@ import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +42,8 @@ public class UserService {
 	private String resourcesLocation;
 	@Value("${resources.upload-uri:/uploaded}")
 	private String uploadUri;
+
+	private final JavaMailSender mailSender;
 
 	private final UsersRepository userRepository;
 
@@ -137,5 +145,57 @@ public class UserService {
 			throw new FileUploadException(e.getMessage());
 		}
 		return savedFileName;
+	}
+
+	@Transactional
+	public void sendCompanyVerifyEmail(Long userId, EmailCertifyRequest request, String siteURL) throws UnsupportedEncodingException, MessagingException {
+		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
+		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
+
+		user.setVerificationCode();
+		userRepository.save(user);
+
+		sendVerificationEmail(user, userProfile.getNickname(), request.getEmail(), siteURL);
+	}
+
+	@Transactional
+	public boolean verify(String verificationCode) {
+		Users user = userRepository.findUsersByVerificationCode(verificationCode).orElseThrow(() -> new NotFoundException("verification code not found"));
+		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
+
+		user.clearVerificationCode();
+		userRepository.save(user);
+		userProfile.certifyCompanyMail();
+		userProfileRepository.save(userProfile);
+
+		return true;
+	}
+
+	private void sendVerificationEmail(Users user, String nickname, String email, String siteURL) throws MessagingException, UnsupportedEncodingException {
+		// TODO: 기획에 따라 메일 내용 변경
+		String fromAddress = "workat.test.mail@gmail.com";
+		String senderName = "Work at_";
+		String subject = "Please verify your registration";
+		String content = "Dear [[name]],<br>"
+			+ "Please click the link below to verify your registration:<br>"
+			+ "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
+			+ "Thank you,<br>"
+			+ "Your company name.";
+
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message);
+
+		helper.setFrom(fromAddress, senderName);
+		helper.setTo(email);
+		helper.setSubject(subject);
+
+		content = content.replace("[[name]]", nickname);
+		String verifyURL = siteURL + "/api/v1/user/email-verified?code=" + user.getVerificationCode();
+
+		content = content.replace("[[URL]]", verifyURL);
+
+		helper.setText(content, true);
+
+		mailSender.send(message);
 	}
 }

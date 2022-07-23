@@ -81,4 +81,8 @@ public class UserProfile extends BaseEntity {
 	public void updateImage(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
+
+	public void certifyCompanyMail() {
+		this.certified = true;
+	}
 }
