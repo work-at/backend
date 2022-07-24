@@ -16,7 +16,7 @@ import com.workat.domain.user.entity.Users;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 
-@Api(tags = "Map Workactioner Api")
+@Api(tags = "Map Workationer Api")
 @RequiredArgsConstructor
 @RestController
 public class WorkerController {

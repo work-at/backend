@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class WorkerListResponse {
 
-	@ApiModelProperty(name = "response", notes = "주위 유저 목록", example = "[{\"id\":3,\"imageUrl\":null,\"position\":{\"name\":\"IT_ENGINEER\",\"content\":\"IT 엔지니어 및 보안\"},\"workingYear\":{\"name\":\"JUNIOR\",\"content\":\"주니어(1~4년)\"}}]")
+	@ApiModelProperty(name = "response", notes = "주위 유저 목록")
 	private List<WorkerDto> response;
 
 	private WorkerListResponse(List<WorkerDto> response) {

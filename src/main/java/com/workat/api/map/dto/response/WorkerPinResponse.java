@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class WorkerPinResponse {
 
-	@ApiModelProperty(name = "response", notes = "주위 유저 핀 목록", example = "")
+	@ApiModelProperty(name = "response", notes = "주위 유저 핀 목록")
 	private List<WorkerPinDto> response;
 
 	private WorkerPinResponse(List<WorkerPinDto> response) {
