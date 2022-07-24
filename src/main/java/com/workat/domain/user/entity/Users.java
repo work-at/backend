@@ -39,12 +39,11 @@ public class Users extends BaseEntity {
 	private String verificationCode;
 
 	@Column
-	private int emailRequestRemain;
+	private int emailRequestRemain = 5;
 
 	private Users(OauthType oauthType, Long oauthId) {
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
-		this.emailRequestRemain = 5;
 	}
 
 	public static Users of(OauthType oauthType, Long oauthId) {

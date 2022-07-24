@@ -56,12 +56,14 @@ public class UserProfile extends BaseEntity {
 	@Column
 	private String story;
 
-	// TODO: 어떤 회사 인증했는지는 추후에 추가할 수 있음
 	@Column
 	private boolean certified;
 
+	@Column
+	private String company;
+
 	@Builder
-	public UserProfile(Users user, String nickname, DepartmentType position, DurationType workingYear, String imageUrl, String story, boolean certified) {
+	public UserProfile(Users user, String nickname, DepartmentType position, DurationType workingYear, String imageUrl, String story, boolean certified, String company) {
 		this.id = user.getId();
 		this.user = user;
 		this.nickname = nickname;
@@ -70,6 +72,7 @@ public class UserProfile extends BaseEntity {
 		this.imageUrl = imageUrl;
 		this.story = story;
 		this.certified = certified;
+		this.company = company;
 	}
 
 	public void updateProfile(String nickname, DepartmentType position, DurationType workingYear, String story) {
@@ -83,7 +86,11 @@ public class UserProfile extends BaseEntity {
 		this.imageUrl = imageUrl;
 	}
 
-	public void certifyCompanyMail() {
+	public void certifyCompanyMail(String company) {
 		this.certified = true;
+
+		int startIndex = company.indexOf("@");
+		int endIndex = company.lastIndexOf(".");
+		this.company = company.substring(startIndex + 1, endIndex);
 	}
 }

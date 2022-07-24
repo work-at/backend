@@ -165,13 +165,14 @@ public class UserService {
 	}
 
 	@Transactional
-	public boolean verify(String verificationCode) {
+	public boolean verify(String verificationCode, String address) {
 		Users user = userRepository.findUsersByVerificationCode(verificationCode).orElseThrow(() -> new NotFoundException("verification code not found"));
 		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
 
 		user.clearVerificationCode();
 		userRepository.save(user);
-		userProfile.certifyCompanyMail();
+		// TODO: 일반 gmail, naver 메일의 경우 어떻게 처리할지 기획에 따라 변경
+		userProfile.certifyCompanyMail(address);
 		userProfileRepository.save(userProfile);
 
 		return true;
@@ -200,7 +201,7 @@ public class UserService {
 		helper.setSubject(subject);
 
 		content = content.replace("[[name]]", nickname);
-		String verifyURL = siteURL + "/api/v1/user/email-verified?code=" + user.getVerificationCode();
+		String verifyURL = siteURL + "/api/v1/user/email-verified?code=" + user.getVerificationCode() + "&address=" + email;
 
 		content = content.replace("[[URL]]", verifyURL);
 
