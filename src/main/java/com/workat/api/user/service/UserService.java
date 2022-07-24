@@ -19,10 +19,12 @@ import com.workat.api.user.dto.SignUpResponse;
 import com.workat.api.user.dto.request.EmailCertifyRequest;
 import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.api.user.dto.request.UserUpdateRequest;
+import com.workat.api.user.dto.response.EmailLimitResponseDto;
 import com.workat.api.user.dto.response.MyProfileResponse;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.FileUploadException;
+import com.workat.common.exception.ForbiddenException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.common.util.FileUploadUtils;
 import com.workat.domain.auth.OauthType;
@@ -150,8 +152,12 @@ public class UserService {
 	@Transactional
 	public void sendCompanyVerifyEmail(Long userId, EmailCertifyRequest request, String siteURL) throws UnsupportedEncodingException, MessagingException {
 		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
-		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
+		if (user.getEmailRequestRemain() == 0) {
+			throw new ForbiddenException("email 인증 요청이 모두 소모되었습니다");
+		}
 
+		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
+		user.decreaseEmailRequestRemain();
 		user.setVerificationCode();
 		userRepository.save(user);
 
@@ -169,6 +175,10 @@ public class UserService {
 		userProfileRepository.save(userProfile);
 
 		return true;
+	}
+
+	public EmailLimitResponseDto getVerificationEmailRemain(Users user) {
+		return EmailLimitResponseDto.of(user.getEmailRequestRemain());
 	}
 
 	private void sendVerificationEmail(Users user, String nickname, String email, String siteURL) throws MessagingException, UnsupportedEncodingException {

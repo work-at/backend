@@ -22,6 +22,7 @@ import com.workat.api.user.dto.SignUpResponse;
 import com.workat.api.user.dto.request.EmailCertifyRequest;
 import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.api.user.dto.request.UserUpdateRequest;
+import com.workat.api.user.dto.response.EmailLimitResponseDto;
 import com.workat.api.user.dto.response.MyProfileResponse;
 import com.workat.api.user.service.UserService;
 import com.workat.common.annotation.UserValidation;
@@ -81,6 +82,12 @@ public class UserController {
 	private String getSiteURL(HttpServletRequest request) {
 		String siteURL = request.getRequestURL().toString();
 		return siteURL.replace(request.getServletPath(), "");
+	}
+
+	@GetMapping("/api/v1/user/verify/limit")
+	public ResponseEntity<EmailLimitResponseDto> getCompanyVerifyEmailRemain(@UserValidation Users user) {
+		EmailLimitResponseDto response = userService.getVerificationEmailRemain(user);
+		return ResponseEntity.ok(response);
 	}
 
 	@ApiIgnore
