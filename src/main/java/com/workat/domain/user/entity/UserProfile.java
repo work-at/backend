@@ -56,6 +56,7 @@ public class UserProfile extends BaseEntity {
 	@Column
 	private String story;
 
+	// TODO: 어떤 회사 인증했는지는 추후에 추가할 수 있음
 	@Column
 	private boolean certified;
 
@@ -80,5 +81,9 @@ public class UserProfile extends BaseEntity {
 
 	public void updateImage(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+
+	public void certifyCompanyMail() {
+		this.certified = true;
 	}
 }

@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import net.bytebuddy.utility.RandomString;
+
 import com.workat.domain.BaseEntity;
 import com.workat.domain.auth.OauthType;
 import lombok.AccessLevel;
@@ -33,6 +35,9 @@ public class Users extends BaseEntity {
 	@Column(unique = true)
 	private Long oauthId;
 
+	@Column
+	private String verificationCode;
+
 	private Users(OauthType oauthType, Long oauthId) {
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
@@ -40,5 +45,13 @@ public class Users extends BaseEntity {
 
 	public static Users of(OauthType oauthType, Long oauthId) {
 		return new Users(oauthType, oauthId);
+	}
+
+	public void setVerificationCode() {
+		this.verificationCode = RandomString.make(64);
+	}
+
+	public void clearVerificationCode() {
+		this.verificationCode = null;
 	}
 }
