@@ -16,6 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.workat.api.chat.dto.ChatMessageDto;
+import com.workat.api.chat.dto.ChatRoomDto;
+import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.common.exception.ChatRoomNotFoundException;
 import com.workat.common.exception.UserNotFoundException;
 import com.workat.domain.auth.OauthType;
@@ -90,14 +93,14 @@ class ChatServiceTest {
 		//when
 
 		//then
-		List<ChatRoom> resultChatRooms = chatService.getChatRooms(user1.getId());
-		assertEquals(resultChatRooms.size(), 1);
+		ChatRoomResponse resultChatRooms = chatService.getChatRooms(user1.getId());
+		assertEquals(resultChatRooms.getRooms().size(), 1);
 
-		ChatRoom chatRoom = resultChatRooms.get(0);
+		ChatRoomDto chatRoom = resultChatRooms.getRooms().get(0);
 		assertAll(
 			() -> assertEquals(chatRoom.getId(), chatRoomId),
-			() -> assertEquals(chatRoom.getUser1(), user1),
-			() -> assertEquals(chatRoom.getUser2(), user2)
+			() -> assertTrue(chatRoom.getOwnerUserIds().contains(user1.getId())),
+			() -> assertTrue(chatRoom.getOwnerUserIds().contains(user2.getId()))
 		);
 	}
 
@@ -110,7 +113,7 @@ class ChatServiceTest {
 		//when
 
 		//then
-		assertEquals(Collections.EMPTY_LIST, chatService.getChatRooms(user.getId()));
+		assertEquals(Collections.EMPTY_LIST, chatService.getChatRooms(user.getId()).getRooms());
 	}
 
 	@Test
@@ -188,8 +191,8 @@ class ChatServiceTest {
 		//when
 		ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
 		Pageable pageable = PageRequest.of(1, pageSize, Sort.by("createdDate").descending());
-		ArrayList<ChatMessage> chatMessages = new ArrayList<>(
-			chatMessageRepository.findAllByRoomOrderByCreatedDateDesc(chatRoom, pageable).getContent());
+
+		ArrayList<ChatMessageDto> chatMessages = new ArrayList<>(chatService.getChatMessages(chatRoom.getId(), pageable).toList());
 		chatMessages.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
 
 		//then
@@ -198,7 +201,7 @@ class ChatServiceTest {
 
 		for (int i = 0; i < pageSize; i++) {
 			final int index = i;
-			ChatMessage chatMessage = chatMessages.get(i);
+			ChatMessageDto chatMessage = chatMessages.get(i);
 			assertAll(
 				() -> assertEquals("test" + (inputSize - index - pageSize), chatMessage.getMessage()),
 				() -> assertEquals(((inputSize - index - pageSize) % 2 != 0) ? user1.getId() : user2.getId(),

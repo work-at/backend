@@ -1,14 +1,17 @@
 package com.workat.api.chat.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.workat.api.chat.dto.ChatMessageDto;
+import com.workat.api.chat.dto.ChatRoomDto;
+import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.common.exception.ChatRoomNotFoundException;
-import com.workat.common.exception.NotFoundException;
 import com.workat.common.exception.UserNotFoundException;
 import com.workat.domain.chat.entity.ChatMessage;
 import com.workat.domain.chat.entity.ChatRoom;
@@ -45,11 +48,16 @@ public class ChatService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<ChatRoom> getChatRooms(Long userId) {
+	public ChatRoomResponse getChatRooms(Long userId) {
 		Users findUser = usersRepository.findById(userId).orElseThrow(() -> {
 			throw new UserNotFoundException(userId);
 		});
-		return chatRoomRepository.findAllByUser(findUser);
+
+		List<ChatRoomDto> roomDtos = chatRoomRepository.findAllByUser(findUser).stream()
+			.map(chatRoom -> ChatRoomDto.of(chatRoom.getId(), chatRoom.getUser1().getId(), chatRoom.getUser2().getId()))
+			.collect(Collectors.toList());
+
+		return ChatRoomResponse.of(roomDtos);
 	}
 
 	@Transactional
@@ -68,10 +76,12 @@ public class ChatService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<ChatMessage> getChatMessages(Long chatRoomId, Pageable pageable) {
+	public Page<ChatMessageDto> getChatMessages(Long chatRoomId, Pageable pageable) {
 		ChatRoom findRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> {
 			throw new ChatRoomNotFoundException(chatRoomId);
 		});
-		return chatMessageRepository.findAllByRoomOrderByCreatedDateDesc(findRoom, pageable);
+
+		return chatMessageRepository.findAllByRoomOrderByCreatedDateDesc(findRoom, pageable)
+			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage()));
 	}
 }
