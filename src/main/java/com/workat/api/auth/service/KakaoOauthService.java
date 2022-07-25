@@ -23,9 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class KakaoOauthService {
-
+	
 	// TODO: Value 로
-	private static final String REDIRECT_URL = "https://workat.o-r.kr/login";
+	private static final String REDIRECT_URL = "http://localhost:5050/login"; // TODO: 프론트쪽 리다이렉트 동선 협의되면 수정
 
 	private static final String AUTH_URL = "https://kauth.kakao.com/oauth/token";
 
@@ -71,11 +71,11 @@ public class KakaoOauthService {
 	private KakaoOauthTokenInfoResponse requestAccessTokenInfo(HttpEntity request) {
 		try {
 			return restTemplate.exchange(
-					ACCESS_TOKEN_INFO_URL,
-					HttpMethod.GET,
-					request,
-					KakaoOauthTokenInfoResponse.class)
-				.getBody();
+								   ACCESS_TOKEN_INFO_URL,
+								   HttpMethod.GET,
+								   request,
+								   KakaoOauthTokenInfoResponse.class)
+							   .getBody();
 		} catch (HttpStatusCodeException e) {
 			log.error(e.getMessage());
 
@@ -88,11 +88,11 @@ public class KakaoOauthService {
 	private KakaoOauthTokenResponse requestAccessToken(HttpEntity request) {
 		try {
 			return restTemplate.exchange(
-					AUTH_URL,
-					HttpMethod.POST,
-					request,
-					KakaoOauthTokenResponse.class)
-				.getBody();
+								   AUTH_URL,
+								   HttpMethod.POST,
+								   request,
+								   KakaoOauthTokenResponse.class)
+							   .getBody();
 		} catch (HttpStatusCodeException e) {
 			log.error(e.getMessage());
 
