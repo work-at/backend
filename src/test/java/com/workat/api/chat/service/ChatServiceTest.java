@@ -192,7 +192,8 @@ class ChatServiceTest {
 		ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
 		Pageable pageable = PageRequest.of(1, pageSize, Sort.by("createdDate").descending());
 
-		ArrayList<ChatMessageDto> chatMessages = new ArrayList<>(chatService.getChatMessages(chatRoom.getId(), pageable).toList());
+		ArrayList<ChatMessageDto> chatMessages = new ArrayList<>(
+			chatService.getChatMessages(chatRoom.getId(), pageable).getMessages().toList());
 		chatMessages.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
 
 		//then

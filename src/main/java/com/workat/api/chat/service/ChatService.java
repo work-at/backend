@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.workat.api.chat.dto.ChatMessageDto;
 import com.workat.api.chat.dto.ChatRoomDto;
+import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.common.exception.ChatRoomNotFoundException;
 import com.workat.common.exception.UserNotFoundException;
@@ -76,12 +77,12 @@ public class ChatService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<ChatMessageDto> getChatMessages(Long chatRoomId, Pageable pageable) {
+	public ChatMessageResponse getChatMessages(Long chatRoomId, Pageable pageable) {
 		ChatRoom findRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> {
 			throw new ChatRoomNotFoundException(chatRoomId);
 		});
 
-		return chatMessageRepository.findAllByRoomOrderByCreatedDateDesc(findRoom, pageable)
-			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage()));
+		return ChatMessageResponse.of(chatMessageRepository.findAllByRoomOrderByCreatedDateDesc(findRoom, pageable)
+			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage())));
 	}
 }
