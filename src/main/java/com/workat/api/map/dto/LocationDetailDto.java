@@ -3,12 +3,8 @@ package com.workat.api.map.dto;
 import com.workat.domain.map.entity.LocationCategory;
 
 import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +21,8 @@ public class LocationDetailDto implements LocationDto {
 	private String placeId;
 
 	private String placeName;
+
+	private String roadAddressName;
 
 	private String placeUrl;
 

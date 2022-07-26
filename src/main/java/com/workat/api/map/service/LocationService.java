@@ -2,7 +2,6 @@ package com.workat.api.map.service;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -149,11 +148,10 @@ public class LocationService {
 			.placeId(location.getPlaceId())
 			.placeUrl(location.getPlaceUrl())
 			.placeName(location.getPlaceName())
+			.roadAddressName(location.getRoadAddressName())
 			.longitude(location.getLongitude())
 			.latitude(location.getLatitude())
 			.build();
-
-		log.error("테스트에요");
 
 		final LocationReviewDto locationLocationReviewDto = reviewService.getLocationReviews(locationId, userId);
 
