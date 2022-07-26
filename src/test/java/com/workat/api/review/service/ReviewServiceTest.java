@@ -16,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.workat.api.review.dto.LocationReviewDto;
@@ -23,6 +24,7 @@ import com.workat.api.review.dto.ReviewDto;
 import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.config.DataJpaTestConfig;
 import com.workat.domain.config.MysqlContainerBaseTest;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
@@ -41,6 +43,7 @@ import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
 @DisplayName("ReviewService 테스트")
+@Import(DataJpaTestConfig.class)
 @ActiveProfiles("test")
 @DataJpaTest
 public class ReviewServiceTest extends MysqlContainerBaseTest {

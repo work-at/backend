@@ -14,6 +14,7 @@ import net.bytebuddy.utility.RandomString;
 
 import com.workat.domain.BaseEntity;
 import com.workat.domain.auth.OauthType;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +25,8 @@ import lombok.NoArgsConstructor;
 @Table(indexes = @Index(columnList = "oauthId", unique = true))
 public class Users extends BaseEntity {
 
-	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id
 	private Long id;
 
 	@Enumerated(EnumType.STRING)
