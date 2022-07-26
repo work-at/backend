@@ -66,8 +66,8 @@ class ChatServiceTest {
 		//then
 		assertAll(
 			() -> assertEquals(chatRoom.getId(), chatRoomId),
-			() -> assertEquals(chatRoom.getUser1(), user1),
-			() -> assertEquals(chatRoom.getUser2(), user2)
+			() -> assertEquals(chatRoom.getOwner(), user1),
+			() -> assertEquals(chatRoom.getOther(), user2)
 		);
 	}
 

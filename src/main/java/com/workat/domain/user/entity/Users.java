@@ -1,8 +1,5 @@
 package com.workat.domain.user.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,21 +8,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import net.bytebuddy.utility.RandomString;
 
 import com.workat.domain.BaseEntity;
 import com.workat.domain.auth.OauthType;
-import com.workat.domain.chat.entity.ChatRoom;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-@ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -33,7 +26,6 @@ import lombok.ToString;
 public class Users extends BaseEntity {
 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "user_id")
 	@Id
 	private Long id;
 

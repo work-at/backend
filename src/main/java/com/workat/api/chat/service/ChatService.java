@@ -3,7 +3,6 @@ package com.workat.api.chat.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,16 +33,16 @@ public class ChatService {
 	private final ChatMessageRepository chatMessageRepository;
 
 	@Transactional
-	public Long createChatRoom(Long user1Id, Long user2Id) {
-		Users findUser1 = usersRepository.findById(user1Id).orElseThrow(() -> {
-			throw new UserNotFoundException(user1Id);
+	public Long createChatRoom(Long ownerUserId, Long otherUserId) {
+		Users findOwnerUser = usersRepository.findById(ownerUserId).orElseThrow(() -> {
+			throw new UserNotFoundException(ownerUserId);
 		});
-		Users findUser2 = usersRepository.findById(user2Id).orElseThrow(() -> {
-			throw new UserNotFoundException(user2Id);
+		Users findOtherUser = usersRepository.findById(otherUserId).orElseThrow(() -> {
+			throw new UserNotFoundException(otherUserId);
 		});
 
 		ChatRoom chatRoom = ChatRoom.of();
-		chatRoom.assignUsers(findUser1, findUser2);
+		chatRoom.assignUsers(findOwnerUser, findOtherUser);
 
 		return chatRoomRepository.save(chatRoom).getId();
 	}
@@ -55,7 +54,8 @@ public class ChatService {
 		});
 
 		List<ChatRoomDto> roomDtos = chatRoomRepository.findAllByUser(findUser).stream()
-			.map(chatRoom -> ChatRoomDto.of(chatRoom.getId(), chatRoom.getUser1().getId(), chatRoom.getUser2().getId()))
+			.map(chatRoom -> ChatRoomDto.of(chatRoom.getId(), chatRoom.getOwner().getId(), chatRoom.getOther().getId(),
+				chatRoom.getCreatedDate()))
 			.collect(Collectors.toList());
 
 		return ChatRoomResponse.of(roomDtos);
@@ -83,6 +83,7 @@ public class ChatService {
 		});
 
 		return ChatMessageResponse.of(chatMessageRepository.findAllByRoomOrderByCreatedDateDesc(findRoom, pageable)
-			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage())));
+			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage(),
+				message.getCreatedDate())));
 	}
 }

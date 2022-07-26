@@ -2,19 +2,17 @@ package com.workat.api.chat.controller;
 
 import java.net.URI;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.workat.api.chat.dto.ChatMessageDto;
 import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.api.chat.service.ChatService;
@@ -44,7 +42,7 @@ public class ChatController {
 		@ApiResponse(code = 200, message = "success", response = Long.class)
 	})
 	@PostMapping("/api/v1/chattings")
-	public ResponseEntity<Long> createChatting(@UserValidation Users user, Long otherUserId) {
+	public ResponseEntity<Long> createChatting(@UserValidation Users user, @RequestParam Long otherUserId) {
 		Long id = chatService.createChatRoom(user.getId(), otherUserId);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 			.buildAndExpand(id)
@@ -70,7 +68,7 @@ public class ChatController {
 		@ApiResponse(code = 200, message = "success", response = Long.class)
 	})
 	@PostMapping("/api/v1/chattings/{roomId}")
-	public ResponseEntity<Long> createMessage(@PathVariable long roomId, Long writerId, String message) {
+	public ResponseEntity<Long> createMessage(@PathVariable long roomId, @RequestParam Long writerId, @RequestParam String message) {
 		Long id = chatService.createChatMessage(roomId, writerId, message);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}")
 			.buildAndExpand(id)

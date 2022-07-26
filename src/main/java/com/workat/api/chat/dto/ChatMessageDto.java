@@ -1,5 +1,7 @@
 package com.workat.api.chat.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +18,9 @@ public class ChatMessageDto {
 
 	private String message;
 
-	public static ChatMessageDto of(Long id, Long writerId, String message) {
-		return new ChatMessageDto(id, writerId, message);
+	private LocalDateTime createdDate;
+
+	public static ChatMessageDto of(Long id, Long writerId, String message, LocalDateTime createdDate) {
+		return new ChatMessageDto(id, writerId, message, createdDate);
 	}
 }

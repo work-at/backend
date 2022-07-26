@@ -19,7 +19,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
 	public List<ChatRoom> findAllByUser(Users user) {
 		return queryFactory.selectFrom(chatRoom)
 			.where(
-				chatRoom.user1.eq(user).or(chatRoom.user2.eq(user))
+				chatRoom.owner.eq(user).or(chatRoom.other.eq(user))
 			).fetch();
 	}
 }

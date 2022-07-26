@@ -13,9 +13,7 @@ import com.workat.domain.user.entity.Users;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -25,20 +23,20 @@ public class ChatRoom extends BaseEntity {
 	@Id
 	private Long id;
 
-	@JoinColumn(name = "user1_id")
+	@JoinColumn(name = "owner_id")
 	@ManyToOne
-	private Users user1;
+	private Users owner;
 
-	@JoinColumn(name = "user2_id")
+	@JoinColumn(name = "other_id")
 	@ManyToOne
-	private Users user2;
+	private Users other;
 
 	public static ChatRoom of() {
 		return new ChatRoom();
 	}
 
-	public void assignUsers(Users user1, Users user2) {
-		this.user1 = user1;
-		this.user2 = user2;
+	public void assignUsers(Users owner, Users other) {
+		this.owner = owner;
+		this.other = other;
 	}
 }

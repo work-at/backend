@@ -1,5 +1,6 @@
 package com.workat.api.chat.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AccessLevel;
@@ -16,7 +17,9 @@ public class ChatRoomDto {
 
 	private List<Long> ownerUserIds;
 
-	public static ChatRoomDto of(Long id, Long user1Id, Long user2Id) {
-		return new ChatRoomDto(id, List.of(user1Id, user2Id));
+	private LocalDateTime createdDate;
+
+	public static ChatRoomDto of(Long id, Long ownerUserId, Long otherUserId, LocalDateTime createdDate) {
+		return new ChatRoomDto(id, List.of(ownerUserId, otherUserId), createdDate);
 	}
 }
