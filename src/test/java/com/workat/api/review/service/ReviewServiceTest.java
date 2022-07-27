@@ -112,7 +112,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 			).collect(Collectors.toList());
 	}
 
-	@DisplayName("getLocationReviews() 메소드는 리뷰 개수, 타입이 저장한 것과 일치해야 한다")
+	@DisplayName("getLocationReviewsWithUser() 메소드는 리뷰 개수, 타입이 저장한 것과 일치해야 한다")
 	@Test
 	void reviewTypeSize() {
 		// given
@@ -132,7 +132,8 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 		// when
 		final long locationId = location.getId();
-		final List<ReviewDto> reviewDtos = reviewService.getLocationReviews(locationId, user1.getId()).getReviews();
+		final List<ReviewDto> reviewDtos = reviewService.getLocationReviewsWithUser(locationId, user1.getId())
+			.getReviews();
 
 		final Map<String, Long> reviewCountMap = reviewDtos.stream()
 			.collect(
@@ -147,9 +148,9 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		);
 	}
 
-	@DisplayName("getLocationReviews() 메소드는 location 리뷰들을 count 역순으로 정렬해야 한다")
+	@DisplayName("getLocationReviewsWithUser() 메소드는 location 리뷰들을 count 역순으로 정렬해야 한다")
 	@Test
-	void getLocationReviews_sorted() {
+	void getLocationReviewsWithUser_sorted() {
 		// given
 		final Location location = saveLocations(1, LocationCategory.CAFE).get(0);
 		final List<Users> users = saveUsers(20);
@@ -177,7 +178,8 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		// when
 		final long locationId = location.getId();
 		final Users user = users.get(0);
-		final List<ReviewDto> reviewDtos = reviewService.getLocationReviews(locationId, user.getId()).getReviews();
+		final List<ReviewDto> reviewDtos = reviewService.getLocationReviewsWithUser(locationId, user.getId())
+			.getReviews();
 
 		// then
 		assertEquals(reviewDtos.size(), 3); // PARKING, WIFI, VIEW
@@ -190,9 +192,9 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		}
 	}
 
-	@DisplayName("getLocationReviews() 메소드는 user 가 해당 location 에 리뷰를 남겼는지 여부를 알려줘야 한다")
+	@DisplayName("getLocationReviewsWithUser() 메소드는 user 가 해당 location 에 리뷰를 남겼는지 여부를 알려줘야 한다")
 	@Test
-	void getLocationReviews_userReviewed() {
+	void getLocationReviewsWithUser_userReviewed() {
 		// given
 		final Location location = saveLocations(1, LocationCategory.CAFE).get(0);
 		final List<Users> users = saveUsers(3);
@@ -210,9 +212,9 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		// when
 		final long locationId = location.getId();
 
-		final LocationReviewDto locationReviews1 = reviewService.getLocationReviews(locationId, user1.getId());
-		final LocationReviewDto locationReviews2 = reviewService.getLocationReviews(locationId, user2.getId());
-		final LocationReviewDto locationReviews3 = reviewService.getLocationReviews(locationId, user3.getId());
+		final LocationReviewDto locationReviews1 = reviewService.getLocationReviewsWithUser(locationId, user1.getId());
+		final LocationReviewDto locationReviews2 = reviewService.getLocationReviewsWithUser(locationId, user2.getId());
+		final LocationReviewDto locationReviews3 = reviewService.getLocationReviewsWithUser(locationId, user3.getId());
 
 		// then
 		assertAll(

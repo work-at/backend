@@ -44,11 +44,11 @@ public class ReviewService {
 	private final LocationRepository locationRepository;
 
 	@Transactional(readOnly = true)
-	public LocationReviewDto getLocationReviews(long locationId, long userId) {
+	public LocationReviewDto getLocationReviewsWithUser(long locationId, long userId) {
 
 		final List<CafeReview> cafeReviews = cafeReviewRepository.findAllByLocation_Id(locationId);
 
-		HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(cafeReviews);
+		final HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(cafeReviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
 		final boolean userReviewed = checkUserReviewed(cafeReviews, userId);
