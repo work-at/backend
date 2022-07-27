@@ -6,18 +6,18 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class DepartmentTypeDto implements UserTypeDto {
+public class ActivityTypeDto implements UserTypeDto {
 
 	String name;
 
 	String content;
 
-	private DepartmentTypeDto(String name, String content) {
+	private ActivityTypeDto(String name, String content) {
 		this.name = name;
 		this.content = content;
 	}
 
-	public static DepartmentTypeDto of(String name, String content) {
-		return new DepartmentTypeDto(name, content);
+	public static ActivityTypeDto of(String name, String content) {
+		return new ActivityTypeDto(name, content);
 	}
 }

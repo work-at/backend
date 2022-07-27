@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class DurationTypeDto implements JobTypeDto {
+public class DurationTypeDto implements UserTypeDto {
 
 	String name;
 
