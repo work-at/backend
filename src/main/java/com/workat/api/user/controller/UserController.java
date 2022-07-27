@@ -84,7 +84,7 @@ public class UserController {
 		return siteURL.replace(request.getServletPath(), "");
 	}
 
-	@GetMapping("/api/v1/user/verify/limit")
+	@GetMapping("/api/v1/user/verify/remaining-attempts")
 	public ResponseEntity<EmailLimitResponseDto> getCompanyVerifyEmailRemain(@UserValidation Users user) {
 		EmailLimitResponseDto response = userService.getVerificationEmailRemain(user);
 		return ResponseEntity.ok(response);
