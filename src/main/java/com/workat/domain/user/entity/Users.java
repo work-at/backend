@@ -39,6 +39,9 @@ public class Users extends BaseEntity {
 	@Column
 	private String verificationCode;
 
+	@Column
+	private int emailRequestRemain = 5;
+
 	private Users(OauthType oauthType, Long oauthId) {
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
@@ -54,5 +57,9 @@ public class Users extends BaseEntity {
 
 	public void clearVerificationCode() {
 		this.verificationCode = null;
+	}
+
+	public void decreaseEmailRequestRemain() {
+		emailRequestRemain--;
 	}
 }

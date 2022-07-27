@@ -22,6 +22,7 @@ import com.workat.api.user.dto.SignUpResponse;
 import com.workat.api.user.dto.request.EmailCertifyRequest;
 import com.workat.api.user.dto.request.SignUpRequest;
 import com.workat.api.user.dto.request.UserUpdateRequest;
+import com.workat.api.user.dto.response.EmailLimitResponseDto;
 import com.workat.api.user.dto.response.MyProfileResponse;
 import com.workat.api.user.service.UserService;
 import com.workat.common.annotation.UserValidation;
@@ -83,11 +84,17 @@ public class UserController {
 		return siteURL.replace(request.getServletPath(), "");
 	}
 
+	@GetMapping("/api/v1/user/verify/remaining-attempts")
+	public ResponseEntity<EmailLimitResponseDto> getCompanyVerifyEmailRemain(@UserValidation Users user) {
+		EmailLimitResponseDto response = userService.getVerificationEmailRemain(user);
+		return ResponseEntity.ok(response);
+	}
+
 	@ApiIgnore
 	@GetMapping("/api/v1/user/email-verified")
-	public String verifyUser(@Param("code") String code) {
+	public String verifyUser(@RequestParam("code") String code, @RequestParam String address) {
 		// TODO: 메일 인증 후 redirect 페이지 여부에 따라 변경 가능
-		if (userService.verify(code)) {
+		if (userService.verify(code, address)) {
 			return "verify_success";
 		}
 		return "verify_fail";
