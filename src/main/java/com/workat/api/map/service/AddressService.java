@@ -1,10 +1,7 @@
 package com.workat.api.map.service;
 
-import static org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit.*;
-
 import java.util.Optional;
 
-import org.springframework.data.geo.Distance;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 

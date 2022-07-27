@@ -1,5 +1,8 @@
 package com.workat.api.map.dto;
 
+import java.util.List;
+
+import com.workat.api.user.dto.ActivityTypeDto;
 import com.workat.api.user.dto.DepartmentTypeDto;
 import com.workat.api.user.dto.DurationTypeDto;
 import com.workat.domain.user.entity.UserProfile;
@@ -33,20 +36,25 @@ public class WorkerDto {
 	@ApiModelProperty(name = "story", notes = "유저 자기소개", example = "안녕하세요 이번에 워케이션에 놀러왔어요")
 	private String story;
 
-	// TODO: 워크챗 수 추가 필요
-	// TODO: 희망활동 추가 필요
+	@ApiModelProperty(name = "workchats", notes = "워크챗 수", example = "5")
+	private int workchats;
 
-	private WorkerDto(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String story) {
+	@ApiModelProperty(name = "activities", notes = "희망 활동")
+	private List<ActivityTypeDto> activities;
+
+	private WorkerDto(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String story, int workchats, List<ActivityTypeDto> activities) {
 		this.id = id;
 		this.nickname = nickname;
 		this.imageUrl = imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
 		this.story = story;
+		this.workchats = workchats;
+		this.activities = activities;
 	}
 
-	public static WorkerDto of(UserProfile userProfile) {
-		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getStory());
+	public static WorkerDto of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities) {
+		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getStory(), workchats, activities);
 	}
 
 }

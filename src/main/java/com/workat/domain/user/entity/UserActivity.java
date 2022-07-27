@@ -1,6 +1,7 @@
 package com.workat.domain.user.entity;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -11,7 +12,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.workat.domain.user.activity.ActivityType;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 public class UserActivity {
 
 	@Id

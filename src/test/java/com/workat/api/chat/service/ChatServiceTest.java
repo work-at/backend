@@ -27,13 +27,14 @@ import com.workat.domain.chat.entity.ChatRoom;
 import com.workat.domain.chat.repository.message.ChatMessageRepository;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
 import com.workat.domain.config.DataJpaTestConfig;
+import com.workat.domain.config.MysqlContainerBaseTest;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UsersRepository;
 
 @Import(DataJpaTestConfig.class)
 @ActiveProfiles("test")
 @DataJpaTest
-class ChatServiceTest {
+class ChatServiceTest extends MysqlContainerBaseTest {
 
 	private ChatService chatService;
 
