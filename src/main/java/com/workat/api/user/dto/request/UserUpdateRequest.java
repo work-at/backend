@@ -31,7 +31,7 @@ public class UserUpdateRequest {
 	private String story;
 
 	@ApiModelProperty(name = "activities", notes = "유저 활동 타입")
-	@IsValidListSize(min = 0, max = 3, message = "1개 이상 3개 이하의 리스트가 인풋으로 들어와야합니다")
+	@IsValidListSize(max = 3, message = "1개 이상 3개 이하의 리스트가 인풋으로 들어와야합니다")
 	private List<String> activities;
 
 	private UserUpdateRequest(String nickname, DepartmentType position, DurationType workingYear, String story, List<String> activities) {
