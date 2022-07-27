@@ -14,7 +14,7 @@ import javax.validation.Payload;
 public @interface IsValidListSize {
 	String message() default "";
 
-	int max() default 100;
+	int max() default 10;
 
 	int min() default 0;
 
