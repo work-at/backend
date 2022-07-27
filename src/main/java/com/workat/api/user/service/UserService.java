@@ -1,7 +1,9 @@
 package com.workat.api.user.service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -18,6 +20,7 @@ import com.workat.api.auth.service.AuthorizationService;
 import com.workat.api.user.dto.SignUpResponse;
 import com.workat.api.user.dto.request.EmailCertifyRequest;
 import com.workat.api.user.dto.request.SignUpRequest;
+import com.workat.api.user.dto.request.UserActivityRequest;
 import com.workat.api.user.dto.request.UserUpdateRequest;
 import com.workat.api.user.dto.response.EmailLimitResponseDto;
 import com.workat.api.user.dto.response.MyProfileResponse;
@@ -28,8 +31,11 @@ import com.workat.common.exception.ForbiddenException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.common.util.FileUploadUtils;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.user.activity.ActivityType;
+import com.workat.domain.user.entity.UserActivity;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.repository.UserActivityRepository;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +56,8 @@ public class UserService {
 	private final UsersRepository userRepository;
 
 	private final UserProfileRepository userProfileRepository;
+
+	private final UserActivityRepository userActivityRepository;
 
 	private final AuthorizationService authorizationService;
 
@@ -147,6 +155,16 @@ public class UserService {
 			throw new FileUploadException(e.getMessage());
 		}
 		return savedFileName;
+	}
+
+	@Transactional
+	public void saveUserActivities(Users user, UserActivityRequest request) {
+		List<UserActivity> activityTypes = request.getActivities().stream()
+			.map(ActivityType::of)
+			.map(activityType -> UserActivity.of(user, activityType))
+			.collect(Collectors.toList());
+
+		userActivityRepository.saveAll(activityTypes);
 	}
 
 	@Transactional

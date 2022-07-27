@@ -6,7 +6,6 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.workat.api.user.dto.SignUpResponse;
 import com.workat.api.user.dto.request.EmailCertifyRequest;
 import com.workat.api.user.dto.request.SignUpRequest;
+import com.workat.api.user.dto.request.UserActivityRequest;
 import com.workat.api.user.dto.request.UserUpdateRequest;
 import com.workat.api.user.dto.response.EmailLimitResponseDto;
 import com.workat.api.user.dto.response.MyProfileResponse;
@@ -71,6 +71,12 @@ public class UserController {
 	public String uploadProfileImage(@UserValidation Users user, @RequestParam("file") MultipartFile multipartFile) {
 		String redirectURI = userService.uploadProfileImage(user.getId(), multipartFile);
 		return "redirect:" + redirectURI;
+	}
+
+	@PostMapping("/api/v1/user/activities")
+	public ResponseEntity<?> setUserActivity(@UserValidation Users user, @Valid @RequestBody UserActivityRequest request) {
+		userService.saveUserActivities(user, request);
+		return ResponseEntity.ok().build();
 	}
 
 	@PostMapping("/api/v1/user/verify")
