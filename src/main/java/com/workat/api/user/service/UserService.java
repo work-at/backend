@@ -20,7 +20,6 @@ import com.workat.api.auth.service.AuthorizationService;
 import com.workat.api.user.dto.SignUpResponse;
 import com.workat.api.user.dto.request.EmailCertifyRequest;
 import com.workat.api.user.dto.request.SignUpRequest;
-import com.workat.api.user.dto.request.UserActivityRequest;
 import com.workat.api.user.dto.request.UserUpdateRequest;
 import com.workat.api.user.dto.response.EmailLimitResponseDto;
 import com.workat.api.user.dto.response.MyProfileResponse;
@@ -124,14 +123,21 @@ public class UserService {
 	}
 
 	@Transactional
-	public void updateUserProfile(Long userId, UserUpdateRequest request) {
-		userProfileRepository.findFirstByNicknameAndIdNot(request.getNickname(), userId).ifPresent(s -> {
+	public void updateUserProfile(Users user, UserUpdateRequest request) {
+		userProfileRepository.findFirstByNicknameAndIdNot(request.getNickname(), user.getId()).ifPresent(s -> {
 			throw new ConflictException("동일한 닉네임의 유저가 존재합니다.");
 		});
 
-		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
+		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		userProfile.updateProfile(request.getNickname(), request.getPosition(), request.getWorkingYear(), request.getStory());
 		userProfileRepository.save(userProfile);
+
+		List<UserActivity> activityTypes = request.getActivities().stream()
+			.map(ActivityType::of)
+			.map(activityType -> UserActivity.of(user, activityType))
+			.collect(Collectors.toList());
+
+		userActivityRepository.saveAll(activityTypes);
 	}
 
 	@Transactional
@@ -155,16 +161,6 @@ public class UserService {
 			throw new FileUploadException(e.getMessage());
 		}
 		return savedFileName;
-	}
-
-	@Transactional
-	public void saveUserActivities(Users user, UserActivityRequest request) {
-		List<UserActivity> activityTypes = request.getActivities().stream()
-			.map(ActivityType::of)
-			.map(activityType -> UserActivity.of(user, activityType))
-			.collect(Collectors.toList());
-
-		userActivityRepository.saveAll(activityTypes);
 	}
 
 	@Transactional
