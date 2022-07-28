@@ -6,7 +6,6 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,7 +62,7 @@ public class UserController {
 
 	@PutMapping("/api/v1/user")
 	public ResponseEntity<?> updateUserProfile(@UserValidation Users user, @Valid @RequestBody UserUpdateRequest request) {
-		userService.updateUserProfile(user.getId(), request);
+		userService.updateUserProfile(user, request);
 		return ResponseEntity.ok().build();
 	}
 

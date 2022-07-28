@@ -2,8 +2,11 @@ package com.workat.api.user.dto.request;
 
 import static lombok.AccessLevel.*;
 
+import java.util.List;
+
 import javax.validation.constraints.Pattern;
 
+import com.workat.common.annotation.IsValidListSize;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
 import io.swagger.annotations.ApiModelProperty;
@@ -27,12 +30,15 @@ public class UserUpdateRequest {
 	@ApiModelProperty(name = "story", notes = "유저 자기소개", example = "안녕하세요 이번에 워케이션에 놀러왔어요")
 	private String story;
 
-	//TODO: 희망 활동 추가
+	@ApiModelProperty(name = "activities", notes = "유저 활동 타입")
+	@IsValidListSize(max = 3, message = "1개 이상 3개 이하의 리스트가 인풋으로 들어와야합니다")
+	private List<String> activities;
 
-	private UserUpdateRequest(String nickname, DepartmentType position, DurationType workingYear, String story) {
+	private UserUpdateRequest(String nickname, DepartmentType position, DurationType workingYear, String story, List<String> activities) {
 		this.nickname = nickname;
 		this.position = position;
 		this.workingYear = workingYear;
 		this.story = story;
+		this.activities = activities;
 	}
 }

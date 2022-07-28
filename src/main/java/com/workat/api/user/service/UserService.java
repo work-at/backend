@@ -1,7 +1,9 @@
 package com.workat.api.user.service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -28,8 +30,11 @@ import com.workat.common.exception.ForbiddenException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.common.util.FileUploadUtils;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.user.activity.ActivityType;
+import com.workat.domain.user.entity.UserActivity;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.repository.UserActivityRepository;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +55,8 @@ public class UserService {
 	private final UsersRepository userRepository;
 
 	private final UserProfileRepository userProfileRepository;
+
+	private final UserActivityRepository userActivityRepository;
 
 	private final AuthorizationService authorizationService;
 
@@ -116,14 +123,21 @@ public class UserService {
 	}
 
 	@Transactional
-	public void updateUserProfile(Long userId, UserUpdateRequest request) {
-		userProfileRepository.findFirstByNicknameAndIdNot(request.getNickname(), userId).ifPresent(s -> {
+	public void updateUserProfile(Users user, UserUpdateRequest request) {
+		userProfileRepository.findFirstByNicknameAndIdNot(request.getNickname(), user.getId()).ifPresent(s -> {
 			throw new ConflictException("동일한 닉네임의 유저가 존재합니다.");
 		});
 
-		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
+		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		userProfile.updateProfile(request.getNickname(), request.getPosition(), request.getWorkingYear(), request.getStory());
 		userProfileRepository.save(userProfile);
+
+		List<UserActivity> activityTypes = request.getActivities().stream()
+			.map(ActivityType::of)
+			.map(activityType -> UserActivity.of(user, activityType))
+			.collect(Collectors.toList());
+
+		userActivityRepository.saveAll(activityTypes);
 	}
 
 	@Transactional

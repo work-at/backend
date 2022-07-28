@@ -14,6 +14,8 @@ import com.workat.api.map.dto.WorkerDto;
 import com.workat.api.map.dto.response.WorkerListResponse;
 import com.workat.api.map.dto.response.WorkerSizeResponse;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.chat.repository.room.ChatRoomCustomRepository;
+import com.workat.domain.chat.repository.room.ChatRoomRepository;
 import com.workat.domain.config.MultipleDatasourceBaseTest;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
@@ -21,6 +23,7 @@ import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.repository.UserActivityRepository;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
@@ -39,6 +42,10 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 	private UsersRepository userRepository;
 	@Autowired
 	private UserProfileRepository userProfileRepository;
+	@Autowired
+	private ChatRoomRepository chatRoomRepository;
+	@Autowired
+	private UserActivityRepository userActivityRepository;
 	@Autowired
 	private WorkerService workerService;
 
@@ -63,7 +70,6 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
 		userProfileRepository.save(userProfile2);
-
 
 		workerLocation = WorkerLocation.of(user.getId(), String.valueOf(127.423084873712), String.valueOf(37.0789561558879), "경기 안성시 죽산면 죽산리");
 		workerLocation1 = WorkerLocation.of(user2.getId(), "127.40", "37.07895", "경기 안성시 삼죽면 내장리");
@@ -113,7 +119,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(response.getId(), user.getId()),
 			() -> Assertions.assertEquals(response.getImageUrl(), userProfile.getImageUrl()),
-			() -> Assertions.assertEquals(response.getPosition().getName(),userProfile.getPosition().name()),
+			() -> Assertions.assertEquals(response.getPosition().getName(), userProfile.getPosition().name()),
 			() -> Assertions.assertEquals(response.getWorkingYear().getName(), userProfile.getWorkingYear().name())
 		);
 	}

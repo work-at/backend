@@ -15,11 +15,16 @@ import com.workat.api.map.dto.WorkerPinDto;
 import com.workat.api.map.dto.response.WorkerListResponse;
 import com.workat.api.map.dto.response.WorkerPinResponse;
 import com.workat.api.map.dto.response.WorkerSizeResponse;
+import com.workat.api.user.dto.ActivityTypeDto;
 import com.workat.common.exception.NotFoundException;
+import com.workat.domain.chat.repository.room.ChatRoomCustomRepository;
+import com.workat.domain.chat.repository.room.ChatRoomRepository;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
+import com.workat.domain.user.entity.UserActivity;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.repository.UserActivityRepository;
 import com.workat.domain.user.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +38,10 @@ public class WorkerService {
 
 	private final UserProfileRepository userProfileRepository;
 
+	private final ChatRoomRepository chatRoomRepository;
+
+	private final UserActivityRepository userActivityRepository;
+
 	@Transactional(readOnly = true)
 	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer) {
 		List<WorkerLocation> workerLocations = getWorkerByLocationNear(user, kilometer);
@@ -43,7 +52,14 @@ public class WorkerService {
 			.map(workerLocation -> userProfileRepository.findById(Long.parseLong(workerLocation.getUserId())))
 			.filter(Optional::isPresent)
 			.map(Optional::get)
-			.map(WorkerDto::of)
+			.map(userProfile -> {
+				int workchats = chatRoomRepository.findAllByUser(userProfile.getUser()).size();
+				List<ActivityTypeDto> activityTypes = userActivityRepository.findByUser_Id(userProfile.getId()).stream()
+					.map(UserActivity::getActivity)
+					.map(activity -> ActivityTypeDto.of(activity.name(), activity.getType()))
+					.collect(Collectors.toList());
+				return WorkerDto.of(userProfile, workchats, activityTypes);
+			})
 			.collect(Collectors.toList());
 
 		return WorkerListResponse.of(workerDtos);
@@ -73,7 +89,12 @@ public class WorkerService {
 	@Transactional(readOnly = true)
 	public WorkerDto findWorkerById(Long userId) {
 		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
-		return WorkerDto.of(userProfile);
+		int workchats = chatRoomRepository.findAllByUser(userProfile.getUser()).size();
+		List<ActivityTypeDto> activityTypes = userActivityRepository.findByUser_Id(userProfile.getId()).stream()
+			.map(UserActivity::getActivity)
+			.map(activity -> ActivityTypeDto.of(activity.name(), activity.getType()))
+			.collect(Collectors.toList());
+		return WorkerDto.of(userProfile, workchats, activityTypes);
 	}
 
 	private List<WorkerLocation> getWorkerByLocationNear(Users user, double kilometer) {
