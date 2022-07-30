@@ -94,8 +94,7 @@ public class UserController {
 		userService.changeUserTracking(user, turnOff);
 		return ResponseEntity.ok().build();
 	}
-
-	@ApiIgnore
+	
 	@GetMapping("/api/v1/user/email-verified")
 	public String verifyUser(@RequestParam("code") String code, @RequestParam String address) {
 		// TODO: 메일 인증 후 redirect 페이지 여부에 따라 변경 가능
