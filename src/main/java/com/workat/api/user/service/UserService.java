@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.workat.api.auth.dto.response.AuthResponse;
 import com.workat.api.auth.service.AuthorizationService;
+import com.workat.api.user.dto.ActivityTypeDto;
 import com.workat.api.user.dto.SignUpResponse;
 import com.workat.api.user.dto.request.EmailCertifyRequest;
 import com.workat.api.user.dto.request.SignUpRequest;
@@ -30,6 +31,7 @@ import com.workat.common.exception.ForbiddenException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.common.util.FileUploadUtils;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.chat.repository.room.ChatRoomRepository;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
 import com.workat.domain.user.activity.ActivityType;
 import com.workat.domain.user.entity.UserActivity;
@@ -62,6 +64,8 @@ public class UserService {
 	private final UserActivityRepository userActivityRepository;
 
 	private final AuthorizationService authorizationService;
+
+	private final ChatRoomRepository chatRoomRepository;
 
 	public AuthResponse login(OauthType oauthType, long oauthId) {
 		final boolean userExist = validateUserExistWithOauthId(oauthType, oauthId);
@@ -122,7 +126,13 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public MyProfileResponse getSelfUserProfile(Long userId) {
 		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
-		return MyProfileResponse.of(userProfile);
+		int workchats = chatRoomRepository.findAllByUser(userProfile.getUser()).size();
+		List<ActivityTypeDto> activityTypes = userActivityRepository.findByUser_Id(userProfile.getId()).stream()
+			.map(UserActivity::getActivity)
+			.map(activity -> ActivityTypeDto.of(activity.name(), activity.getType()))
+			.collect(Collectors.toList());
+
+		return MyProfileResponse.of(userProfile, workchats, activityTypes);
 	}
 
 	@Transactional
