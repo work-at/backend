@@ -16,8 +16,8 @@ import com.workat.api.map.dto.response.WorkerListResponse;
 import com.workat.api.map.dto.response.WorkerPinResponse;
 import com.workat.api.map.dto.response.WorkerSizeResponse;
 import com.workat.api.user.dto.ActivityTypeDto;
+import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
-import com.workat.domain.chat.repository.room.ChatRoomCustomRepository;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
 import com.workat.domain.map.entity.WorkerLocation;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
@@ -44,6 +44,9 @@ public class WorkerService {
 
 	@Transactional(readOnly = true)
 	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer) {
+		if (user.isTrackingOff()) {
+			throw new BadRequestException("내 위치 공유 옵션을 켜야합니다");
+		}
 		List<WorkerLocation> workerLocations = getWorkerByLocationNear(user, kilometer);
 
 		List<WorkerDto> workerDtos = workerLocations
@@ -67,6 +70,9 @@ public class WorkerService {
 
 	@Transactional(readOnly = true)
 	public WorkerPinResponse findAllWorkerPinsByLocationNear(Users user, double kilometer) {
+		if (user.isTrackingOff()) {
+			throw new BadRequestException("내 위치 공유 옵션을 켜야합니다");
+		}
 		WorkerLocation userLocation = workerLocationRedisRepository.findById(user.getId())
 			.orElseThrow(() -> new NotFoundException("user need to update address"));
 
@@ -81,6 +87,9 @@ public class WorkerService {
 
 	@Transactional(readOnly = true)
 	public WorkerSizeResponse countAllWorkerByLocationNear(Users user, double kilometer) {
+		if (user.isTrackingOff()) {
+			throw new BadRequestException("내 위치 공유 옵션을 켜야합니다");
+		}
 		List<WorkerLocation> workerLocations = getWorkerByLocationNear(user, kilometer);
 
 		return WorkerSizeResponse.of(Math.max(workerLocations.size() - 1, 0));
@@ -88,6 +97,7 @@ public class WorkerService {
 
 	@Transactional(readOnly = true)
 	public WorkerDto findWorkerById(Long userId) {
+		// TODO: 내 위치 공유 옵션을 끌 경우 워케이셔너 조회 자체가 불가능한지 여부 결정
 		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		int workchats = chatRoomRepository.findAllByUser(userProfile.getUser()).size();
 		List<ActivityTypeDto> activityTypes = userActivityRepository.findByUser_Id(userProfile.getId()).stream()

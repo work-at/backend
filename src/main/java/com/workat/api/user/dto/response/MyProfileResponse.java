@@ -1,5 +1,8 @@
 package com.workat.api.user.dto.response;
 
+import java.util.List;
+
+import com.workat.api.user.dto.ActivityTypeDto;
 import com.workat.api.user.dto.DepartmentTypeDto;
 import com.workat.api.user.dto.DurationTypeDto;
 import com.workat.domain.user.entity.UserProfile;
@@ -35,10 +38,15 @@ public class MyProfileResponse {
 	@ApiModelProperty(name = "certified", notes = "회사 인증 여부", example = "false")
 	private boolean certified;
 
-	// TODO: 내 소식 - 워크챗 수, 새 댓글 알람 수 추가 필요
-	// TODO: 희망활동 추가 필요
+	@ApiModelProperty(name = "workchats", notes = "워크챗 수", example = "5")
+	private int workchats;
 
-	private MyProfileResponse(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String story, boolean certified) {
+	@ApiModelProperty(name = "activities", notes = "희망 활동")
+	private List<ActivityTypeDto> activities;
+
+	// TODO: 내 소식 - 새 댓글 알람 수 추가 필요
+
+	private MyProfileResponse(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String story, boolean certified, int workchats, List<ActivityTypeDto> activities) {
 		this.id = id;
 		this.nickname = nickname;
 		this.imageUrl = imageUrl;
@@ -46,10 +54,12 @@ public class MyProfileResponse {
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
 		this.story = story;
 		this.certified = certified;
+		this.workchats = workchats;
+		this.activities = activities;
 	}
 
-	public static MyProfileResponse of(UserProfile userProfile) {
-		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getStory(), userProfile.isCertified());
+	public static MyProfileResponse of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities) {
+		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getStory(), userProfile.isCertified(), workchats, activities);
 	}
 
 }
