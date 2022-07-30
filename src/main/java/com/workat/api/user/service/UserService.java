@@ -30,6 +30,7 @@ import com.workat.common.exception.ForbiddenException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.common.util.FileUploadUtils;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
 import com.workat.domain.user.activity.ActivityType;
 import com.workat.domain.user.entity.UserActivity;
 import com.workat.domain.user.entity.UserProfile;
@@ -55,6 +56,8 @@ public class UserService {
 	private final UsersRepository userRepository;
 
 	private final UserProfileRepository userProfileRepository;
+
+	private final WorkerLocationRedisRepository workerLocationRedisRepository;
 
 	private final UserActivityRepository userActivityRepository;
 
@@ -190,6 +193,27 @@ public class UserService {
 		userProfileRepository.save(userProfile);
 
 		return true;
+	}
+
+	@Transactional
+	public void changeUserTracking(Users user, boolean turnOff) {
+		if (turnOff) {
+			turnOffTracking(user);
+			return;
+		}
+		turnOnTracking(user);
+	}
+
+	private void turnOffTracking(Users user) {
+		workerLocationRedisRepository.deleteById(user.getId());
+
+		user.turnOffTracking();
+		userRepository.save(user);
+	}
+
+	private void turnOnTracking(Users user) {
+		user.turnOnTracking();
+		userRepository.save(user);
 	}
 
 	public EmailLimitResponseDto getVerificationEmailRemain(Users user) {

@@ -89,6 +89,12 @@ public class UserController {
 		return ResponseEntity.ok(response);
 	}
 
+	@PutMapping("/api/v1/user/tracking")
+	public ResponseEntity<?> getCompanyVerifyEmailRemain(@UserValidation Users user, @RequestParam boolean turnOff) {
+		userService.changeUserTracking(user, turnOff);
+		return ResponseEntity.ok().build();
+	}
+
 	@ApiIgnore
 	@GetMapping("/api/v1/user/email-verified")
 	public String verifyUser(@RequestParam("code") String code, @RequestParam String address) {

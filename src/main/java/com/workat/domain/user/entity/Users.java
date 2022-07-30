@@ -42,6 +42,9 @@ public class Users extends BaseEntity {
 	@Column
 	private int emailRequestRemain = 5;
 
+	@Column
+	private boolean trackingOff;
+
 	private Users(OauthType oauthType, Long oauthId) {
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
@@ -61,5 +64,13 @@ public class Users extends BaseEntity {
 
 	public void decreaseEmailRequestRemain() {
 		emailRequestRemain--;
+	}
+
+	public void turnOnTracking() {
+		this.trackingOff = false;
+	}
+
+	public void turnOffTracking() {
+		this.trackingOff = true;
 	}
 }
