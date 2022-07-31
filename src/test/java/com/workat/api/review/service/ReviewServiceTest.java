@@ -19,8 +19,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.dto.ReviewDto;
+import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.domain.auth.OauthType;
@@ -210,11 +210,11 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		// when
 		final long locationId = location.getId();
 
-		final LocationReviewDto locationReviews1 = reviewService.getLocationReviewsWithUser(locationId,
+		final ReviewWithUserDto locationReviews1 = reviewService.getLocationReviewsWithUser(locationId,
 			LocationCategory.CAFE, user1.getId());
-		final LocationReviewDto locationReviews2 = reviewService.getLocationReviewsWithUser(locationId,
+		final ReviewWithUserDto locationReviews2 = reviewService.getLocationReviewsWithUser(locationId,
 			LocationCategory.CAFE, user2.getId());
-		final LocationReviewDto locationReviews3 = reviewService.getLocationReviewsWithUser(locationId,
+		final ReviewWithUserDto locationReviews3 = reviewService.getLocationReviewsWithUser(locationId,
 			LocationCategory.CAFE, user3.getId());
 
 		// then

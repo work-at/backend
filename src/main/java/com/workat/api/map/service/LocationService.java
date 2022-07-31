@@ -15,9 +15,9 @@ import com.workat.api.map.dto.LocationDto;
 import com.workat.api.map.dto.LocationPinDto;
 import com.workat.api.map.dto.response.LocationDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
-import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.dto.ReviewDto;
 import com.workat.api.review.dto.ReviewTypeDto;
+import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
@@ -175,7 +175,7 @@ public class LocationService {
 			.placeUrl(location.getPlaceUrl())
 			.build();
 
-		final LocationReviewDto locationLocationReviewDto = reviewService.getLocationReviewsWithUser(
+		final ReviewWithUserDto locationLocationReviewDto = reviewService.getLocationReviewsWithUser(
 			locationId,
 			category,
 			userId);

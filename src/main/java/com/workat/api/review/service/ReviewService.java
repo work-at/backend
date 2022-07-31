@@ -12,8 +12,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.dto.ReviewDto;
+import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
@@ -54,7 +54,7 @@ public class ReviewService {
 		return sortedReviewDtos;
 	}
 
-	public LocationReviewDto getLocationReviewsWithUser(long locationId, LocationCategory category, long userId) {
+	public ReviewWithUserDto getLocationReviewsWithUser(long locationId, LocationCategory category, long userId) {
 
 		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
@@ -63,7 +63,7 @@ public class ReviewService {
 
 		final boolean userReviewed = checkUserReviewed(reviews, userId);
 
-		return LocationReviewDto.of(
+		return ReviewWithUserDto.of(
 			sortedReviewDtos,
 			userReviewed
 		);
