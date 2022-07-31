@@ -18,6 +18,7 @@ import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
+import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.review.BaseReviewType;
 import com.workat.domain.review.CafeReviewType;
@@ -43,20 +44,39 @@ public class ReviewService {
 
 	private final LocationRepository locationRepository;
 
-	@Transactional(readOnly = true)
-	public LocationReviewDto getLocationReviewsWithUser(long locationId, long userId) {
+	public List<ReviewDto> getLocationReviews(long locationId, LocationCategory category) {
 
-		final List<CafeReview> cafeReviews = cafeReviewRepository.findAllByLocation_Id(locationId);
+		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
-		final HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(cafeReviews);
+		final HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(reviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
-		final boolean userReviewed = checkUserReviewed(cafeReviews, userId);
+		return sortedReviewDtos;
+	}
+
+	public LocationReviewDto getLocationReviewsWithUser(long locationId, LocationCategory category, long userId) {
+
+		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
+
+		final HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(reviews);
+		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
+
+		final boolean userReviewed = checkUserReviewed(reviews, userId);
 
 		return LocationReviewDto.of(
 			sortedReviewDtos,
 			userReviewed
 		);
+	}
+
+	@Transactional(readOnly = true)
+	public List<? extends BaseReview> getReviewsByCategory(long locationId, LocationCategory category) {
+
+		if (category == LocationCategory.CAFE) {
+			return cafeReviewRepository.findAllByLocation_Id(locationId);
+		}
+
+		return restaurantReviewRepository.findAllByLocation_Id(locationId);
 	}
 
 	private <T extends BaseReview> HashMap<BaseReviewType, Long> convertReviewCountMap(List<T> reviews) {
@@ -79,8 +99,8 @@ public class ReviewService {
 			.collect(toList());
 	}
 
-	private boolean checkUserReviewed(List<CafeReview> cafeReviews, long userId) {
-		final Optional<CafeReview> reviewMatchedUser = cafeReviews.stream()
+	private boolean checkUserReviewed(List<? extends BaseReview> reviews, long userId) {
+		final Optional<? extends BaseReview> reviewMatchedUser = reviews.stream()
 			.filter(review -> review.getUser().getId() == userId)
 			.findFirst();
 
@@ -104,7 +124,7 @@ public class ReviewService {
 		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
 
 		final List<CafeReview> cafeReviews = reviewTypeNames.stream()
-			.map(name -> CafeReviewType.of(name))
+			.map(CafeReviewType::of)
 			.map(reviewType -> CafeReview.of(reviewType, location, user))
 			.collect(toList());
 
@@ -128,7 +148,7 @@ public class ReviewService {
 		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
 
 		final List<RestaurantReview> RestaurantReviews = reviewTypeNames.stream()
-			.map(name -> FoodReviewType.of(name))
+			.map(FoodReviewType::of)
 			.map(reviewType -> RestaurantReview.of(reviewType, location, user))
 			.collect(toList());
 

@@ -40,7 +40,6 @@ import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
 import com.workat.domain.user.repository.UserProfileRepository;
-import com.workat.domain.user.repository.UsersRepository;
 
 @DisplayName("ReviewService 테스트")
 @Import(DataJpaTestConfig.class)
@@ -58,9 +57,6 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 	@Autowired
 	private LocationRepository locationRepository;
-
-	@Autowired
-	private UsersRepository userRepository;
 
 	@Autowired
 	private UserProfileRepository userProfileRepository;
@@ -132,7 +128,8 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 		// when
 		final long locationId = location.getId();
-		final List<ReviewDto> reviewDtos = reviewService.getLocationReviewsWithUser(locationId, user1.getId())
+		final List<ReviewDto> reviewDtos = reviewService.getLocationReviewsWithUser(locationId, LocationCategory.CAFE,
+				user1.getId())
 			.getReviews();
 
 		final Map<String, Long> reviewCountMap = reviewDtos.stream()
@@ -178,7 +175,8 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		// when
 		final long locationId = location.getId();
 		final Users user = users.get(0);
-		final List<ReviewDto> reviewDtos = reviewService.getLocationReviewsWithUser(locationId, user.getId())
+		final List<ReviewDto> reviewDtos = reviewService.getLocationReviewsWithUser(locationId, LocationCategory.CAFE,
+				user.getId())
 			.getReviews();
 
 		// then
@@ -212,9 +210,12 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		// when
 		final long locationId = location.getId();
 
-		final LocationReviewDto locationReviews1 = reviewService.getLocationReviewsWithUser(locationId, user1.getId());
-		final LocationReviewDto locationReviews2 = reviewService.getLocationReviewsWithUser(locationId, user2.getId());
-		final LocationReviewDto locationReviews3 = reviewService.getLocationReviewsWithUser(locationId, user3.getId());
+		final LocationReviewDto locationReviews1 = reviewService.getLocationReviewsWithUser(locationId,
+			LocationCategory.CAFE, user1.getId());
+		final LocationReviewDto locationReviews2 = reviewService.getLocationReviewsWithUser(locationId,
+			LocationCategory.CAFE, user2.getId());
+		final LocationReviewDto locationReviews3 = reviewService.getLocationReviewsWithUser(locationId,
+			LocationCategory.CAFE, user3.getId());
 
 		// then
 		assertAll(
