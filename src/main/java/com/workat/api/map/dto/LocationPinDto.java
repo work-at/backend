@@ -12,7 +12,7 @@ public class LocationPinDto extends LocationDto {
 		super(id, placeId, latitude, longitude);
 	}
 
-	static public LocationPinDto of(long id, String placeId, double latitude, double longitude) {
+	public static LocationPinDto of(long id, String placeId, double latitude, double longitude) {
 		return new LocationPinDto(id, placeId, latitude, longitude);
 	}
 }
