@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LocationResponse<T extends LocationDto> {
 
-	private List<T> data;
+	private List<T> locations;
 
-	public static <T extends LocationDto> LocationResponse of(List<T> list) {
-		return new LocationResponse<T>(list);
+	public static <T extends LocationDto> LocationResponse<T> of(List<T> list) {
+		return new LocationResponse<>(list);
 	}
 }

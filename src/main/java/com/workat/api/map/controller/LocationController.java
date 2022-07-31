@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.workat.api.map.dto.LocationDetailDto;
-import com.workat.api.map.dto.LocationPinDto;
 import com.workat.api.map.dto.response.LocationDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.map.service.LocationService;
@@ -42,7 +40,7 @@ public class LocationController {
 		@ApiImplicitParam(name = "radius", value = "반경", dataType = "Integer", example = "0", defaultValue = DEFAULT_RADIUS)
 	})
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "success", response = LocationDetailDto.class)
+		@ApiResponse(code = 200, message = "success")
 	})
 	@GetMapping("/api/v1/map/cafes")
 	public ResponseEntity<LocationResponse> getCafes(@UserValidation Users user,
@@ -61,7 +59,7 @@ public class LocationController {
 		@ApiImplicitParam(name = "radius", value = "반경", dataType = "Integer", example = "0", defaultValue = DEFAULT_RADIUS)
 	})
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "success", response = LocationPinDto.class)
+		@ApiResponse(code = 200, message = "success")
 	})
 	@GetMapping("/api/v1/map/cafes/pin")
 	public ResponseEntity<LocationResponse> getCafesPin(@UserValidation Users user,
@@ -90,7 +88,7 @@ public class LocationController {
 		@ApiImplicitParam(name = "radius", value = "반경", dataType = "Integer", example = "0", defaultValue = DEFAULT_RADIUS)
 	})
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "success", response = LocationDetailDto.class)
+		@ApiResponse(code = 200, message = "success")
 	})
 	@GetMapping("/api/v1/map/restaurants")
 	public ResponseEntity<LocationResponse> getRestaurants(@UserValidation Users user,
@@ -109,7 +107,7 @@ public class LocationController {
 		@ApiImplicitParam(name = "radius", value = "반경", dataType = "Integer", example = "0", defaultValue = DEFAULT_RADIUS)
 	})
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "success", response = LocationPinDto.class)
+		@ApiResponse(code = 200, message = "success")
 	})
 	@GetMapping("/api/v1/map/restaurants/pin")
 	public ResponseEntity<LocationResponse> getRestaurantsPin(@UserValidation Users user,
@@ -150,7 +148,8 @@ public class LocationController {
 	}
 
 	@GetMapping("/api/v1/map/restaurants/test")
-	public ResponseEntity<LocationResponse> getRestaurantsTest(@NotNull @RequestParam double longitude,
+	public ResponseEntity<LocationResponse> getRestaurantsTest(
+		@NotNull @RequestParam double longitude,
 		@NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		LocationResponse response =
@@ -159,7 +158,8 @@ public class LocationController {
 	}
 
 	@GetMapping("/api/v1/map/restaurants/pin/test")
-	public ResponseEntity<LocationResponse> getRestaurantsPinTest(@NotNull @RequestParam double longitude,
+	public ResponseEntity<LocationResponse> getRestaurantsPinTest(
+		@NotNull @RequestParam double longitude,
 		@NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		LocationResponse response =
