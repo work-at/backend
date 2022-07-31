@@ -33,6 +33,9 @@ public class WorkerDto {
 	@ApiModelProperty(name = "workingYear", notes = "워케이셔너 연차", example = "{\"name\":\"JUNIOR\",\"content\":\"주니어(1~4년)\"}")
 	private DurationTypeDto workingYear;
 
+	@ApiModelProperty(name = "company", notes = "유저 회사, 미인증시 null", example = "emarteveryday")
+	private String company;
+
 	@ApiModelProperty(name = "story", notes = "유저 자기소개", example = "안녕하세요 이번에 워케이션에 놀러왔어요")
 	private String story;
 
@@ -42,19 +45,20 @@ public class WorkerDto {
 	@ApiModelProperty(name = "activities", notes = "희망 활동")
 	private List<ActivityTypeDto> activities;
 
-	private WorkerDto(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String story, int workchats, List<ActivityTypeDto> activities) {
+	private WorkerDto(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String company, String story, int workchats, List<ActivityTypeDto> activities) {
 		this.id = id;
 		this.nickname = nickname;
 		this.imageUrl = imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
+		this.company = company;
 		this.story = story;
 		this.workchats = workchats;
 		this.activities = activities;
 	}
 
 	public static WorkerDto of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities) {
-		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getStory(), workchats, activities);
+		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(), workchats, activities);
 	}
 
 }
