@@ -14,14 +14,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LocationBriefDto extends LocationDto {
 
-	private long id;
-
-	private String placeId;
-
-	private double latitude;
-
-	private double longitude;
-
 	private LocationCategory category;
 
 	private String placeName;
@@ -39,10 +31,7 @@ public class LocationBriefDto extends LocationDto {
 		String placeName, String roadAddressName, String thumbnailImageUrl, int reviewCount,
 		List<ReviewTypeDto> topReviews) {
 		super(id, placeId, latitude, longitude);
-		this.id = id;
-		this.placeId = placeId;
-		this.latitude = latitude;
-		this.longitude = longitude;
+		
 		this.category = category;
 		this.placeName = placeName;
 		this.roadAddressName = roadAddressName;
