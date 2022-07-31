@@ -1,6 +1,7 @@
 package com.workat.api.user.service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ import com.workat.domain.user.activity.ActivityType;
 import com.workat.domain.user.entity.UserActivity;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.filter.FilterEmail;
 import com.workat.domain.user.repository.UserActivityRepository;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
@@ -177,11 +179,15 @@ public class UserService {
 	}
 
 	@Transactional
-	public void sendCompanyVerifyEmail(Long userId, EmailCertifyRequest request, String siteURL) throws UnsupportedEncodingException, MessagingException {
-		Users user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
+	public void sendCompanyVerifyEmail(Users user, EmailCertifyRequest request, String siteURL) throws UnsupportedEncodingException, MessagingException {
 		if (user.getEmailRequestRemain() == 0) {
 			throw new ForbiddenException("email 인증 요청이 모두 소모되었습니다");
 		}
+
+		Arrays.stream(FilterEmail.values())
+			.filter(filterEmail -> request.getEmail().endsWith(filterEmail.getEmail()))
+			.findFirst()
+			.orElseThrow(() -> new BadRequestException("기본 이메일은 인증할 수 없습니다"));
 
 		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
 		user.decreaseEmailRequestRemain();
@@ -198,7 +204,6 @@ public class UserService {
 
 		user.clearVerificationCode();
 		userRepository.save(user);
-		// TODO: 일반 gmail, naver 메일의 경우 어떻게 처리할지 기획에 따라 변경
 		userProfile.certifyCompanyMail(address);
 		userProfileRepository.save(userProfile);
 
