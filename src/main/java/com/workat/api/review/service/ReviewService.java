@@ -109,11 +109,8 @@ public class ReviewService {
 	}
 
 	private boolean checkUserReviewed(List<? extends BaseReview> reviews, long userId) {
-		final Optional<? extends BaseReview> reviewMatchedUser = reviews.stream()
-			.filter(review -> review.getUser().getId() == userId)
-			.findFirst();
-
-		return reviewMatchedUser.isPresent();
+		return reviews.stream()
+			.anyMatch(review -> review.getUser().getId() == userId);
 	}
 
 	@Transactional
