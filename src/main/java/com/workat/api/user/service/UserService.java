@@ -184,12 +184,9 @@ public class UserService {
 			throw new ForbiddenException("email 인증 요청이 모두 소모되었습니다");
 		}
 
-		Arrays.stream(FilterEmail.values())
-			.filter(filterEmail -> request.getEmail().endsWith(filterEmail.getEmail()))
-			.findFirst()
-			.ifPresent(email -> {
-				throw new BadRequestException("기본 이메일 " + email + " 은 인증할 수 없습니다");
-			});
+		if (FilterEmail.anyMatch(request.getEmail())) {
+			throw new BadRequestException("기본 이메일 " + request.getEmail() + " 은 인증할 수 없습니다");
+		}
 
 		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
 		user.decreaseEmailRequestRemain();
