@@ -19,8 +19,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.dto.ReviewDto;
+import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.domain.auth.OauthType;
@@ -40,7 +40,6 @@ import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
 import com.workat.domain.user.repository.UserProfileRepository;
-import com.workat.domain.user.repository.UsersRepository;
 
 @DisplayName("ReviewService 테스트")
 @Import(DataJpaTestConfig.class)
@@ -58,9 +57,6 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 	@Autowired
 	private LocationRepository locationRepository;
-
-	@Autowired
-	private UsersRepository userRepository;
 
 	@Autowired
 	private UserProfileRepository userProfileRepository;
@@ -112,7 +108,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 			).collect(Collectors.toList());
 	}
 
-	@DisplayName("getLocationReviews() 메소드는 리뷰 개수, 타입이 저장한 것과 일치해야 한다")
+	@DisplayName("getLocationReviewsWithUser() 메소드는 리뷰 개수, 타입이 저장한 것과 일치해야 한다")
 	@Test
 	void reviewTypeSize() {
 		// given
@@ -132,7 +128,9 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 		// when
 		final long locationId = location.getId();
-		final List<ReviewDto> reviewDtos = reviewService.getLocationReviews(locationId, user1.getId()).getReviews();
+		final List<ReviewDto> reviewDtos = reviewService.getLocationReviewsWithUser(locationId, LocationCategory.CAFE,
+				user1.getId())
+			.getReviews();
 
 		final Map<String, Long> reviewCountMap = reviewDtos.stream()
 			.collect(
@@ -147,9 +145,9 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		);
 	}
 
-	@DisplayName("getLocationReviews() 메소드는 location 리뷰들을 count 역순으로 정렬해야 한다")
+	@DisplayName("getLocationReviewsWithUser() 메소드는 location 리뷰들을 count 역순으로 정렬해야 한다")
 	@Test
-	void getLocationReviews_sorted() {
+	void getLocationReviewsWithUser_sorted() {
 		// given
 		final Location location = saveLocations(1, LocationCategory.CAFE).get(0);
 		final List<Users> users = saveUsers(20);
@@ -177,7 +175,9 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		// when
 		final long locationId = location.getId();
 		final Users user = users.get(0);
-		final List<ReviewDto> reviewDtos = reviewService.getLocationReviews(locationId, user.getId()).getReviews();
+		final List<ReviewDto> reviewDtos = reviewService.getLocationReviewsWithUser(locationId, LocationCategory.CAFE,
+				user.getId())
+			.getReviews();
 
 		// then
 		assertEquals(reviewDtos.size(), 3); // PARKING, WIFI, VIEW
@@ -190,9 +190,9 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		}
 	}
 
-	@DisplayName("getLocationReviews() 메소드는 user 가 해당 location 에 리뷰를 남겼는지 여부를 알려줘야 한다")
+	@DisplayName("getLocationReviewsWithUser() 메소드는 user 가 해당 location 에 리뷰를 남겼는지 여부를 알려줘야 한다")
 	@Test
-	void getLocationReviews_userReviewed() {
+	void getLocationReviewsWithUser_userReviewed() {
 		// given
 		final Location location = saveLocations(1, LocationCategory.CAFE).get(0);
 		final List<Users> users = saveUsers(3);
@@ -210,9 +210,12 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		// when
 		final long locationId = location.getId();
 
-		final LocationReviewDto locationReviews1 = reviewService.getLocationReviews(locationId, user1.getId());
-		final LocationReviewDto locationReviews2 = reviewService.getLocationReviews(locationId, user2.getId());
-		final LocationReviewDto locationReviews3 = reviewService.getLocationReviews(locationId, user3.getId());
+		final ReviewWithUserDto locationReviews1 = reviewService.getLocationReviewsWithUser(locationId,
+			LocationCategory.CAFE, user1.getId());
+		final ReviewWithUserDto locationReviews2 = reviewService.getLocationReviewsWithUser(locationId,
+			LocationCategory.CAFE, user2.getId());
+		final ReviewWithUserDto locationReviews3 = reviewService.getLocationReviewsWithUser(locationId,
+			LocationCategory.CAFE, user3.getId());
 
 		// then
 		assertAll(
@@ -220,6 +223,44 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 			() -> assertTrue(locationReviews2.isUserReviewed()),
 			() -> assertFalse(locationReviews3.isUserReviewed()) // user3 은 리뷰 저장 안 됨
 		);
+	}
+
+	@DisplayName("getLocationReviewsWithUser() 메소드는 리뷰를 남긴 유저의 수를 알려줘야 한다")
+	@Test
+	void getLocationReviewsWithUser_userCount() {
+		// given
+		final Location location = saveLocations(1, LocationCategory.CAFE).get(0);
+		final List<Users> users = saveUsers(3);
+
+		final Users user1 = users.get(0);
+		final Users user2 = users.get(1);
+		final Users user3 = users.get(2);
+
+		final CafeReview cafeReview1ByUser1 = CafeReview.of(CafeReviewType.PARKING, location, user1);
+		final CafeReview cafeReview2ByUser1 = CafeReview.of(CafeReviewType.PARKING, location, user1);
+		final CafeReview cafeReview3ByUser1 = CafeReview.of(CafeReviewType.PARKING, location, user1);
+		final CafeReview cafeReview4ByUser1 = CafeReview.of(CafeReviewType.PARKING, location, user1);
+		final CafeReview cafeReviewByUser2 = CafeReview.of(CafeReviewType.WIFI, location, user2);
+		final CafeReview cafeReviewByUser3 = CafeReview.of(CafeReviewType.WIFI, location, user3);
+
+		// user1 4개, user2, user3 1개씩 리뷰 저장
+		cafeReviewRepository.saveAll(Arrays.asList(
+			cafeReview1ByUser1,
+			cafeReview2ByUser1,
+			cafeReview3ByUser1,
+			cafeReview4ByUser1,
+			cafeReviewByUser2,
+			cafeReviewByUser3
+		));
+
+		// when
+		final long locationId = location.getId();
+
+		final ReviewWithUserDto locationReviews = reviewService.getLocationReviewsWithUser(locationId,
+			LocationCategory.CAFE, user1.getId());
+
+		// then
+		assertAll(() -> assertEquals(locationReviews.getUserCount(), 3));
 	}
 
 	@DisplayName("addCafeReview 메소드는 인자로 주어진 리뷰 타입 개수만큼 리뷰를 저장한다")

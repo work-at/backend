@@ -12,12 +12,13 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.workat.api.review.dto.LocationReviewDto;
 import com.workat.api.review.dto.ReviewDto;
+import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
+import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.review.BaseReviewType;
 import com.workat.domain.review.CafeReviewType;
@@ -43,20 +44,48 @@ public class ReviewService {
 
 	private final LocationRepository locationRepository;
 
-	@Transactional(readOnly = true)
-	public LocationReviewDto getLocationReviews(long locationId, long userId) {
+	public List<ReviewDto> getLocationReviews(long locationId, LocationCategory category) {
 
-		final List<CafeReview> cafeReviews = cafeReviewRepository.findAllByLocation_Id(locationId);
+		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
-		HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(cafeReviews);
+		final HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(reviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
-		final boolean userReviewed = checkUserReviewed(cafeReviews, userId);
+		return sortedReviewDtos;
+	}
 
-		return LocationReviewDto.of(
+	public ReviewWithUserDto getLocationReviewsWithUser(long locationId, LocationCategory category, long userId) {
+
+		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
+
+		final long userCount = countReviewedUser(reviews);
+		final HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(reviews);
+		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
+
+		final boolean userReviewed = checkUserReviewed(reviews, userId);
+
+		return ReviewWithUserDto.of(
 			sortedReviewDtos,
-			userReviewed
+			userReviewed,
+			userCount
 		);
+	}
+
+	@Transactional(readOnly = true)
+	public List<? extends BaseReview> getReviewsByCategory(long locationId, LocationCategory category) {
+
+		if (category == LocationCategory.CAFE) {
+			return cafeReviewRepository.findAllByLocation_Id(locationId);
+		}
+
+		return restaurantReviewRepository.findAllByLocation_Id(locationId);
+	}
+
+	private <T extends BaseReview> long countReviewedUser(List<T> reviews) {
+		return reviews.stream()
+			.map(review -> review.getUser().getId())
+			.collect(toSet())
+			.size();
 	}
 
 	private <T extends BaseReview> HashMap<BaseReviewType, Long> convertReviewCountMap(List<T> reviews) {
@@ -79,12 +108,9 @@ public class ReviewService {
 			.collect(toList());
 	}
 
-	private boolean checkUserReviewed(List<CafeReview> cafeReviews, long userId) {
-		final Optional<CafeReview> reviewMatchedUser = cafeReviews.stream()
-			.filter(review -> review.getUser().getId() == userId)
-			.findFirst();
-
-		return reviewMatchedUser.isPresent();
+	private boolean checkUserReviewed(List<? extends BaseReview> reviews, long userId) {
+		return reviews.stream()
+			.anyMatch(review -> review.getUser().getId() == userId);
 	}
 
 	@Transactional
@@ -104,7 +130,7 @@ public class ReviewService {
 		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
 
 		final List<CafeReview> cafeReviews = reviewTypeNames.stream()
-			.map(name -> CafeReviewType.of(name))
+			.map(CafeReviewType::of)
 			.map(reviewType -> CafeReview.of(reviewType, location, user))
 			.collect(toList());
 
@@ -128,7 +154,7 @@ public class ReviewService {
 		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
 
 		final List<RestaurantReview> RestaurantReviews = reviewTypeNames.stream()
-			.map(name -> FoodReviewType.of(name))
+			.map(FoodReviewType::of)
 			.map(reviewType -> RestaurantReview.of(reviewType, location, user))
 			.collect(toList());
 

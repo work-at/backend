@@ -2,7 +2,6 @@ package com.workat.api.map.service;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -10,11 +9,15 @@ import java.util.stream.IntStream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.workat.api.map.dto.LocationBriefDto;
 import com.workat.api.map.dto.LocationDetailDto;
+import com.workat.api.map.dto.LocationDto;
 import com.workat.api.map.dto.LocationPinDto;
 import com.workat.api.map.dto.response.LocationDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
-import com.workat.api.review.dto.LocationReviewDto;
+import com.workat.api.review.dto.ReviewDto;
+import com.workat.api.review.dto.ReviewTypeDto;
+import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
@@ -36,6 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class LocationService {
 
+	private static final int TOP_REVIEW_LENGTH = 3;
+
 	private final LocationHttpReceiver locationHttpReceiver;
 
 	private final ReviewService reviewService;
@@ -44,7 +49,9 @@ public class LocationService {
 
 	private final AreaRepository areaRepository;
 
-	public LocationResponse getLocations(boolean isPin, LocationCategory category, double longitude, double latitude,
+	// TODO: 2022/07/31 pin 과 brief 를 분리해보기
+	public LocationResponse<? extends LocationDto> getLocations(boolean isPin, LocationCategory category,
+		double longitude, double latitude,
 		int radius) {
 
 		if (category == null) {
@@ -68,25 +75,39 @@ public class LocationService {
 				.collect(Collectors.toList());
 
 			return LocationResponse.of(locationPinDtos);
-		} else {
-			List<LocationDetailDto> locationDetailDtos = locations.stream()
-				.map(location -> LocationDetailDto.builder()
-					.id(location.getId())
-					.category(location.getCategory())
-					.phone(location.getPhone())
-					.placeId(location.getPlaceId())
-					.placeUrl(location.getPlaceUrl())
-					.placeName(location.getPlaceName())
-					.longitude(location.getLongitude())
-					.latitude(location.getLatitude())
-					.build())
-				.collect(Collectors.toList());
-
-			return LocationResponse.of(locationDetailDtos);
 		}
+
+		List<LocationBriefDto> locationBriefs = locations.stream()
+			.map(location -> {
+				long locationId = location.getId();
+				List<ReviewDto> locationReviews = reviewService.getLocationReviews(locationId, category);
+
+				int reviewCount = locationReviews.size();
+				List<ReviewTypeDto> topReviews = locationReviews.stream()
+					.limit(TOP_REVIEW_LENGTH)
+					.map(ReviewDto::getReviewType)
+					.collect(Collectors.toList());
+
+				return LocationBriefDto.builder()
+					.id(locationId)
+					.placeId(location.getPlaceId())
+					.latitude(location.getLatitude())
+					.longitude(location.getLongitude())
+					.category(location.getCategory())
+					.placeName(location.getPlaceName())
+					.roadAddressName(location.getRoadAddressName())
+					// .thumbnailImageUrl(location.getThumbnailImageUrl()) // TODO: 파일 서버 구축되면 링크로 내려주기
+					.reviewCount(reviewCount)
+					.topReviews(topReviews)
+					.build();
+			})
+			.collect(Collectors.toList());
+
+		return LocationResponse.of(locationBriefs);
 	}
 
-	public LocationResponse getLocationsTest(boolean isPin, LocationCategory category, double longitude,
+	public LocationResponse<? extends LocationDto> getLocationsTest(boolean isPin, LocationCategory category,
+		double longitude,
 		double latitude, int radius) {
 
 		if (isPin) {
@@ -144,18 +165,20 @@ public class LocationService {
 
 		final LocationDetailDto locationDetailDto = LocationDetailDto.builder()
 			.id(location.getId())
-			.category(location.getCategory())
-			.phone(location.getPhone())
 			.placeId(location.getPlaceId())
-			.placeUrl(location.getPlaceUrl())
-			.placeName(location.getPlaceName())
 			.longitude(location.getLongitude())
 			.latitude(location.getLatitude())
+			.category(location.getCategory())
+			.placeName(location.getPlaceName())
+			.roadAddressName(location.getRoadAddressName())
+			.phone(location.getPhone())
+			.placeUrl(location.getPlaceUrl())
 			.build();
 
-		log.error("테스트에요");
-
-		final LocationReviewDto locationLocationReviewDto = reviewService.getLocationReviews(locationId, userId);
+		final ReviewWithUserDto locationLocationReviewDto = reviewService.getLocationReviewsWithUser(
+			locationId,
+			category,
+			userId);
 
 		return LocationDetailResponse.of(
 			locationDetailDto,

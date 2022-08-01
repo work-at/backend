@@ -27,7 +27,7 @@ public class CafeReview extends BaseReview {
 		this.reviewType = reviewType;
 	}
 
-	static public CafeReview of(CafeReviewType reviewType, Location location, Users user) {
+	public static CafeReview of(CafeReviewType reviewType, Location location, Users user) {
 		return new CafeReview(reviewType, location, user);
 	}
 
