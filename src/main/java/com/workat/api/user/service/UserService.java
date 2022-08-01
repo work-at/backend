@@ -54,6 +54,8 @@ public class UserService {
 	private String resourcesLocation;
 	@Value("${resources.upload-uri:/uploaded}")
 	private String uploadUri;
+	@Value("${resources.profile-upload-folder:/profile_images}")
+	private String profileFolder;
 
 	private final JavaMailSender mailSender;
 
@@ -164,10 +166,10 @@ public class UserService {
 		}
 		String savedFileName = null;
 		try {
-			savedFileName = FileUploadUtils.fileUpload(resourcesLocation, String.valueOf(userId), multipartFile.getBytes());
+			savedFileName = FileUploadUtils.fileUpload(resourcesLocation + profileFolder, String.valueOf(userId), multipartFile.getBytes());
 			log.info("save actual path: " + savedFileName);
 
-			savedFileName = savedFileName.replace(resourcesLocation, uploadUri);
+			savedFileName = savedFileName.replace(resourcesLocation + profileFolder, uploadUri + profileFolder);
 			log.info("access image path: " + savedFileName);
 
 			userProfile.updateImage(savedFileName);

@@ -55,3 +55,4 @@ restTemplate:
 resources:
   upload-folder: /Users/work_at_tour/images
   upload-uri: /uploaded
+  profile-upload-folder: /profile_images

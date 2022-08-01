@@ -22,3 +22,4 @@ spring:
 resources:
   upload-folder: /home/work_at_tour/images
   upload-uri: /uploaded
+  profile-upload-folder: /profile_images
