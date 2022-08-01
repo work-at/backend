@@ -32,6 +32,9 @@ public class MyProfileResponse {
 	@ApiModelProperty(name = "workingYear", notes = "워케이셔너 연차", example = "{\"name\":\"JUNIOR\",\"content\":\"주니어(1~4년)\"}")
 	private DurationTypeDto workingYear;
 
+	@ApiModelProperty(name = "company", notes = "유저 회사, 미인증시 null", example = "emarteveryday")
+	private String company;
+
 	@ApiModelProperty(name = "story", notes = "유저 자기소개", example = "안녕하세요 이번에 워케이션에 놀러왔어요")
 	private String story;
 
@@ -46,12 +49,13 @@ public class MyProfileResponse {
 
 	// TODO: 내 소식 - 새 댓글 알람 수 추가 필요
 
-	private MyProfileResponse(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String story, boolean certified, int workchats, List<ActivityTypeDto> activities) {
+	private MyProfileResponse(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String company, String story, boolean certified, int workchats, List<ActivityTypeDto> activities) {
 		this.id = id;
 		this.nickname = nickname;
 		this.imageUrl = imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
+		this.company = company;
 		this.story = story;
 		this.certified = certified;
 		this.workchats = workchats;
@@ -59,7 +63,7 @@ public class MyProfileResponse {
 	}
 
 	public static MyProfileResponse of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities) {
-		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getStory(), userProfile.isCertified(), workchats, activities);
+		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(), userProfile.isCertified(), workchats, activities);
 	}
 
 }

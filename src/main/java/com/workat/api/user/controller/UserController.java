@@ -74,7 +74,7 @@ public class UserController {
 
 	@PostMapping("/api/v1/user/verify")
 	public ResponseEntity<?> sendCompanyVerifyEmail(@UserValidation Users user, @Valid @RequestBody EmailCertifyRequest emailCertifyRequest, HttpServletRequest request) throws UnsupportedEncodingException, MessagingException {
-		userService.sendCompanyVerifyEmail(user.getId(), emailCertifyRequest, getSiteURL(request));
+		userService.sendCompanyVerifyEmail(user, emailCertifyRequest, getSiteURL(request));
 		return ResponseEntity.ok().build();
 	}
 
@@ -94,7 +94,7 @@ public class UserController {
 		userService.changeUserTracking(user, turnOff);
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@GetMapping("/api/v1/user/email-verified")
 	public String verifyUser(@RequestParam("code") String code, @RequestParam String address) {
 		// TODO: 메일 인증 후 redirect 페이지 여부에 따라 변경 가능
