@@ -187,7 +187,9 @@ public class UserService {
 		Arrays.stream(FilterEmail.values())
 			.filter(filterEmail -> request.getEmail().endsWith(filterEmail.getEmail()))
 			.findFirst()
-			.orElseThrow(() -> new BadRequestException("기본 이메일은 인증할 수 없습니다"));
+			.ifPresent(email -> {
+				throw new BadRequestException("기본 이메일 " + email + " 은 인증할 수 없습니다");
+			});
 
 		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
 		user.decreaseEmailRequestRemain();
