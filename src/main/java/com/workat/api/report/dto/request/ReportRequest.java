@@ -19,7 +19,7 @@ public class ReportRequest {
 	private String email;
 
 	@NotNull
-	@ApiModelProperty(name = "type", notes = "문의 타입(INQUERY, SERVICE_OFFER, ERROR_REPORT, OTHERS)", example = "workat@gmail.com")
+	@ApiModelProperty(name = "type", notes = "문의 타입(INQUERY, SERVICE_OFFER, ERROR_REPORT, OTHERS)", example = "INQUERY")
 	private CSType type;
 
 	@NotBlank
