@@ -17,12 +17,16 @@ public class ReviewWithUserDto {
 	@ApiModelProperty(name = "userReviewed", notes = "유저가 리뷰 남겼는지 여부")
 	private boolean userReviewed;
 
-	private ReviewWithUserDto(List<ReviewDto> reviewDtos, boolean userReviewed) {
+	@ApiModelProperty(name = "userCount", notes = "리뷰 남긴 유저 수")
+	private long userCount;
+
+	private ReviewWithUserDto(List<ReviewDto> reviewDtos, boolean userReviewed, long userCount) {
 		this.reviews = reviewDtos;
 		this.userReviewed = userReviewed;
+		this.userCount = userCount;
 	}
 
-	public static ReviewWithUserDto of(List<ReviewDto> reviewDtos, boolean userReviewed) {
-		return new ReviewWithUserDto(reviewDtos, userReviewed);
+	public static ReviewWithUserDto of(List<ReviewDto> reviewDtos, boolean userReviewed, long userCount) {
+		return new ReviewWithUserDto(reviewDtos, userReviewed, userCount);
 	}
 }

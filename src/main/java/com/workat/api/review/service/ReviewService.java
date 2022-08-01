@@ -58,6 +58,7 @@ public class ReviewService {
 
 		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
+		final long userCount = countReviewedUser(reviews);
 		final HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(reviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
@@ -65,7 +66,8 @@ public class ReviewService {
 
 		return ReviewWithUserDto.of(
 			sortedReviewDtos,
-			userReviewed
+			userReviewed,
+			userCount
 		);
 	}
 
@@ -77,6 +79,13 @@ public class ReviewService {
 		}
 
 		return restaurantReviewRepository.findAllByLocation_Id(locationId);
+	}
+
+	private <T extends BaseReview> long countReviewedUser(List<T> reviews) {
+		return reviews.stream()
+			.map(review -> review.getUser().getId())
+			.collect(toSet())
+			.size();
 	}
 
 	private <T extends BaseReview> HashMap<BaseReviewType, Long> convertReviewCountMap(List<T> reviews) {

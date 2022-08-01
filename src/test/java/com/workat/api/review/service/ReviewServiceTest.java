@@ -225,6 +225,44 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 		);
 	}
 
+	@DisplayName("getLocationReviewsWithUser() 메소드는 리뷰를 남긴 유저의 수를 알려줘야 한다")
+	@Test
+	void getLocationReviewsWithUser_userCount() {
+		// given
+		final Location location = saveLocations(1, LocationCategory.CAFE).get(0);
+		final List<Users> users = saveUsers(3);
+
+		final Users user1 = users.get(0);
+		final Users user2 = users.get(1);
+		final Users user3 = users.get(2);
+
+		final CafeReview cafeReview1ByUser1 = CafeReview.of(CafeReviewType.PARKING, location, user1);
+		final CafeReview cafeReview2ByUser1 = CafeReview.of(CafeReviewType.PARKING, location, user1);
+		final CafeReview cafeReview3ByUser1 = CafeReview.of(CafeReviewType.PARKING, location, user1);
+		final CafeReview cafeReview4ByUser1 = CafeReview.of(CafeReviewType.PARKING, location, user1);
+		final CafeReview cafeReviewByUser2 = CafeReview.of(CafeReviewType.WIFI, location, user2);
+		final CafeReview cafeReviewByUser3 = CafeReview.of(CafeReviewType.WIFI, location, user3);
+
+		// user1 4개, user2, user3 1개씩 리뷰 저장
+		cafeReviewRepository.saveAll(Arrays.asList(
+			cafeReview1ByUser1,
+			cafeReview2ByUser1,
+			cafeReview3ByUser1,
+			cafeReview4ByUser1,
+			cafeReviewByUser2,
+			cafeReviewByUser3
+		));
+
+		// when
+		final long locationId = location.getId();
+
+		final ReviewWithUserDto locationReviews = reviewService.getLocationReviewsWithUser(locationId,
+			LocationCategory.CAFE, user1.getId());
+
+		// then
+		assertAll(() -> assertEquals(locationReviews.getUserCount(), 3));
+	}
+
 	@DisplayName("addCafeReview 메소드는 인자로 주어진 리뷰 타입 개수만큼 리뷰를 저장한다")
 	@Test
 	void addCafeReview_size() {
