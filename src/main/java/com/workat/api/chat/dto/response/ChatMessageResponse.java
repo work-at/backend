@@ -1,6 +1,6 @@
 package com.workat.api.chat.dto.response;
 
-import org.springframework.data.domain.Page;
+import java.util.List;
 
 import com.workat.api.chat.dto.ChatMessageDto;
 
@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ChatMessageResponse {
 
-	private Page<ChatMessageDto> messages;
+	private List<ChatMessageDto> messages;
 
-	public static ChatMessageResponse of(Page<ChatMessageDto> messages) {
+	public static ChatMessageResponse of(List<ChatMessageDto> messages) {
 		return new ChatMessageResponse(messages);
 	}
 }

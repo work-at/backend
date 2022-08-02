@@ -1,12 +1,14 @@
 package com.workat.api.chat.service;
 
+import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.workat.domain.chat.entity.ChatMessageSortType;
 import com.workat.api.chat.dto.ChatMessageDto;
 import com.workat.api.chat.dto.ChatRoomDto;
 import com.workat.api.chat.dto.response.ChatMessageResponse;
@@ -25,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class ChatService {
+
+	private long pageSize = 50L;
 
 	private final UsersRepository usersRepository;
 
@@ -77,13 +81,23 @@ public class ChatService {
 	}
 
 	@Transactional(readOnly = true)
-	public ChatMessageResponse getChatMessages(Long chatRoomId, Pageable pageable) {
+	public ChatMessageResponse getChatMessages(Long chatRoomId, Long messageId, ChatMessageSortType sortType) {
 		ChatRoom findRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> {
 			throw new ChatRoomNotFoundException(chatRoomId);
 		});
 
-		return ChatMessageResponse.of(chatMessageRepository.findAllByRoomOrderByCreatedDateDesc(findRoom, pageable)
+		List<ChatMessage> result;
+		if (sortType == ChatMessageSortType.RECENT) {
+			result = chatMessageRepository.findRecentMessage(findRoom, messageId, pageSize);
+		} else if (sortType == ChatMessageSortType.LATEST) {
+			result = chatMessageRepository.findLatestMessage(findRoom, messageId, pageSize);
+		} else {
+			throw new InvalidParameterException("chat message sort type not valid");
+		}
+
+		return ChatMessageResponse.of(result.stream()
 			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage(),
-				message.getCreatedDate())));
+				message.getCreatedDate()))
+			.collect(Collectors.toList()));
 	}
 }

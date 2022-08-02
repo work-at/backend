@@ -5,11 +5,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.workat.api.chat.service.converter.ChatMessageSortTypeConverter;
 import com.workat.common.annotation.argumentResolver.UserValidationArgumentResolver;
 
 @Configuration
@@ -22,6 +24,12 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Autowired
 	private UserValidationArgumentResolver validationArgumentResolver;
+
+	@Override
+	public void addFormatters(FormatterRegistry registry) {
+		WebMvcConfigurer.super.addFormatters(registry);
+		registry.addConverter(new ChatMessageSortTypeConverter());
+	}
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
