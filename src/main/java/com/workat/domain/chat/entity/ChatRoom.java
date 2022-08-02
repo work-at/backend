@@ -1,5 +1,6 @@
 package com.workat.domain.chat.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,6 +32,8 @@ public class ChatRoom extends BaseEntity {
 	@ManyToOne
 	private Users other;
 
+	private boolean isDeleted;
+
 	public static ChatRoom of() {
 		return new ChatRoom();
 	}
@@ -38,5 +41,9 @@ public class ChatRoom extends BaseEntity {
 	public void assignUsers(Users owner, Users other) {
 		this.owner = owner;
 		this.other = other;
+	}
+
+	public void deleteRoom() {
+		this.isDeleted = true;
 	}
 }
