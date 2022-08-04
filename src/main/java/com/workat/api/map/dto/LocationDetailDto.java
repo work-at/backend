@@ -24,10 +24,10 @@ public class LocationDetailDto extends LocationDto {
 	private String placeUrl;
 
 	@Builder
-	public LocationDetailDto(long id, String placeId, double latitude, double longitude,
+	public LocationDetailDto(long id, String placeId, double longitude, double latitude,
 		LocationCategory category, String placeName, String roadAddressName, String fullImageUrl, String phone,
 		String placeUrl) {
-		super(id, placeId, latitude, longitude);
+		super(id, placeId, longitude, latitude);
 
 		this.category = category;
 		this.placeName = placeName;
@@ -36,5 +36,5 @@ public class LocationDetailDto extends LocationDto {
 		this.phone = phone;
 		this.placeUrl = placeUrl;
 	}
-	
+
 }
