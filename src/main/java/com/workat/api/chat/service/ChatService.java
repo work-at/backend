@@ -1,9 +1,9 @@
 package com.workat.api.chat.service;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,9 +11,12 @@ import com.workat.api.chat.dto.ChatMessageDto;
 import com.workat.api.chat.dto.ChatRoomDto;
 import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
+import com.workat.common.exception.ChatRoomIsDeletedException;
 import com.workat.common.exception.ChatRoomNotFoundException;
+import com.workat.common.exception.ChatRoomUserNotMatchException;
 import com.workat.common.exception.UserNotFoundException;
 import com.workat.domain.chat.entity.ChatMessage;
+import com.workat.domain.chat.entity.ChatMessageSortType;
 import com.workat.domain.chat.entity.ChatRoom;
 import com.workat.domain.chat.repository.message.ChatMessageRepository;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
@@ -25,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class ChatService {
+
+	private long pageSize = 50L;
 
 	private final UsersRepository usersRepository;
 
@@ -62,14 +67,29 @@ public class ChatService {
 	}
 
 	@Transactional
+	public void deleteChatRoom(Long userId, Long chatRoomId) {
+		Users findUser = usersRepository.findById(userId).orElseThrow(() -> {
+			throw new UserNotFoundException(userId);
+		});
+
+		ChatRoom findRoom = getChatRoomFromRepository(chatRoomId);
+
+		validateChatRoom(findRoom, findUser.getId());
+
+		findRoom.deleteRoom();
+
+		chatRoomRepository.save(findRoom);
+	}
+
+	@Transactional
 	public Long createChatMessage(Long chatRoomId, Long writerId, String message) {
 		usersRepository.findById(writerId).orElseThrow(() -> {
 			throw new UserNotFoundException(writerId);
 		});
 
-		ChatRoom findRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> {
-			throw new ChatRoomNotFoundException(chatRoomId);
-		});
+		ChatRoom findRoom = getChatRoomFromRepository(chatRoomId);
+
+		validateChatRoom(findRoom, writerId);
 
 		ChatMessage chatMessage = ChatMessage.of(writerId, message);
 		chatMessage.assignRoom(findRoom);
@@ -77,13 +97,39 @@ public class ChatService {
 	}
 
 	@Transactional(readOnly = true)
-	public ChatMessageResponse getChatMessages(Long chatRoomId, Pageable pageable) {
-		ChatRoom findRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> {
-			throw new ChatRoomNotFoundException(chatRoomId);
+	public ChatMessageResponse getChatMessages(Long chatRoomId, Long messageId, ChatMessageSortType sortType) {
+		ChatRoom findRoom = getChatRoomFromRepository(chatRoomId);
+
+		List<ChatMessage> result;
+		if (sortType == ChatMessageSortType.AFTER) {
+			result = chatMessageRepository.findRecentMessage(findRoom, messageId, pageSize);
+		} else if (sortType == ChatMessageSortType.BEFORE) {
+			result = chatMessageRepository.findLatestMessage(findRoom, messageId, pageSize);
+		} else {
+			throw new InvalidParameterException("chat message sort type not valid");
+		}
+
+		return ChatMessageResponse.of(result.stream()
+			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage(),
+				message.getCreatedDate()))
+			.collect(Collectors.toList()));
+	}
+
+	private ChatRoom getChatRoomFromRepository(Long roomId) {
+		ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> {
+			throw new ChatRoomNotFoundException(roomId);
 		});
 
-		return ChatMessageResponse.of(chatMessageRepository.findAllByRoomOrderByCreatedDateDesc(findRoom, pageable)
-			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage(),
-				message.getCreatedDate())));
+		if (room.isDeleted()) {
+			throw new ChatRoomIsDeletedException(roomId);
+		}
+
+		return room;
+	}
+
+	private void validateChatRoom(ChatRoom chatRoom, Long userId) {
+		if (!chatRoom.getOwner().getId().equals(userId) || !chatRoom.getOther().getId().equals(userId)) {
+			throw new ChatRoomUserNotMatchException(chatRoom.getId(), userId);
+		}
 	}
 }
