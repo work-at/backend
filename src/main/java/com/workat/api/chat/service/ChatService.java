@@ -101,9 +101,9 @@ public class ChatService {
 		ChatRoom findRoom = getChatRoomFromRepository(chatRoomId);
 
 		List<ChatMessage> result;
-		if (sortType == ChatMessageSortType.RECENT) {
+		if (sortType == ChatMessageSortType.AFTER) {
 			result = chatMessageRepository.findRecentMessage(findRoom, messageId, pageSize);
-		} else if (sortType == ChatMessageSortType.LATEST) {
+		} else if (sortType == ChatMessageSortType.BEFORE) {
 			result = chatMessageRepository.findLatestMessage(findRoom, messageId, pageSize);
 		} else {
 			throw new InvalidParameterException("chat message sort type not valid");

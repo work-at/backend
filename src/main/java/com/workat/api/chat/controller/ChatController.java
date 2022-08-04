@@ -6,6 +6,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,7 +65,7 @@ public class ChatController {
 
 	@ApiOperation("채팅방을 나가는 api")
 	@ApiResponse(code = 200, message = "success")
-	@GetMapping("/api/v1/chattings/{roomId}")
+	@DeleteMapping("/api/v1/chattings/{roomId}")
 	public void deleteChattingRoom(@UserValidation Users user, @PathVariable Long roomId) {
 		chatService.deleteChatRoom(user.getId(), roomId);
 	}

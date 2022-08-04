@@ -1,7 +1,7 @@
 package com.workat.domain.chat.entity;
 
 public enum ChatMessageSortType {
-	LATEST, RECENT;
+	BEFORE, AFTER;
 
 	public static ChatMessageSortType of(String name) {
 		if (name == null) {
