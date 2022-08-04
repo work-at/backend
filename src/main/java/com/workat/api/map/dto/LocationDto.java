@@ -12,14 +12,14 @@ public abstract class LocationDto {
 
 	private String placeId;
 
-	private double latitude;
-
 	private double longitude;
 
-	protected LocationDto(long id, String placeId, double latitude, double longitude) {
+	private double latitude;
+
+	protected LocationDto(long id, String placeId, double longitude, double latitude) {
 		this.id = id;
 		this.placeId = placeId;
-		this.latitude = latitude;
 		this.longitude = longitude;
+		this.latitude = latitude;
 	}
 }
