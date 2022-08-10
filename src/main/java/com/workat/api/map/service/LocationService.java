@@ -216,7 +216,7 @@ public class LocationService {
 
 	private void readSeoulSubwayCsv() {
 		//호선, 역명, 주소, lat, long
-		String seoulSubwayCsvPath = "/csv/seoul_subway.csv";
+		String seoulSubwayCsvPath = "/csv/seoul_subway_1.csv";
 		URL url = getClass().getResource(seoulSubwayCsvPath);
 
 		if (url == null || url.getPath() == null) {
