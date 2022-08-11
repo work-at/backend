@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class LocationController {
 
 	private static final String DEFAULT_RADIUS = "2000";
+
 	private final LocationService locationService;
 
 	@ApiOperation("현재 위치 기준으로 반경(radius) 내 카페 정보를 가져오기")
@@ -127,44 +128,4 @@ public class LocationController {
 			locationService.getLocationById(LocationCategory.CAFE, locationId, user.getId());
 		return ResponseEntity.ok(dto);
 	}
-
-	// TODO: 2022/07/21 테스트 데이터가 올라가면 지울 예정
-	@GetMapping("/api/v1/map/cafes/test")
-	public ResponseEntity<LocationResponse> getCafesTest(@NotNull @RequestParam double longitude,
-		@NotNull @RequestParam double latitude,
-		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
-		LocationResponse response = locationService.getLocationsTest(false, LocationCategory.CAFE, longitude, latitude,
-			radius);
-		return ResponseEntity.ok(response);
-	}
-
-	@GetMapping("/api/v1/map/cafes/pin/test")
-	public ResponseEntity<LocationResponse> getCafesPinTest(@NotNull @RequestParam double longitude,
-		@NotNull @RequestParam double latitude,
-		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
-		LocationResponse response =
-			locationService.getLocationsTest(true, LocationCategory.CAFE, longitude, latitude, radius);
-		return ResponseEntity.ok(response);
-	}
-
-	@GetMapping("/api/v1/map/restaurants/test")
-	public ResponseEntity<LocationResponse> getRestaurantsTest(
-		@NotNull @RequestParam double longitude,
-		@NotNull @RequestParam double latitude,
-		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
-		LocationResponse response =
-			locationService.getLocationsTest(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
-		return ResponseEntity.ok(response);
-	}
-
-	@GetMapping("/api/v1/map/restaurants/pin/test")
-	public ResponseEntity<LocationResponse> getRestaurantsPinTest(
-		@NotNull @RequestParam double longitude,
-		@NotNull @RequestParam double latitude,
-		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
-		LocationResponse response =
-			locationService.getLocationsTest(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
-		return ResponseEntity.ok(response);
-	}
-
 }
