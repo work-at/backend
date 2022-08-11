@@ -10,4 +10,6 @@ public interface CustomChatMessageRepository {
 	List<ChatMessage> findLatestMessage(ChatRoom chatRoom, long messageId, long pageSize);
 
 	List<ChatMessage> findRecentMessage(ChatRoom chatRoom, long messageId, long pageSize);
+
+	boolean isAllMessageRead(long lastMessageId, long otherUserId);
 }

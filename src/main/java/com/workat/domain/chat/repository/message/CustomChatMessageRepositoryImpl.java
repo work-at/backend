@@ -32,4 +32,11 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 			.limit(pageSize)
 			.fetch();
 	}
+
+	@Override
+	public boolean isAllMessageRead(long lastMessageId, long otherUserId) {
+		return jpaQueryFactory.selectFrom(chatMessage)
+			.where(chatMessage.id.gt(lastMessageId).and(chatMessage.writerId.eq(otherUserId)))
+			.stream().findAny().isEmpty();
+	}
 }
