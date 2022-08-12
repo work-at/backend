@@ -17,16 +17,12 @@ public class ReviewTypeDto {
 	@ApiModelProperty(name = "content", notes = "리뷰 타입 content", example = "뷰가 좋아요")
 	private String content;
 
-	@ApiModelProperty(name = "iconType", notes = "리뷰 타입 content", example = "CommonReview1")
-	private String iconType;
-
-	private ReviewTypeDto(String name, String content, String iconType) {
+	private ReviewTypeDto(String name, String content) {
 		this.name = name;
 		this.content = content;
-		this.iconType = iconType;
 	}
 
 	public static ReviewTypeDto of(BaseReviewType baseReviewData) {
-		return new ReviewTypeDto(baseReviewData.getName(), baseReviewData.getContent(), baseReviewData.getIconType());
+		return new ReviewTypeDto(baseReviewData.getName(), baseReviewData.getContent());
 	}
 }
