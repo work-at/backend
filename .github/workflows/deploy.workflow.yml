@@ -36,3 +36,9 @@ jobs:
           docker build -f ./Dockerfile.dev --tag ${{secrets.DOCKER_USERNAME}}/workat:dev .
           docker push ${{secrets.DOCKER_USERNAME}}/workat:dev
         if: contains(github.ref, 'develop')
+
+      - name: Build and push the Docker image for production deployment
+        run: |
+          docker build -f ./Dockerfile.prod --tag ${{secrets.DOCKER_USERNAME}}/workat:prod .
+          docker push ${{secrets.DOCKER_USERNAME}}/workat:prod
+        if: contains(github.ref, 'develop')

@@ -37,6 +37,7 @@ spring:
 external:
   kakaoOauth:
     clientId: "7052acd04b3385c80fac9bb40d8b5a32"
+    redirect-url: "http://localhost:5050/login"
   tour-api:
     big-data:
       "2scFfN6uVjhuRcXrj1DgGjslYn0wYJc7kvCOHHwOI/0kr1sjf2OqLLjq5SvCt3jKyr4JPHr/K3QGuXhvv6HYlQ=="

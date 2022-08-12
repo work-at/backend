@@ -1,0 +1,3 @@
+FROM adoptopenjdk/openjdk11:alpine-jre
+COPY build/libs/workat-0.0.1-SNAPSHOT.jar workat.jar
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "workat.jar"]
