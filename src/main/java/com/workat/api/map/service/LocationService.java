@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +20,7 @@ import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
+import com.workat.common.util.DistanceUtils;
 import com.workat.common.util.FileReadUtils;
 import com.workat.domain.area.entity.Area;
 import com.workat.domain.area.repository.AreaRepository;
@@ -30,6 +30,7 @@ import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.map.vo.MapPoint;
+import com.workat.domain.map.vo.MapRangeInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,7 @@ public class LocationService {
 	private final AreaRepository areaRepository;
 
 	// TODO: 2022/07/31 pin 과 brief 를 분리해보기
+	@Transactional(readOnly = true)
 	public LocationResponse<? extends LocationDto> getLocations(boolean isPin, LocationCategory category,
 		double longitude, double latitude,
 		int radius) {
@@ -58,11 +60,9 @@ public class LocationService {
 			throw new BadRequestException("category must be food or cafe");
 		}
 
-		// TODO: 2022/07/13 거리 로직 확정 후 적용 예정
-		MapPoint minPoint = MapPoint.of(longitude, latitude);
-		MapPoint maxPoint = MapPoint.of(longitude, latitude);
-
-		List<Location> locations = locationRepository.findAllByRadius(minPoint, maxPoint);
+		MapRangeInfo mapRangeInfo = DistanceUtils.getLocationPoint(longitude, latitude, radius);
+		List<Location> locations = locationRepository.findAllByRadius(mapRangeInfo);
+		log.info("findAllByRadius : " + locations.size());
 
 		if (locations.isEmpty()) {
 			throw new NotFoundException("location not found exception");
@@ -104,53 +104,6 @@ public class LocationService {
 			.collect(Collectors.toList());
 
 		return LocationResponse.of(locationBriefs);
-	}
-
-	public LocationResponse<? extends LocationDto> getLocationsTest(boolean isPin, LocationCategory category,
-		double longitude,
-		double latitude, int radius) {
-
-		if (isPin) {
-			locationRepository.deleteAll();
-			locationRepository.flush();
-
-			List<Location> locations = IntStream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-				.boxed()
-				.map(n -> Location.builder()
-					.category(category)
-					.placeId("TEST" + n)
-					.placeUrl("https://www.naver.com")
-					.placeName("TEST" + n)
-					.addressName("TEST" + n)
-					.roadAddressName("TEST" + n)
-					.longitude(longitude + (n / 100.0))
-					.latitude(latitude + (n / 100.0))
-					.build()
-				).collect(Collectors.toList());
-			locationRepository.saveAll(locations);
-
-			List<LocationPinDto> locationPinDtos = locations.stream()
-				.map(location -> LocationPinDto.of(location.getId(), location.getPlaceId(), location.getLongitude(),
-					location.getLatitude()))
-				.collect(Collectors.toList());
-
-			return LocationResponse.of(locationPinDtos);
-		} else {
-			List<LocationDetailDto> locationDetailDtos = locationRepository.findAll().stream()
-				.map(location -> LocationDetailDto.builder()
-					.id(location.getId())
-					.category(location.getCategory())
-					.phone(location.getPhone())
-					.placeId(location.getPlaceId())
-					.placeUrl(location.getPlaceUrl())
-					.placeName(location.getPlaceName())
-					.longitude(location.getLongitude())
-					.latitude(location.getLatitude())
-					.build())
-				.collect(Collectors.toList());
-
-			return LocationResponse.of(locationDetailDtos);
-		}
 	}
 
 	public LocationDetailResponse getLocationById(LocationCategory category, long locationId, long userId) {
@@ -216,7 +169,7 @@ public class LocationService {
 
 	private void readSeoulSubwayCsv() {
 		//호선, 역명, 주소, lat, long
-		String seoulSubwayCsvPath = "/csv/seoul_subway.csv";
+		String seoulSubwayCsvPath = "/csv/seoul_subway_1.csv";
 		URL url = getClass().getResource(seoulSubwayCsvPath);
 
 		if (url == null || url.getPath() == null) {
