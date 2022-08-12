@@ -51,6 +51,7 @@ public class LocationService {
 	private final AreaRepository areaRepository;
 
 	// TODO: 2022/07/31 pin 과 brief 를 분리해보기
+	@Transactional(readOnly = true)
 	public LocationResponse<? extends LocationDto> getLocations(boolean isPin, LocationCategory category,
 		double longitude, double latitude,
 		int radius) {
