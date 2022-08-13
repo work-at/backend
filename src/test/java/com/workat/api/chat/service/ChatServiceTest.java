@@ -20,11 +20,16 @@ import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.common.exception.ChatRoomNotFoundException;
 import com.workat.common.exception.UserNotFoundException;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.chat.entity.ChatMessage;
 import com.workat.domain.chat.entity.ChatRoom;
 import com.workat.domain.chat.repository.message.ChatMessageRepository;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
 import com.workat.domain.config.DataJpaTestConfig;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.job.DepartmentType;
+import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
 @Import(DataJpaTestConfig.class)
@@ -38,6 +43,9 @@ class ChatServiceTest {
 	private UsersRepository usersRepository;
 
 	@Autowired
+	private UserProfileRepository userProfileRepository;
+
+	@Autowired
 	private ChatRoomRepository chatRoomRepository;
 
 	@Autowired
@@ -45,7 +53,8 @@ class ChatServiceTest {
 
 	@BeforeEach
 	void init() {
-		this.chatService = new ChatService(usersRepository, chatRoomRepository, chatMessageRepository);
+		this.chatService = new ChatService(usersRepository, userProfileRepository, chatRoomRepository,
+			chatMessageRepository);
 	}
 
 	@Test
@@ -83,21 +92,53 @@ class ChatServiceTest {
 		//given
 		Users user1 = Users.of(OauthType.KAKAO, 1L);
 		Users user2 = Users.of(OauthType.KAKAO, 2L);
+		// usersRepository.saveAll(List.of(user1, user2));
+
+		UserProfile user1Profile = UserProfile.builder()
+			.user(user1)
+			.nickname("user1")
+			.imageUrl("user1")
+			.position(DepartmentType.IT_ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user1Profile);
+		UserProfile user2Profile = UserProfile.builder()
+			.user(user2)
+			.nickname("user2")
+			.imageUrl("user2")
+			.position(DepartmentType.IT_ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user2Profile);
 		usersRepository.saveAll(List.of(user1, user2));
 
-		Long chatRoomId = chatService.createChatRoom(user1.getId(), user2.getId());
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+		ChatMessage givenMessage1 = ChatMessage.of(user1.getId(), "test1");
+		givenMessage1.assignRoom(givenChatroom);
+		ChatMessage givenMessage2 = ChatMessage.of(user2.getId(), "test2");
+		givenMessage2.assignRoom(givenChatroom);
+		ChatMessage givenMessage3 = ChatMessage.of(user1.getId(), "test3");
+		givenMessage3.assignRoom(givenChatroom);
+		ChatMessage givenMessage4 = ChatMessage.of(user2.getId(), "test4");
+		givenMessage4.assignRoom(givenChatroom);
+		chatMessageRepository.saveAll(List.of(givenMessage1, givenMessage2, givenMessage3, givenMessage4));
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessage2.getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessage1.getId());
+		chatRoomRepository.save(givenChatroom);
 
 		//when
+		ChatRoomResponse resultChatRooms = chatService.getChatRooms(user1.getId());
 
 		//then
-		ChatRoomResponse resultChatRooms = chatService.getChatRooms(user1.getId());
 		assertEquals(resultChatRooms.getRooms().size(), 1);
 
 		ChatRoomDto chatRoom = resultChatRooms.getRooms().get(0);
 		assertAll(
-			() -> assertEquals(chatRoom.getId(), chatRoomId),
-			() -> assertTrue(chatRoom.getOwnerUserIds().contains(user1.getId())),
-			() -> assertTrue(chatRoom.getOwnerUserIds().contains(user2.getId()))
+			() -> assertEquals(chatRoom.getId(), givenChatroom.getId()),
+			() -> assertEquals(chatRoom.getOtherUser().getUserId(), user2.getId()),
+			() -> assertFalse(chatRoom.isAllRead())
 		);
 	}
 

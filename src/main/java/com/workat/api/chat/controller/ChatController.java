@@ -2,12 +2,11 @@ package com.workat.api.chat.controller;
 
 import java.net.URI;
 
-import javax.validation.constraints.Pattern;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,8 +57,7 @@ public class ChatController {
 		@ApiResponse(code = 200, message = "success", response = ChatRoomResponse.class)
 	})
 	@GetMapping("/api/v1/users/chattings")
-	public ResponseEntity<ChatRoomResponse> getChattingByUser(@UserValidation Users user,
-		@RequestParam @Pattern(regexp = "yyyyMMddHHmmss") String lastTime) {
+	public ResponseEntity<ChatRoomResponse> getChattingByUser(@UserValidation Users user) {
 		return ResponseEntity.ok(chatService.getChatRooms(user.getId()));
 	}
 
@@ -89,7 +87,6 @@ public class ChatController {
 	}
 
 	@ApiOperation("채팅 메세지를 가져오는 api")
-	@ApiImplicitParams(value = {})
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "success", response = ChatMessageResponse.class)
 	})
@@ -98,5 +95,15 @@ public class ChatController {
 		@RequestParam(required = false) Long messageId, @RequestParam ChatMessageSortType sortType) {
 		return ResponseEntity.ok(
 			chatService.getChatMessages(roomId, messageId == null ? Long.MAX_VALUE : messageId, sortType));
+	}
+
+	@ApiOperation("채팅 메세지를 가져오는 api")
+	@ApiResponses(value = {
+		@ApiResponse(code = 200, message = "success")
+	})
+	@PatchMapping("/api/v1/users/chatting/{roomId}/time")
+	public void patchRoomLastUserCheckingTime(@UserValidation Users user, @PathVariable Long roomId,
+		Long lastMessageId) {
+		chatService.patchRoomLastUserCheckingMessage(user.getId(), roomId, lastMessageId);
 	}
 }

@@ -9,18 +9,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.workat.api.chat.dto.ChatMessageDto;
 import com.workat.api.chat.dto.ChatRoomDto;
+import com.workat.api.chat.dto.ChatRoomListUserDto;
 import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.common.exception.ChatRoomIsDeletedException;
 import com.workat.common.exception.ChatRoomNotFoundException;
 import com.workat.common.exception.ChatRoomUserNotMatchException;
+import com.workat.common.exception.NotFoundException;
 import com.workat.common.exception.UserNotFoundException;
 import com.workat.domain.chat.entity.ChatMessage;
 import com.workat.domain.chat.entity.ChatMessageSortType;
 import com.workat.domain.chat.entity.ChatRoom;
 import com.workat.domain.chat.repository.message.ChatMessageRepository;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
+import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +36,8 @@ public class ChatService {
 	private long pageSize = 50L;
 
 	private final UsersRepository usersRepository;
+
+	private final UserProfileRepository userProfileRepository;
 
 	private final ChatRoomRepository chatRoomRepository;
 
@@ -58,12 +64,30 @@ public class ChatService {
 			throw new UserNotFoundException(userId);
 		});
 
-		List<ChatRoomDto> roomDtos = chatRoomRepository.findAllByUser(findUser).stream()
-			.map(chatRoom -> ChatRoomDto.of(chatRoom.getId(), chatRoom.getOwner().getId(), chatRoom.getOther().getId(),
-				chatRoom.getCreatedDate()))
+		List<ChatRoomDto> roomDtoList = chatRoomRepository.findAllByUser(findUser).stream()
+			.map(chatRoom -> {
+				Long anotherUserId = chatRoom.getAnotherOwnerUserId(findUser.getId());
+
+				UserProfile anotherUserProfile = userProfileRepository.findById(anotherUserId).orElseThrow(() -> {
+					throw new NotFoundException("another user profile is not found");
+				});
+
+				ChatRoomListUserDto userDto = ChatRoomListUserDto.builder()
+					.userId(anotherUserId)
+					.userNickname(anotherUserProfile.getNickname())
+					.position(anotherUserProfile.getPosition().getType())
+					.workingYear(anotherUserProfile.getWorkingYear().getType())
+					.userProfileUrl(anotherUserProfile.getImageUrl())
+					.build();
+
+				boolean isAllRead = chatMessageRepository.isAllMessageRead(
+					chatRoom.getUsersLastCheckingMessageId(userId), anotherUserId);
+
+				return ChatRoomDto.of(chatRoom.getId(), userDto, isAllRead, chatRoom.getCreatedDate());
+			})
 			.collect(Collectors.toList());
 
-		return ChatRoomResponse.of(roomDtos);
+		return ChatRoomResponse.of(roomDtoList);
 	}
 
 	@Transactional
@@ -113,6 +137,21 @@ public class ChatService {
 			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage(),
 				message.getCreatedDate()))
 			.collect(Collectors.toList()));
+	}
+
+	@Transactional
+	public void patchRoomLastUserCheckingMessage(Long userId, Long roomId, Long lastMessageId) {
+		Users findUser = usersRepository.findById(userId).orElseThrow(() -> {
+			throw new UserNotFoundException(userId);
+		});
+
+		ChatRoom findRoom = getChatRoomFromRepository(roomId);
+
+		validateChatRoom(findRoom, findUser.getId());
+
+		findRoom.setUsersLastCheckingMessageId(findUser.getId(), lastMessageId);
+
+		chatRoomRepository.save(findRoom);
 	}
 
 	private ChatRoom getChatRoomFromRepository(Long roomId) {
