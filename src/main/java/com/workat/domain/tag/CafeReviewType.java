@@ -1,10 +1,10 @@
-package com.workat.domain.review;
+package com.workat.domain.tag;
 
 import java.util.EnumSet;
 
 import com.workat.common.exception.NotFoundException;
 
-public enum CafeReviewType implements BaseReviewType {
+public enum CafeReviewType implements BaseTag {
 
 	WIFI("와이파이가\n빵빵해요"),
 	MEAL("식사 메뉴가\n있어요"),

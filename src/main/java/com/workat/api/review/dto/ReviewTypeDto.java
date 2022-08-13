@@ -1,6 +1,6 @@
 package com.workat.api.review.dto;
 
-import com.workat.domain.review.BaseReviewType;
+import com.workat.domain.tag.BaseTag;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
@@ -22,7 +22,7 @@ public class ReviewTypeDto {
 		this.content = content;
 	}
 
-	public static ReviewTypeDto of(BaseReviewType baseReviewData) {
+	public static ReviewTypeDto of(BaseTag baseReviewData) {
 		return new ReviewTypeDto(baseReviewData.getName(), baseReviewData.getContent());
 	}
 }

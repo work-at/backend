@@ -1,10 +1,10 @@
-package com.workat.domain.review;
+package com.workat.domain.tag;
 
 import java.util.EnumSet;
 
 import com.workat.common.exception.NotFoundException;
 
-public enum FoodReviewType implements BaseReviewType {
+public enum FoodReviewType implements BaseTag {
 
 	QUICK_FOOD("음식이 빨리\n나와요"),
 	EAT_ALONE("혼밥\n가능해요"),
