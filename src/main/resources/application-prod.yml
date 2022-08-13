@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: prod
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,12 +18,17 @@ spring:
     host: 34.64.37.69
     port: 6379
     password: workat@1234
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: work.at.tour@gmail.com
+    password: ${EMAIL_PASSWORD}
 
 external:
   kakaoOauth:
-    redirect-url: "http://localhost:5050/login"
+    redirect-url: "http://workat.o-r.kr/login"
 
 resources:
-  upload-folder: /home/work_at_tour/images
+  upload-folder: /home/work_at_prod/images
   upload-uri: /uploaded
   profile-upload-folder: /profile_images

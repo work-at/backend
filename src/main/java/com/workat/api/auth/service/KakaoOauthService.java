@@ -23,9 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class KakaoOauthService {
-	
-	// TODO: Value 로
-	private static final String REDIRECT_URL = "http://localhost:5050/login"; // TODO: 프론트쪽 리다이렉트 동선 협의되면 수정
+
+	@Value("${external.kakaoOauth.redirect-url}")
+	private String REDIRECT_URL;
 
 	private static final String AUTH_URL = "https://kauth.kakao.com/oauth/token";
 
