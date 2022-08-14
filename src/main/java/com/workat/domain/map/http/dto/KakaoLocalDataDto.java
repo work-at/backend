@@ -24,6 +24,8 @@ public class KakaoLocalDataDto {
 
 	private String placeUrl;
 
+	private String categoryName;
+
 	private String x;
 
 	private String y;
@@ -33,12 +35,14 @@ public class KakaoLocalDataDto {
 	private String roadAddressName;
 
 	@Builder
-	public KakaoLocalDataDto(String id, String phone, String placeName, String placeUrl, String x, String y,
+	public KakaoLocalDataDto(String id, String phone, String placeName, String placeUrl, String categoryName, String x,
+		String y,
 		String addressName, String roadAddressName) {
 		this.id = id;
 		this.phone = phone;
 		this.placeName = placeName;
 		this.placeUrl = placeUrl;
+		this.categoryName = categoryName;
 		this.x = x;
 		this.y = y;
 		this.addressName = addressName;

@@ -167,7 +167,7 @@ public class ChatService {
 	}
 
 	private void validateChatRoom(ChatRoom chatRoom, Long userId) {
-		if (!chatRoom.getOwner().getId().equals(userId) || !chatRoom.getOther().getId().equals(userId)) {
+		if (!chatRoom.getOwner().getId().equals(userId) && !chatRoom.getOther().getId().equals(userId)) {
 			throw new ChatRoomUserNotMatchException(chatRoom.getId(), userId);
 		}
 	}

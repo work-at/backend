@@ -114,6 +114,6 @@ public class LocationHttpReceiver {
 			.queryParam("radius", String.valueOf(radius))
 			.queryParam("page", String.valueOf(page))
 			.queryParam("size", "15")
-			.queryParam("sort", "distance").toUriString();
+			.queryParam("sort", "accuracy").toUriString();
 	}
 }

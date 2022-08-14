@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
+import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
@@ -98,8 +100,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		//when
 
 		//then
-		assertThrows(NotFoundException.class,
-			() -> locationService.getLocations(false, LocationCategory.CAFE, 1.0, 1.0, 1));
+		assertEquals(Collections.emptyList(), locationService.getLocations(false, LocationCategory.RESTAURANT, 1.0, 1.0, 1).getLocations());
 	}
 
 	@Test
@@ -109,8 +110,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		//when
 
 		//then
-		assertThrows(NotFoundException.class,
-			() -> locationService.getLocations(false, LocationCategory.RESTAURANT, 1.0, 1.0, 1));
+		assertEquals(Collections.emptyList(), locationService.getLocations(false, LocationCategory.RESTAURANT, 1.0, 1.0, 1).getLocations());
 	}
 
 	// TODO: 2022/07/13 거리 관련 로직 확정전이라 exception이 무조건 발생

@@ -7,6 +7,7 @@ import java.util.List;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.workat.domain.map.entity.Location;
+import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.vo.MapRangeInfo;
 
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,9 @@ public class LocationRepositoryCustomImpl implements LocationRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<Location> findAllByRadius(MapRangeInfo mapRangeInfo) {
+	public List<Location> findAllByRadius(LocationCategory category, MapRangeInfo mapRangeInfo) {
 		return jpaQueryFactory.selectFrom(location)
-			.where(intoMapRange(mapRangeInfo))
+			.where(intoMapRange(mapRangeInfo).and(location.category.eq(category)))
 			.fetch();
 	}
 
