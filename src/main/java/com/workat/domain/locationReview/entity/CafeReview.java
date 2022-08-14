@@ -1,4 +1,4 @@
-package com.workat.domain.review.entity;
+package com.workat.domain.locationReview.entity;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
