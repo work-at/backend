@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 
 import com.workat.domain.BaseEntity;
 import com.workat.domain.map.entity.Location;
-import com.workat.domain.review.BaseReviewType;
+import com.workat.domain.tag.BaseTag;
 import com.workat.domain.user.entity.Users;
 
 import lombok.AccessLevel;
@@ -44,5 +44,5 @@ public abstract class BaseReview extends BaseEntity {
 		this.user = user;
 	}
 
-	abstract public BaseReviewType getReviewType();
+	abstract public BaseTag getReviewType();
 }

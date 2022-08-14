@@ -6,7 +6,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 import com.workat.domain.map.entity.Location;
-import com.workat.domain.review.CafeReviewType;
+import com.workat.domain.tag.CafeReviewType;
 import com.workat.domain.user.entity.Users;
 
 import lombok.AccessLevel;

@@ -20,14 +20,14 @@ import com.workat.common.exception.NotFoundException;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.repository.location.LocationRepository;
-import com.workat.domain.review.BaseReviewType;
-import com.workat.domain.review.CafeReviewType;
-import com.workat.domain.review.FoodReviewType;
 import com.workat.domain.review.entity.BaseReview;
 import com.workat.domain.review.entity.CafeReview;
 import com.workat.domain.review.entity.RestaurantReview;
 import com.workat.domain.review.repository.CafeReviewRepository;
 import com.workat.domain.review.repository.RestaurantReviewRepository;
+import com.workat.domain.tag.BaseTag;
+import com.workat.domain.tag.CafeReviewType;
+import com.workat.domain.tag.FoodReviewType;
 import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class ReviewService {
 
 		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
-		final HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(reviews);
+		final HashMap<BaseTag, Long> reviewCountMap = convertReviewCountMap(reviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
 		return sortedReviewDtos;
@@ -59,7 +59,7 @@ public class ReviewService {
 		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
 		final long userCount = countReviewedUser(reviews);
-		final HashMap<BaseReviewType, Long> reviewCountMap = convertReviewCountMap(reviews);
+		final HashMap<BaseTag, Long> reviewCountMap = convertReviewCountMap(reviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
 		final boolean userReviewed = checkUserReviewed(reviews, userId);
@@ -88,15 +88,15 @@ public class ReviewService {
 			.size();
 	}
 
-	private <T extends BaseReview> HashMap<BaseReviewType, Long> convertReviewCountMap(List<T> reviews) {
+	private <T extends BaseReview> HashMap<BaseTag, Long> convertReviewCountMap(List<T> reviews) {
 
-		final HashMap<BaseReviewType, Long> reviewCountMap = reviews.stream()
+		final HashMap<BaseTag, Long> reviewCountMap = reviews.stream()
 			.collect(groupingBy(BaseReview::getReviewType, HashMap::new, counting()));
 
 		return reviewCountMap;
 	}
 
-	private <T extends BaseReviewType> List<ReviewDto> getSortedReviewDtos(Map<T, Long> map) {
+	private <T extends BaseTag> List<ReviewDto> getSortedReviewDtos(Map<T, Long> map) {
 
 		return map.entrySet()
 			.stream()
