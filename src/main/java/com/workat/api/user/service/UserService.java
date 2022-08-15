@@ -56,6 +56,8 @@ public class UserService {
 	private String uploadUri;
 	@Value("${resources.profile-upload-folder:/profile_images}")
 	private String profileFolder;
+	@Value("${spring.mail.username}")
+	private String fromAddress;
 
 	private final JavaMailSender mailSender;
 
@@ -237,15 +239,16 @@ public class UserService {
 	}
 
 	private void sendVerificationEmail(Users user, String nickname, String email, String siteURL) throws MessagingException, UnsupportedEncodingException {
-		// TODO: 기획에 따라 메일 내용 변경
-		String fromAddress = "workat.test.mail@gmail.com";
 		String senderName = "Work at_";
-		String subject = "Please verify your registration";
-		String content = "Dear [[name]],<br>"
-			+ "Please click the link below to verify your registration:<br>"
-			+ "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
-			+ "Thank you,<br>"
-			+ "Your company name.";
+		String subject = "이메일 인증을 해주세요";
+		String content = "안녕하세요.<br>"
+			+ "워케이셔너와 원활한 네트워킹 참가를 위해 이메일 인증을 완료해 주세요.<br>"
+			+ "<br>"
+			+ "회사인증을 했을 경우 회사인증 배지가 부여됩니다.<br>"
+			+ "워크앳을 통해 새로운 업무 문화를 경험해 보세요!<br>"
+			+ "<h3 style=\"text-align: center;\"><a href=\"[[URL]]\" target=\"_self\">이메일 인증하기</a></h3>"
+			+ "<br>"
+			+ "workat.Co";
 
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);
