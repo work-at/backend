@@ -70,7 +70,6 @@ public class ChatController {
 
 	@ApiOperation("채팅 메세지를 생성하는 api")
 	@ApiImplicitParams(value = {
-		@ApiImplicitParam(name = "writerId", value = "1", required = true, dataType = "long", example = "1"),
 		@ApiImplicitParam(name = "message", value = "샘플 메세지 입니다.", required = true, dataType = "string", example = "샘플 메세지 입니다."),
 	})
 	@ApiResponses(value = {
