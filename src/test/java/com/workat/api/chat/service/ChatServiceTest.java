@@ -98,7 +98,7 @@ class ChatServiceTest {
 			.user(user1)
 			.nickname("user1")
 			.imageUrl("user1")
-			.position(DepartmentType.IT_ENGINEER)
+			.position(DepartmentType.ENGINEER)
 			.workingYear(DurationType.JUNIOR)
 			.build();
 		userProfileRepository.save(user1Profile);
@@ -106,7 +106,7 @@ class ChatServiceTest {
 			.user(user2)
 			.nickname("user2")
 			.imageUrl("user2")
-			.position(DepartmentType.IT_ENGINEER)
+			.position(DepartmentType.ENGINEER)
 			.workingYear(DurationType.JUNIOR)
 			.build();
 		userProfileRepository.save(user2Profile);

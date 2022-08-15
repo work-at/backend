@@ -207,7 +207,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		UserProfile userProfile = UserProfile.builder()
 			.user(user)
 			.nickname("holden")
-			.position(DepartmentType.ACCOUNTANT)
+			.position(DepartmentType.ENGINEER)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();

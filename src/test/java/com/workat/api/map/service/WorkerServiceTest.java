@@ -55,7 +55,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		userProfile = UserProfile.builder()
 			.user(user)
 			.nickname("nickname")
-			.position(DepartmentType.ACCOUNTANT)
+			.position(DepartmentType.ENGINEER)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
@@ -65,7 +65,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		UserProfile userProfile2 = UserProfile.builder()
 			.user(user2)
 			.nickname("nick")
-			.position(DepartmentType.ACCOUNTANT)
+			.position(DepartmentType.ENGINEER)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();

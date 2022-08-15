@@ -103,7 +103,7 @@ public class AddressServiceTest extends MultipleDatasourceBaseTest {
 		UserProfile userProfile = UserProfile.builder()
 			.user(user)
 			.nickname("nickname")
-			.position(DepartmentType.ACCOUNTANT)
+			.position(DepartmentType.ENGINEER)
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
