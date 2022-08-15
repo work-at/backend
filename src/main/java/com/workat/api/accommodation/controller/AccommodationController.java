@@ -3,10 +3,12 @@ package com.workat.api.accommodation.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
 import com.workat.api.accommodation.service.AccommodationService;
 import com.workat.domain.accommodation.RegionType;
@@ -14,6 +16,7 @@ import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +45,17 @@ public class AccommodationController {
 	) {
 		AccommodationsResponse response = accommodationService.getAccommodations(
 			region, infoTagName, topReviewTagName, pageNumber, pageSize);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@ResponseStatus(value = HttpStatus.OK)
+	@ApiOperation("Accommodation 단건 조회")
+	@ApiImplicitParam(name = "accommodationId", value = "Accommodation Id", required = true, dataType = "long", example = "1")
+	@GetMapping("/api/v1/accommodations/{accommodationId}")
+	public ResponseEntity<AccommodationResponse> getAccommodation(
+		@PathVariable("accommodationId") long accommodationId) {
+		AccommodationResponse response = accommodationService.getAccommodation(accommodationId);
 
 		return ResponseEntity.ok(response);
 	}
