@@ -18,7 +18,7 @@ public class TourApiService {
 	private final MonthlyRegionVisitorRepository monthlyRegionVisitorRepository;
 	private final YearlyRegionVisitorRepository yearlyRegionVisitorRepository;
 
-	public VisitorDegree calculateWorkatDegree(RegionCode regionCode) {
+	public VisitorDegree calculateWorkatDegree(RegionCode regionCode) { // TODO: 숙소 조회 시 사용
 		MonthlyRegionVisitor monthlyRegionVisitor = monthlyRegionVisitorRepository.findById(regionCode.getCode()).orElseThrow(() -> new NotFoundException(regionCode.name() + " not found"));
 		YearlyRegionVisitor yearlyRegionVisitor = yearlyRegionVisitorRepository.findById(regionCode.getCode()).orElseThrow(() -> new NotFoundException(regionCode.name() + " not found"));
 
