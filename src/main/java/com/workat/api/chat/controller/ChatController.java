@@ -77,9 +77,9 @@ public class ChatController {
 		@ApiResponse(code = 200, message = "success", response = Long.class)
 	})
 	@PostMapping("/api/v1/chattings/{roomId}")
-	public ResponseEntity<Long> createMessage(@PathVariable long roomId, @RequestParam Long writerId,
+	public ResponseEntity<Long> createMessage(@PathVariable long roomId, @UserValidation Users user,
 		@RequestParam String message) {
-		Long id = chatService.createChatMessage(roomId, writerId, message);
+		Long id = chatService.createChatMessage(roomId, user.getId(), message);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}")
 			.buildAndExpand(id)
 			.toUri();

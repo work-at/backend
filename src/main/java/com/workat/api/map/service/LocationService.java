@@ -2,8 +2,15 @@ package com.workat.api.map.service;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,11 +68,11 @@ public class LocationService {
 		}
 
 		MapRangeInfo mapRangeInfo = DistanceUtils.getLocationPoint(longitude, latitude, radius);
-		List<Location> locations = locationRepository.findAllByRadius(mapRangeInfo);
+		List<Location> locations = locationRepository.findAllByRadius(category, mapRangeInfo);
 		log.info("findAllByRadius : " + locations.size());
 
 		if (locations.isEmpty()) {
-			throw new NotFoundException("location not found exception");
+			return LocationResponse.of(Collections.emptyList());
 		}
 
 		if (isPin) {
@@ -78,6 +85,7 @@ public class LocationService {
 		}
 
 		List<LocationBriefDto> locationBriefs = locations.stream()
+			.limit(100L)
 			.map(location -> {
 				long locationId = location.getId();
 				List<ReviewDto> locationReviews = reviewService.getLocationReviews(locationId, category);
@@ -96,7 +104,7 @@ public class LocationService {
 					.category(location.getCategory())
 					.placeName(location.getPlaceName())
 					.roadAddressName(location.getRoadAddressName())
-					// .thumbnailImageUrl(location.getThumbnailImageUrl()) // TODO: 파일 서버 구축되면 링크로 내려주기
+					.thumbnailImageUrl(generateImageUrl(category, location.getPlaceCategory()))
 					.reviewCount(reviewCount)
 					.topReviews(topReviews)
 					.build();
@@ -140,26 +148,41 @@ public class LocationService {
 	}
 
 	@Transactional
-	public void updateLocations() {
+	public long updateLocations() {
 		createAreaFromCsv();
+
+		long startLocationCount = locationRepository.findAll().size();
 
 		for (LocationCategory category : LocationCategory.values()) {
 			List<Area> areas = areaRepository.findAll();
 			for (Area area : areas) {
-				log.info(area.getName() + " batch start");
-				List<KakaoLocalDataDto> locationDtos = locationHttpReceiver.updateLocations(category,
-					MapPoint.of(area.getLongitude(), area.getLatitude()), 5000);
-				List<Location> locations = locationDtos.stream()
-					.distinct()
-					.map(dto -> {
-						Location location = locationRepository.findByPlaceId(dto.getId())
-							.orElseGet(() -> Location.of(category, dto));
-						return location.update(dto);
-					})
-					.collect(Collectors.toList());
-				locationRepository.saveAll(locations);
+				log.info(area.getName() + " " + category.getValue() + " batch start, total area size : " + areas.size()
+					+ " of this batch index : " + (areas.indexOf(area) + 1));
+
+				ArrayList<Location> result = new ArrayList<>();
+				for (int x = -3; x <= 3; x++) {
+					for (int y = -3; y <= 3; y++) {
+						List<KakaoLocalDataDto> locationDtos = locationHttpReceiver.updateLocations(category,
+							MapPoint.of(area.getLongitude() + (x / 100.0), area.getLatitude() + (y / 100.0)), 5000);
+						List<Location> locations = locationDtos.stream()
+							.filter(distinctByKey(KakaoLocalDataDto::getId))
+							.map(dto -> {
+								Location location = locationRepository.findByPlaceId(dto.getId())
+									.orElseGet(() -> Location.of(category, dto));
+								return location.update(dto);
+							})
+							.collect(Collectors.toList());
+						result.addAll(locations);
+					}
+				}
+
+				locationRepository.saveAll(result.stream()
+					.filter(distinctByKey(Location::getPlaceId))
+					.collect(Collectors.toList()));
 			}
 		}
+
+		return locationRepository.findAll().size() - startLocationCount;
 	}
 
 	private void createAreaFromCsv() {
@@ -169,7 +192,8 @@ public class LocationService {
 
 	private void readSeoulSubwayCsv() {
 		//호선, 역명, 주소, lat, long
-		String seoulSubwayCsvPath = "/csv/seoul_subway_1.csv";
+		//1,2,4호선 완료
+		String seoulSubwayCsvPath = "/csv/seoul_subway_3.csv";
 		URL url = getClass().getResource(seoulSubwayCsvPath);
 
 		if (url == null || url.getPath() == null) {
@@ -189,5 +213,36 @@ public class LocationService {
 			.collect(Collectors.toList());
 
 		areaRepository.saveAll(result);
+	}
+
+	private String generateImageUrl(LocationCategory category, String placeCategory) {
+
+		if (category == LocationCategory.CAFE) {
+			return "";
+		}
+
+		if (placeCategory.contains("한식")) {
+			return "";
+		}
+
+		if (placeCategory.contains("일식")) {
+			return "";
+		}
+
+		if (placeCategory.contains("중식")) {
+			return "";
+		}
+
+		if (placeCategory.contains("양식")) {
+			return "";
+		}
+
+		//기타
+		return "";
+	}
+
+	private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+		Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
 }

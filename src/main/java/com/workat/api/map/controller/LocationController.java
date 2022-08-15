@@ -115,7 +115,7 @@ public class LocationController {
 		@NotNull @RequestParam double longitude, @NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		LocationResponse response =
-			locationService.getLocations(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
+			locationService.getLocations(true, LocationCategory.RESTAURANT, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
 	}
 

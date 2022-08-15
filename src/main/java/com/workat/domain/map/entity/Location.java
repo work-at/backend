@@ -46,6 +46,9 @@ public class Location extends BaseEntity {
 	private String placeUrl;
 
 	@Column
+	private String placeCategory;
+
+	@Column
 	private String addressName;
 
 	@Column
@@ -64,6 +67,7 @@ public class Location extends BaseEntity {
 			.placeId(dto.getId())
 			.placeName(dto.getPlaceName())
 			.placeUrl(dto.getPlaceUrl())
+			.placeCategory(dto.getCategoryName())
 			.addressName(dto.getAddressName())
 			.roadAddressName(dto.getRoadAddressName())
 			.longitude(Double.parseDouble(dto.getX()))
