@@ -19,23 +19,17 @@ public class AccommodationDto {
 
 	private String imgUrl;
 
-	private List<TagDto> infoTags;
-
 	private List<TagDto> topReviewTags;
 
-	private AccommodationDto(long id, String name, long price, String imgUrl,
-		List<TagDto> infoTags, List<TagDto> topReviewTags) {
+	private AccommodationDto(long id, String name, long price, String imgUrl, List<TagDto> topReviewTags) {
 		this.id = id;
 		this.name = name;
 		this.price = price;
 		this.imgUrl = imgUrl;
-		this.infoTags = infoTags;
 		this.topReviewTags = topReviewTags;
 	}
 
-	public static AccommodationDto of(long id, String name, long price, String imgUrl,
-		List<TagDto> infoTags, List<TagDto> topReviewTags) {
-		return new AccommodationDto(id, name, price, imgUrl,
-			infoTags, topReviewTags);
+	public static AccommodationDto of(long id, String name, long price, String imgUrl, List<TagDto> topReviewTags) {
+		return new AccommodationDto(id, name, price, imgUrl, topReviewTags);
 	}
 }
