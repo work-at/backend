@@ -98,7 +98,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 					UserProfile userProfile = UserProfile.builder()
 						.user(user)
 						.nickname(String.format("name%d", idx))
-						.position(DepartmentType.ACCOUNTANT)
+						.position(DepartmentType.ENGINEER)
 						.workingYear(DurationType.JUNIOR)
 						.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 						.build();
