@@ -4,12 +4,16 @@ import java.util.Arrays;
 
 import org.springframework.stereotype.Service;
 
+import com.workat.api.accommodation.dto.AccommodationDetailDto;
 import com.workat.api.accommodation.dto.AccommodationDto;
+import com.workat.api.accommodation.dto.AccommodationReviewDto;
+import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagDto;
+import com.workat.domain.tag.dto.TagWithCountDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,4 +50,37 @@ public class AccommodationService {
 		);
 	}
 
+	public AccommodationResponse getAccommodation(long accommodationId) {
+
+		return AccommodationResponse.of(
+			AccommodationDetailDto.builder()
+				.id(accommodationId)
+				.name("그랜드워커힐서울")
+				.imgUrl(
+					"https://lh5.googleusercontent.com/p/AF1QipOKO_7oTuHLK31fOjhqp13KompnHRxgi_2_oOVT=w253-h168-k-no")
+				.price(235000L)
+				.phone("1670-0005")
+				.roadAddressName("서울 광진구 워커힐로 177 그랜드워커힐 서울")
+				.placeUrl("https://kko.to/jhJN8vUzS")
+				.relatedUrl("https://www.walkerhill.com/grandwalkerhillseoul")
+				.infoTags(Arrays.asList(
+					TagDto.of(AccommodationInfoTag.NEAR_CITY),
+					TagDto.of(AccommodationInfoTag.WORKSPACE),
+					TagDto.of(AccommodationInfoTag.SHARED_WORKSPACE)
+				))
+				.build(),
+			AccommodationReviewDto.of(
+				Arrays.asList(
+					TagWithCountDto.of(TagDto.of(AccommodationReviewTag.SERVE_MEAL), 90),
+					TagWithCountDto.of(TagDto.of(AccommodationReviewTag.FOCUS), 75),
+					TagWithCountDto.of(TagDto.of(AccommodationReviewTag.WIFI), 60),
+					TagWithCountDto.of(TagDto.of(AccommodationReviewTag.POWER), 55),
+					TagWithCountDto.of(TagDto.of(AccommodationReviewTag.QUIET), 40),
+					TagWithCountDto.of(TagDto.of(AccommodationReviewTag.SEAT), 30)
+				),
+				false,
+				1
+			)
+		);
+	}
 }
