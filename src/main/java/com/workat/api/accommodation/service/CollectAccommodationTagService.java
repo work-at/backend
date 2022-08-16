@@ -1,6 +1,5 @@
 package com.workat.api.accommodation.service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +17,8 @@ import lombok.RequiredArgsConstructor;
 public class CollectAccommodationTagService {
 
 	public TagsResponse collectReviewTags() {
-		List<TagDto> list = Arrays.stream(AccommodationReviewTag.values())
+		List<TagDto> list = AccommodationReviewTag.ALL
+			.stream()
 			.map(TagDto::of)
 			.collect(Collectors.toList());
 
@@ -26,7 +26,8 @@ public class CollectAccommodationTagService {
 	}
 
 	public TagsResponse collectInfoTags() {
-		List<TagDto> list = Arrays.stream(AccommodationInfoTag.values())
+		List<TagDto> list = AccommodationInfoTag.ALL
+			.stream()
 			.map(TagDto::of)
 			.collect(Collectors.toList());
 

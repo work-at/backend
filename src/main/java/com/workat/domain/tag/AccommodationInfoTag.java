@@ -1,6 +1,7 @@
 package com.workat.domain.tag;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import com.workat.common.exception.NotFoundException;
 
@@ -13,6 +14,8 @@ public enum AccommodationInfoTag implements BaseTag {
 	NEAR_CITY("도시 인근"),
 	FREE_PARKING("무료 주차"),
 	SHARED_WORKSPACE("공용업무공간");
+
+	public static final Set<AccommodationInfoTag> ALL = EnumSet.allOf(AccommodationInfoTag.class);
 
 	private final String content;
 

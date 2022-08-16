@@ -1,6 +1,7 @@
 package com.workat.domain.tag;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import com.workat.common.exception.NotFoundException;
 
@@ -12,6 +13,8 @@ public enum AccommodationReviewTag implements BaseTag {
 	QUIET("조용한 공간이 있어요"),
 	FOCUS("집중이 잘 돼요"),
 	SERVE_MEAL("식사메뉴가 있어요");
+
+	public static final Set<AccommodationReviewTag> ALL = EnumSet.allOf(AccommodationReviewTag.class);
 
 	private final String content;
 
