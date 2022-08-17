@@ -27,7 +27,7 @@ spring:
 server:
   ssl:
     key-store: ${KEY_STORE}
-    key-store-password:
+    key-store-password: ${KEY_PASSWORD}
     keyStoreType: PKCS12
     keyAlias: tomcat
 
