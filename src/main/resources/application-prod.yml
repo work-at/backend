@@ -28,8 +28,10 @@ server:
   ssl:
     key-store: ${KEY_STORE}
     key-store-password: ${KEY_PASSWORD}
-    keyStoreType: PKCS12
-    keyAlias: tomcat
+    key-store-type: PKCS12
+    key-alias: tomcat
+  http2:
+    enabled: true
 
 external:
   kakaoOauth:
