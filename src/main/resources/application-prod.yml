@@ -24,6 +24,13 @@ spring:
     username: work.at.tour@gmail.com
     password: ${EMAIL_PASSWORD}
 
+server:
+  ssl:
+    key-store: ${KEY_STORE}
+    key-store-password:
+    keyStoreType: PKCS12
+    keyAlias: tomcat
+
 external:
   kakaoOauth:
     redirect-url: "http://workat.o-r.kr/login"
