@@ -4,6 +4,7 @@ import static com.workat.domain.chat.entity.QChatRoom.*;
 
 import java.util.List;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.workat.domain.chat.entity.ChatRoom;
 import com.workat.domain.user.entity.Users;
@@ -18,8 +19,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
 	@Override
 	public List<ChatRoom> findAllByUser(Users user) {
 		return queryFactory.selectFrom(chatRoom)
-			.where(
-				chatRoom.owner.eq(user).or(chatRoom.other.eq(user)).and(chatRoom.isDeleted.eq(false))
-			).fetch();
+			.where(chatRoom.owner.eq(user).or(chatRoom.applicant.eq(user)))
+			.fetch();
 	}
 }

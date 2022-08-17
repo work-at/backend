@@ -1,9 +1,7 @@
 package com.workat.domain.chat.entity;
 
 import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,30 +29,43 @@ public class ChatRoom extends BaseEntity {
 	@ManyToOne
 	private Users owner;
 
-	@JoinColumn(name = "other_id")
+	@JoinColumn(name = "applicant_id")
 	@ManyToOne
-	private Users other;
+	private Users applicant;
 
 	private Long ownerLastCheckingMessageId;
 
-	private Long otherLastCheckingMessageId;
+	private Long applicantLastCheckingMessageId;
 
-	private boolean isDeleted;
+	private boolean isStart;
+
+	private boolean isOwnerDeleted;
+
+	private boolean isApplicantDeleted;
 
 	public static ChatRoom of() {
 		return new ChatRoom();
 	}
 
-	public void assignUsers(Users owner, Users other) {
+	public void assignUsers(Users owner, Users applicant) {
 		this.owner = owner;
-		this.other = other;
+		this.applicant = applicant;
 	}
 
+	public void chattingConfirm(Long userId) {
+		if (userId.equals(owner.getId())) {
+			this.isStart = true;
+		} else {
+			throw new InvalidParameterException("this user(id : " + userId +") no authority, wrong value");
+		}
+	}
+
+	// TODO: 2022/08/17 추후 owner, applicant 구분하는 로직 람다를 이용해서 리팩터링할 예정
 	public void setUsersLastCheckingMessageId(Long userId, Long lastMessageId) {
 		if (userId.equals(owner.getId())) {
 			this.ownerLastCheckingMessageId = lastMessageId;
-		} else if (userId.equals(other.getId())) {
-			this.otherLastCheckingMessageId = lastMessageId;
+		} else if (userId.equals(applicant.getId())) {
+			this.applicantLastCheckingMessageId = lastMessageId;
 		} else {
 			throw new InvalidParameterException("this room not contains user, userId = " + userId);
 		}
@@ -63,8 +74,8 @@ public class ChatRoom extends BaseEntity {
 	public Long getUsersLastCheckingMessageId(Long userId) {
 		if (userId.equals(owner.getId())) {
 			return this.ownerLastCheckingMessageId != null ? this.ownerLastCheckingMessageId : 0;
-		} else if(userId.equals(other.getId())) {
-			return this.otherLastCheckingMessageId != null ? this.otherLastCheckingMessageId : 0;
+		} else if (userId.equals(applicant.getId())) {
+			return this.applicantLastCheckingMessageId != null ? this.applicantLastCheckingMessageId : 0;
 		} else {
 			throw new InvalidParameterException("this room not contains user, userId = " + userId);
 		}
@@ -72,18 +83,50 @@ public class ChatRoom extends BaseEntity {
 
 	public Long getAnotherOwnerUserId(Long userId) {
 		Long ownerUserId = owner.getId();
-		Long otherUserId = other.getId();
+		Long applyUserId = applicant.getId();
 
 		if (ownerUserId.equals(userId)) {
-			return otherUserId;
-		} else if (otherUserId.equals(userId)) {
+			return applyUserId;
+		} else if (applyUserId.equals(userId)) {
 			return ownerUserId;
 		} else {
 			throw new InvalidParameterException("this room not contain userId = " + userId);
 		}
 	}
 
-	public void deleteRoom() {
-		this.isDeleted = true;
+	public void deleteRoom(Long userId) {
+		Long ownerUserId = owner.getId();
+		Long applyUserId = applicant.getId();
+		if (userId.equals(ownerUserId)) {
+			this.isOwnerDeleted = true;
+		} else if (userId.equals(applyUserId)) {
+			this.isApplicantDeleted = true;
+		} else {
+			throw new InvalidParameterException("this room not contain userId = " + userId);
+		}
+	}
+
+	public boolean isDeletedByMe(Long userId) {
+		Long ownerUserId = owner.getId();
+		Long applyUserId = applicant.getId();
+		if (userId.equals(ownerUserId)) {
+			return this.isOwnerDeleted;
+		} else if (userId.equals(applyUserId)) {
+			return this.isApplicantDeleted;
+		} else {
+			throw new InvalidParameterException("this room not contain userId = " + userId);
+		}
+	}
+
+	public boolean isDeletedByOther(Long userId) {
+		Long ownerUserId = owner.getId();
+		Long applyUserId = applicant.getId();
+		if (userId.equals(ownerUserId)) {
+			return this.isApplicantDeleted;
+		} else if (userId.equals(applyUserId)) {
+			return this.isOwnerDeleted;
+		} else {
+			throw new InvalidParameterException("this room not contain userId = " + userId);
+		}
 	}
 }
