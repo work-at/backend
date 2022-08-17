@@ -18,8 +18,8 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 	@Override
 	public List<ChatMessage> findLatestMessage(ChatRoom chatRoom, long messageId, long pageSize) {
 		return jpaQueryFactory.selectFrom(chatMessage)
-			.where(chatMessage.room.eq(chatRoom).and(chatMessage.id.lt(messageId)))
-			.orderBy(chatMessage.id.desc())
+			.where(chatMessage.room.id.eq(chatRoom.getId()).and(chatMessage.id.lt(messageId)))
+			.orderBy(chatMessage.id.asc())
 			.limit(pageSize)
 			.fetch();
 	}
@@ -27,7 +27,7 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 	@Override
 	public List<ChatMessage> findRecentMessage(ChatRoom chatRoom, long messageId, long pageSize) {
 		return jpaQueryFactory.selectFrom(chatMessage)
-			.where(chatMessage.room.eq(chatRoom).and(chatMessage.id.gt(messageId)))
+			.where(chatMessage.room.id.eq(chatRoom.getId()).and(chatMessage.id.gt(messageId)))
 			.orderBy(chatMessage.id.asc())
 			.limit(pageSize)
 			.fetch();

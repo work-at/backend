@@ -44,16 +44,16 @@ public class ChatService {
 	private final ChatMessageRepository chatMessageRepository;
 
 	@Transactional
-	public Long createChatRoom(Long ownerUserId, Long otherUserId) {
+	public Long createChatRoom(Long ownerUserId, Long applyUserId) {
 		Users findOwnerUser = usersRepository.findById(ownerUserId).orElseThrow(() -> {
 			throw new UserNotFoundException(ownerUserId);
 		});
-		Users findOtherUser = usersRepository.findById(otherUserId).orElseThrow(() -> {
-			throw new UserNotFoundException(otherUserId);
+		Users findApplyUser = usersRepository.findById(applyUserId).orElseThrow(() -> {
+			throw new UserNotFoundException(applyUserId);
 		});
 
 		ChatRoom chatRoom = ChatRoom.of();
-		chatRoom.assignUsers(findOwnerUser, findOtherUser);
+		chatRoom.assignUsers(findOwnerUser, findApplyUser);
 
 		return chatRoomRepository.save(chatRoom).getId();
 	}
@@ -65,6 +65,7 @@ public class ChatService {
 		});
 
 		List<ChatRoomDto> roomDtoList = chatRoomRepository.findAllByUser(findUser).stream()
+			.filter(chatRoom -> !chatRoom.isDeletedByMe(userId))
 			.map(chatRoom -> {
 				Long anotherUserId = chatRoom.getAnotherOwnerUserId(findUser.getId());
 
@@ -83,7 +84,15 @@ public class ChatService {
 				boolean isAllRead = chatMessageRepository.isAllMessageRead(
 					chatRoom.getUsersLastCheckingMessageId(userId), anotherUserId);
 
-				return ChatRoomDto.of(chatRoom.getId(), userDto, isAllRead, chatRoom.getCreatedDate());
+				return ChatRoomDto.builder()
+					.id(chatRoom.getId())
+					.otherUser(userDto)
+					.isStart(chatRoom.isStart())
+					.isAllRead(isAllRead)
+					.isDeletedByOtherUser(chatRoom.isDeletedByOther(userId))
+					.isBlockedByOtherUser(false)
+					.createdDate(chatRoom.getCreatedDate())
+					.build();
 			})
 			.collect(Collectors.toList());
 
@@ -100,7 +109,7 @@ public class ChatService {
 
 		validateChatRoom(findRoom, findUser.getId());
 
-		findRoom.deleteRoom();
+		findRoom.deleteRoom(userId);
 
 		chatRoomRepository.save(findRoom);
 	}
@@ -140,7 +149,7 @@ public class ChatService {
 	}
 
 	@Transactional
-	public void patchRoomLastUserCheckingMessage(Long userId, Long roomId, Long lastMessageId) {
+	public void postRoomLastUserCheckingMessage(Long userId, Long roomId, Long lastMessageId) {
 		Users findUser = usersRepository.findById(userId).orElseThrow(() -> {
 			throw new UserNotFoundException(userId);
 		});
@@ -154,12 +163,27 @@ public class ChatService {
 		chatRoomRepository.save(findRoom);
 	}
 
+	@Transactional
+	public void chattingConfirm(Long userId, Long roomId) {
+		Users findUser = usersRepository.findById(userId).orElseThrow(() -> {
+			throw new UserNotFoundException(userId);
+		});
+
+		ChatRoom findRoom = getChatRoomFromRepository(roomId);
+
+		validateChatRoom(findRoom, findUser.getId());
+
+		findRoom.chattingConfirm(userId);
+
+		chatRoomRepository.save(findRoom);
+	}
+
 	private ChatRoom getChatRoomFromRepository(Long roomId) {
 		ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> {
 			throw new ChatRoomNotFoundException(roomId);
 		});
 
-		if (room.isDeleted()) {
+		if (room.isOwnerDeleted() || room.isApplicantDeleted()) {
 			throw new ChatRoomIsDeletedException(roomId);
 		}
 
@@ -167,8 +191,9 @@ public class ChatService {
 	}
 
 	private void validateChatRoom(ChatRoom chatRoom, Long userId) {
-		if (!chatRoom.getOwner().getId().equals(userId) && !chatRoom.getOther().getId().equals(userId)) {
+		if (!chatRoom.getOwner().getId().equals(userId) && !chatRoom.getApplicant().getId().equals(userId)) {
 			throw new ChatRoomUserNotMatchException(chatRoom.getId(), userId);
 		}
 	}
+
 }

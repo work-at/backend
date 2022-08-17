@@ -1,6 +1,5 @@
 package com.workat.common.exception.handler;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +12,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.workat.common.exception.base.BusinessException;
 import com.workat.common.exception.dto.ErrorResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(BusinessException.class)
 	protected ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
+		log.error("throw " + e.getCode() + " error, " + e.getMessage());
 		return new ResponseEntity<>(ErrorResponse.of(e.getCode().value(), e.getMessage()), e.getCode());
 	}
 

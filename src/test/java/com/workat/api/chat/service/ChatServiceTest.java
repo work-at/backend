@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.workat.api.chat.dto.ChatMessageDto;
 import com.workat.api.chat.dto.ChatRoomDto;
+import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.common.exception.ChatRoomNotFoundException;
 import com.workat.common.exception.UserNotFoundException;
@@ -73,7 +74,7 @@ class ChatServiceTest {
 		assertAll(
 			() -> assertEquals(chatRoom.getId(), chatRoomId),
 			() -> assertEquals(chatRoom.getOwner(), user1),
-			() -> assertEquals(chatRoom.getOther(), user2)
+			() -> assertEquals(chatRoom.getApplicant(), user2)
 		);
 	}
 
@@ -88,11 +89,49 @@ class ChatServiceTest {
 	}
 
 	@Test
-	void getChatRooms_success() {
+	void confirmChatRooms_success() {
 		//given
 		Users user1 = Users.of(OauthType.KAKAO, 1L);
 		Users user2 = Users.of(OauthType.KAKAO, 2L);
-		// usersRepository.saveAll(List.of(user1, user2));
+
+		UserProfile user1Profile = UserProfile.builder()
+			.user(user1)
+			.nickname("user1")
+			.imageUrl("user1")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user1Profile);
+		UserProfile user2Profile = UserProfile.builder()
+			.user(user2)
+			.nickname("user2")
+			.imageUrl("user2")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user2Profile);
+		usersRepository.saveAll(List.of(user1, user2));
+
+		Long chatRoomId = chatService.createChatRoom(user1.getId(), user2.getId());
+
+		//when
+		ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
+		assertFalse(chatRoom.isStart());
+
+		chatRoom.chattingConfirm(user1.getId());
+		assertTrue(chatRoom.isStart());
+
+		ChatRoomResponse response = chatService.getChatRooms(user1.getId());
+
+		//then
+		assertEquals(response.getRooms().size(), 1);
+	}
+
+	@Test
+	void getChatRooms_case1_success() {
+		//given
+		Users user1 = Users.of(OauthType.KAKAO, 1L);
+		Users user2 = Users.of(OauthType.KAKAO, 2L);
 
 		UserProfile user1Profile = UserProfile.builder()
 			.user(user1)
@@ -140,6 +179,264 @@ class ChatServiceTest {
 			() -> assertEquals(chatRoom.getOtherUser().getUserId(), user2.getId()),
 			() -> assertFalse(chatRoom.isAllRead())
 		);
+	}
+
+	@Test
+	void getChatRooms_case2_success() {
+		//given
+		Users user1 = Users.of(OauthType.KAKAO, 1L);
+		Users user2 = Users.of(OauthType.KAKAO, 2L);
+
+		UserProfile user1Profile = UserProfile.builder()
+			.user(user1)
+			.nickname("user1")
+			.imageUrl("user1")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user1Profile);
+		UserProfile user2Profile = UserProfile.builder()
+			.user(user2)
+			.nickname("user2")
+			.imageUrl("user2")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user2Profile);
+		usersRepository.saveAll(List.of(user1, user2));
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		givenChatroom.deleteRoom(user1.getId());
+
+		ChatRoomResponse resultChatRooms = chatService.getChatRooms(user1.getId());
+
+		//then
+		assertEquals(resultChatRooms.getRooms().size(), 0);
+	}
+
+	@Test
+	void getChatRooms_case3_success() {
+		//given
+		Users user1 = Users.of(OauthType.KAKAO, 1L);
+		Users user2 = Users.of(OauthType.KAKAO, 2L);
+
+		UserProfile user1Profile = UserProfile.builder()
+			.user(user1)
+			.nickname("user1")
+			.imageUrl("user1")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user1Profile);
+		UserProfile user2Profile = UserProfile.builder()
+			.user(user2)
+			.nickname("user2")
+			.imageUrl("user2")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user2Profile);
+		usersRepository.saveAll(List.of(user1, user2));
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		givenChatroom.deleteRoom(user2.getId());
+
+		ChatRoomResponse resultChatRooms = chatService.getChatRooms(user1.getId());
+
+		//then
+		assertEquals(resultChatRooms.getRooms().size(), 1);
+
+		ChatRoomDto chatRoom = resultChatRooms.getRooms().get(0);
+		assertAll(
+			() -> assertEquals(chatRoom.getId(), givenChatroom.getId()),
+			() -> assertEquals(chatRoom.getOtherUser().getUserId(), user2.getId()),
+			() -> assertFalse(chatRoom.isStart()),
+			() -> assertTrue(chatRoom.isDeletedByOtherUser()),
+			() -> assertTrue(chatRoom.isAllRead())
+		);
+	}
+
+
+	@Test
+	void getChatRoomMessage_case1_success() {
+		//given
+		Users user1 = Users.of(OauthType.KAKAO, 1L);
+		Users user2 = Users.of(OauthType.KAKAO, 2L);
+
+		UserProfile user1Profile = UserProfile.builder()
+			.user(user1)
+			.nickname("user1")
+			.imageUrl("user1")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user1Profile);
+		UserProfile user2Profile = UserProfile.builder()
+			.user(user2)
+			.nickname("user2")
+			.imageUrl("user2")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user2Profile);
+		usersRepository.saveAll(List.of(user1, user2));
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+		ChatMessage givenMessage1 = ChatMessage.of(user1.getId(), "test1");
+		givenMessage1.assignRoom(givenChatroom);
+		ChatMessage givenMessage2 = ChatMessage.of(user2.getId(), "test2");
+		givenMessage2.assignRoom(givenChatroom);
+		ChatMessage givenMessage3 = ChatMessage.of(user1.getId(), "test3");
+		givenMessage3.assignRoom(givenChatroom);
+		ChatMessage givenMessage4 = ChatMessage.of(user2.getId(), "test4");
+		givenMessage4.assignRoom(givenChatroom);
+		ChatMessage givenMessage5 = ChatMessage.of(user1.getId(), "test5");
+		givenMessage5.assignRoom(givenChatroom);
+		ChatMessage givenMessage6 = ChatMessage.of(user2.getId(), "test6");
+		givenMessage6.assignRoom(givenChatroom);
+		ChatMessage givenMessage7 = ChatMessage.of(user1.getId(), "test7");
+		givenMessage7.assignRoom(givenChatroom);
+		ChatMessage givenMessage8 = ChatMessage.of(user2.getId(), "test8");
+		givenMessage8.assignRoom(givenChatroom);
+		chatMessageRepository.saveAll(
+			List.of(givenMessage1, givenMessage2, givenMessage3, givenMessage4, givenMessage5, givenMessage6,
+				givenMessage7, givenMessage8));
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessage2.getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessage1.getId());
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+			givenMessage1.getId(), AFTER);
+
+		//then
+		assertEquals(resultMessageResponse.getMessages().size(), 7);
+	}
+
+	@Test
+	void getChatRoomMessage_case2_success() {
+		//given
+		Users user1 = Users.of(OauthType.KAKAO, 1L);
+		Users user2 = Users.of(OauthType.KAKAO, 2L);
+
+		UserProfile user1Profile = UserProfile.builder()
+			.user(user1)
+			.nickname("user1")
+			.imageUrl("user1")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user1Profile);
+		UserProfile user2Profile = UserProfile.builder()
+			.user(user2)
+			.nickname("user2")
+			.imageUrl("user2")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user2Profile);
+		usersRepository.saveAll(List.of(user1, user2));
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+		ChatMessage givenMessage1 = ChatMessage.of(user1.getId(), "test1");
+		givenMessage1.assignRoom(givenChatroom);
+		ChatMessage givenMessage2 = ChatMessage.of(user2.getId(), "test2");
+		givenMessage2.assignRoom(givenChatroom);
+		ChatMessage givenMessage3 = ChatMessage.of(user1.getId(), "test3");
+		givenMessage3.assignRoom(givenChatroom);
+		ChatMessage givenMessage4 = ChatMessage.of(user2.getId(), "test4");
+		givenMessage4.assignRoom(givenChatroom);
+		ChatMessage givenMessage5 = ChatMessage.of(user1.getId(), "test5");
+		givenMessage5.assignRoom(givenChatroom);
+		ChatMessage givenMessage6 = ChatMessage.of(user2.getId(), "test6");
+		givenMessage6.assignRoom(givenChatroom);
+		ChatMessage givenMessage7 = ChatMessage.of(user1.getId(), "test7");
+		givenMessage7.assignRoom(givenChatroom);
+		ChatMessage givenMessage8 = ChatMessage.of(user2.getId(), "test8");
+		givenMessage8.assignRoom(givenChatroom);
+		chatMessageRepository.saveAll(
+			List.of(givenMessage1, givenMessage2, givenMessage3, givenMessage4, givenMessage5, givenMessage6,
+				givenMessage7, givenMessage8));
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessage2.getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessage1.getId());
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+			givenMessage7.getId(), AFTER);
+
+		//then
+		assertEquals(resultMessageResponse.getMessages().size(), 1);
+	}
+
+	@Test
+	void getChatRoomMessage_case3_success() {
+		//given
+		Users user1 = Users.of(OauthType.KAKAO, 1L);
+		Users user2 = Users.of(OauthType.KAKAO, 2L);
+
+		UserProfile user1Profile = UserProfile.builder()
+			.user(user1)
+			.nickname("user1")
+			.imageUrl("user1")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user1Profile);
+		UserProfile user2Profile = UserProfile.builder()
+			.user(user2)
+			.nickname("user2")
+			.imageUrl("user2")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user2Profile);
+		usersRepository.saveAll(List.of(user1, user2));
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+		ChatMessage givenMessage1 = ChatMessage.of(user1.getId(), "test1");
+		givenMessage1.assignRoom(givenChatroom);
+		ChatMessage givenMessage2 = ChatMessage.of(user2.getId(), "test2");
+		givenMessage2.assignRoom(givenChatroom);
+		ChatMessage givenMessage3 = ChatMessage.of(user1.getId(), "test3");
+		givenMessage3.assignRoom(givenChatroom);
+		ChatMessage givenMessage4 = ChatMessage.of(user2.getId(), "test4");
+		givenMessage4.assignRoom(givenChatroom);
+		ChatMessage givenMessage5 = ChatMessage.of(user1.getId(), "test5");
+		givenMessage5.assignRoom(givenChatroom);
+		ChatMessage givenMessage6 = ChatMessage.of(user2.getId(), "test6");
+		givenMessage6.assignRoom(givenChatroom);
+		ChatMessage givenMessage7 = ChatMessage.of(user1.getId(), "test7");
+		givenMessage7.assignRoom(givenChatroom);
+		ChatMessage givenMessage8 = ChatMessage.of(user2.getId(), "test8");
+		givenMessage8.assignRoom(givenChatroom);
+		chatMessageRepository.saveAll(
+			List.of(givenMessage1, givenMessage2, givenMessage3, givenMessage4, givenMessage5, givenMessage6,
+				givenMessage7, givenMessage8));
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessage2.getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessage1.getId());
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+			givenMessage1.getId(), BEFORE);
+
+		//then
+		assertEquals(resultMessageResponse.getMessages().size(), 0);
 	}
 
 	@Test

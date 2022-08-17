@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,12 +43,31 @@ public class ChatController {
 		@ApiResponse(code = 200, message = "success", response = Long.class)
 	})
 	@PostMapping("/api/v1/chattings")
-	public ResponseEntity<Long> createChattingRoom(@UserValidation Users user, @RequestParam Long otherUserId) {
-		Long id = chatService.createChatRoom(user.getId(), otherUserId);
+	public ResponseEntity<Long> createChattingRoom(@UserValidation Users user, @RequestParam Long ownerUserId) {
+		Long id = chatService.createChatRoom(ownerUserId, user.getId());
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 			.buildAndExpand(id)
 			.toUri();
 		return ResponseEntity.created(uri).build();
+	}
+
+	@ApiOperation("유저 A가 신청 받은 채팅을 시작하는 로직 api")
+	@ApiResponses(value = {
+		@ApiResponse(code = 200, message = "success")
+	})
+	@PostMapping("/api/v1/chattings/{roomId}/confirm")
+	public void postRoomConfirm(@UserValidation Users user, @PathVariable Long roomId) {
+		chatService.chattingConfirm(user.getId(), roomId);
+	}
+
+	@ApiOperation("유저 A가 채팅방에서 마지막으로 읽은 메세지를 최신화 해주는 api")
+	@ApiResponses(value = {
+		@ApiResponse(code = 200, message = "success")
+	})
+	@PostMapping("/api/v1/users/chatting/{roomId}/lastMessage")
+	public void postRoomLastUserCheckingTime(@UserValidation Users user, @PathVariable Long roomId,
+		Long lastMessageId) {
+		chatService.postRoomLastUserCheckingMessage(user.getId(), roomId, lastMessageId);
 	}
 
 	@ApiOperation("채팅방을 가져오는 api")
@@ -94,15 +112,5 @@ public class ChatController {
 		@RequestParam(required = false) Long messageId, @RequestParam ChatMessageSortType sortType) {
 		return ResponseEntity.ok(
 			chatService.getChatMessages(roomId, messageId == null ? Long.MAX_VALUE : messageId, sortType));
-	}
-
-	@ApiOperation("채팅 메세지를 가져오는 api")
-	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "success")
-	})
-	@PatchMapping("/api/v1/users/chatting/{roomId}/time")
-	public void patchRoomLastUserCheckingTime(@UserValidation Users user, @PathVariable Long roomId,
-		Long lastMessageId) {
-		chatService.patchRoomLastUserCheckingMessage(user.getId(), roomId, lastMessageId);
 	}
 }
