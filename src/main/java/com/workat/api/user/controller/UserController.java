@@ -103,4 +103,9 @@ public class UserController {
 		}
 		return "verify_fail";
 	}
+
+	@PostMapping("/api/v1/user/blocking")
+	public void postUserBlock(@UserValidation Users user, @RequestParam Long blockUserId) {
+		userService.postUserBlock(user.getId(), blockUserId);
+	}
 }

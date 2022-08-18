@@ -24,10 +24,12 @@ import com.workat.domain.chat.entity.ChatMessageSortType;
 import com.workat.domain.chat.entity.ChatRoom;
 import com.workat.domain.chat.repository.message.ChatMessageRepository;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
+import com.workat.domain.user.entity.UserBlocking;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
+import com.workat.domain.user.repository.blocking.UserBlockingRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,11 +37,17 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ChatService {
 
+	private long pageSize = 50L;
+
 	private final UsersRepository usersRepository;
+
 	private final UserProfileRepository userProfileRepository;
+
+	private final UserBlockingRepository userBlockingRepository;
+
 	private final ChatRoomRepository chatRoomRepository;
+
 	private final ChatMessageRepository chatMessageRepository;
-	private final long pageSize = 50L;
 
 	@Transactional
 	public Long createChatRoom(Long ownerUserId, Long applyUserId) {
@@ -70,7 +78,12 @@ public class ChatService {
 			throw new UserNotFoundException(userId);
 		});
 
+		List<Long> blockUserIdList = userBlockingRepository.findAllByReportingUserId(userId).stream()
+			.map(userBlocking -> userBlocking.getBlockedUser().getId())
+			.collect(Collectors.toList());
+
 		List<ChatRoomDto> roomDtoList = chatRoomRepository.findAllByUser(findUser).stream()
+			.filter(chatRoom -> !blockUserIdList.contains(chatRoom.getAnotherOwnerUserId(userId)))
 			.filter(chatRoom -> !chatRoom.isDeletedByMe(userId))
 			.map(chatRoom -> {
 				Long anotherUserId = chatRoom.getAnotherOwnerUserId(findUser.getId());
@@ -78,6 +91,9 @@ public class ChatService {
 				UserProfile anotherUserProfile = userProfileRepository.findById(anotherUserId).orElseThrow(() -> {
 					throw new NotFoundException("another user profile is not found");
 				});
+
+				boolean isBlocked = !userBlockingRepository.findByReportingUserIdAndBlockedUserId(anotherUserId, userId)
+					.isEmpty();
 
 				ChatRoomListUserDto userDto = ChatRoomListUserDto.builder()
 					.userId(anotherUserId)
@@ -96,7 +112,7 @@ public class ChatService {
 					.isStart(chatRoom.isStart())
 					.isAllRead(isAllRead)
 					.isDeletedByOtherUser(chatRoom.isDeletedByOther(userId))
-					.isBlockedByOtherUser(false)
+					.isBlockedByOtherUser(isBlocked)
 					.createdDate(chatRoom.getCreatedDate())
 					.build();
 			})
@@ -207,8 +223,7 @@ public class ChatService {
 
 		List<ChatRoom> chatRooms = owner.getChatRooms();
 
-		return owner.getChatRooms()
-			.stream()
+		return chatRooms.stream()
 			.anyMatch(room -> {
 				Long ownerId = room.getApplicant().getId();
 				return ownerId.equals(applicantId);

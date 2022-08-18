@@ -1,7 +1,6 @@
 package com.workat.api.user.service;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,18 +29,22 @@ import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.FileUploadException;
 import com.workat.common.exception.ForbiddenException;
 import com.workat.common.exception.NotFoundException;
+import com.workat.common.exception.UserNotFoundException;
 import com.workat.common.util.FileUploadUtils;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
 import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
 import com.workat.domain.user.activity.ActivityType;
 import com.workat.domain.user.entity.UserActivity;
+import com.workat.domain.user.entity.UserBlocking;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.filter.FilterEmail;
 import com.workat.domain.user.repository.UserActivityRepository;
+import com.workat.domain.user.repository.blocking.UserBlockingRepository;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,10 +55,13 @@ public class UserService {
 
 	@Value("${resources.upload-folder:/home/work_at_tour/images}")
 	private String resourcesLocation;
+
 	@Value("${resources.upload-uri:/uploaded}")
 	private String uploadUri;
+
 	@Value("${resources.profile-upload-folder:/profile_images}")
 	private String profileFolder;
+
 	@Value("${spring.mail.username}")
 	private String fromAddress;
 
@@ -64,6 +70,8 @@ public class UserService {
 	private final UsersRepository userRepository;
 
 	private final UserProfileRepository userProfileRepository;
+
+	private final UserBlockingRepository userBlockingRepository;
 
 	private final WorkerLocationRedisRepository workerLocationRedisRepository;
 
@@ -79,7 +87,8 @@ public class UserService {
 		if (!userExist) {
 			return AuthResponse.ResponseForSignup(oauthId);
 		}
-		final Users user = userRepository.findByOauthTypeAndOauthId(oauthType, oauthId).orElseThrow(() -> new NotFoundException("user not found"));
+		final Users user = userRepository.findByOauthTypeAndOauthId(oauthType, oauthId)
+			.orElseThrow(() -> new NotFoundException("user not found"));
 		final String accessToken = authorizationService.createAccessToken(user.getId());
 
 		return AuthResponse.ResponseForLogin(accessToken);
@@ -131,7 +140,8 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public MyProfileResponse getSelfUserProfile(Long userId) {
-		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
+		UserProfile userProfile = userProfileRepository.findById(userId)
+			.orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		int workchats = chatRoomRepository.findAllByUser(userProfile.getUser()).size();
 		List<ActivityTypeDto> activityTypes = userActivityRepository.findByUser_Id(userProfile.getId()).stream()
 			.map(UserActivity::getActivity)
@@ -147,8 +157,10 @@ public class UserService {
 			throw new ConflictException("동일한 닉네임의 유저가 존재합니다.");
 		});
 
-		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
-		userProfile.updateProfile(request.getNickname(), request.getPosition(), request.getWorkingYear(), request.getStory());
+		UserProfile userProfile = userProfileRepository.findById(user.getId())
+			.orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
+		userProfile.updateProfile(request.getNickname(), request.getPosition(), request.getWorkingYear(),
+			request.getStory());
 		userProfileRepository.save(userProfile);
 
 		List<UserActivity> activityTypes = request.getActivities().stream()
@@ -161,14 +173,16 @@ public class UserService {
 
 	@Transactional
 	public String uploadProfileImage(Long userId, MultipartFile multipartFile) {
-		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
+		UserProfile userProfile = userProfileRepository.findById(userId)
+			.orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 
 		if (multipartFile.getOriginalFilename() == null || multipartFile.getOriginalFilename().isBlank()) {
 			throw new BadRequestException("빈 파일입니다.");
 		}
 		String savedFileName = null;
 		try {
-			savedFileName = FileUploadUtils.fileUpload(resourcesLocation + profileFolder, String.valueOf(userId), multipartFile.getBytes());
+			savedFileName = FileUploadUtils.fileUpload(resourcesLocation + profileFolder, String.valueOf(userId),
+				multipartFile.getBytes());
 			log.info("save actual path: " + savedFileName);
 
 			savedFileName = savedFileName.replace(resourcesLocation + profileFolder, uploadUri + profileFolder);
@@ -183,7 +197,9 @@ public class UserService {
 	}
 
 	@Transactional
-	public void sendCompanyVerifyEmail(Users user, EmailCertifyRequest request, String siteURL) throws UnsupportedEncodingException, MessagingException {
+	public void sendCompanyVerifyEmail(Users user, EmailCertifyRequest request, String siteURL) throws
+		UnsupportedEncodingException,
+		MessagingException {
 		if (user.getEmailRequestRemain() == 0) {
 			throw new ForbiddenException("email 인증 요청이 모두 소모되었습니다");
 		}
@@ -192,7 +208,8 @@ public class UserService {
 			throw new BadRequestException("기본 이메일 " + request.getEmail() + " 은 인증할 수 없습니다");
 		}
 
-		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
+		UserProfile userProfile = userProfileRepository.findById(user.getId())
+			.orElseThrow(() -> new NotFoundException("user not found"));
 		user.decreaseEmailRequestRemain();
 		user.setVerificationCode();
 		userRepository.save(user);
@@ -202,8 +219,10 @@ public class UserService {
 
 	@Transactional
 	public boolean verify(String verificationCode, String address) {
-		Users user = userRepository.findUsersByVerificationCode(verificationCode).orElseThrow(() -> new NotFoundException("verification code not found"));
-		UserProfile userProfile = userProfileRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("user not found"));
+		Users user = userRepository.findUsersByVerificationCode(verificationCode)
+			.orElseThrow(() -> new NotFoundException("verification code not found"));
+		UserProfile userProfile = userProfileRepository.findById(user.getId())
+			.orElseThrow(() -> new NotFoundException("user not found"));
 
 		user.clearVerificationCode();
 		userRepository.save(user);
@@ -238,7 +257,9 @@ public class UserService {
 		return EmailLimitResponseDto.of(user.getEmailRequestRemain());
 	}
 
-	private void sendVerificationEmail(Users user, String nickname, String email, String siteURL) throws MessagingException, UnsupportedEncodingException {
+	private void sendVerificationEmail(Users user, String nickname, String email, String siteURL) throws
+		MessagingException,
+		UnsupportedEncodingException {
 		String senderName = "Work at_";
 		String subject = "이메일 인증을 해주세요";
 		String content = "안녕하세요.<br>"
@@ -258,12 +279,29 @@ public class UserService {
 		helper.setSubject(subject);
 
 		content = content.replace("[[name]]", nickname);
-		String verifyURL = siteURL + "/api/v1/user/email-verified?code=" + user.getVerificationCode() + "&address=" + email;
+		String verifyURL =
+			siteURL + "/api/v1/user/email-verified?code=" + user.getVerificationCode() + "&address=" + email;
 
 		content = content.replace("[[URL]]", verifyURL);
 
 		helper.setText(content, true);
 
 		mailSender.send(message);
+	}
+
+	@Transactional
+	public void postUserBlock(Long reportingUserId, Long blockedUserId) {
+		Users findReportingUser = userRepository.findById(reportingUserId).orElseThrow(() -> {
+			throw new UserNotFoundException(reportingUserId);
+		});
+
+		Users findBlockedUser = userRepository.findById(blockedUserId).orElseThrow(() -> {
+			throw new UserNotFoundException(blockedUserId);
+		});
+
+		UserBlocking userBlocking = UserBlocking.of();
+		userBlocking.assignUsers(findReportingUser, findBlockedUser);
+
+		userBlockingRepository.save(userBlocking);
 	}
 }
