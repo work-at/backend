@@ -27,7 +27,7 @@ public class WorkerDto {
 	@ApiModelProperty(name = "imageUrl", notes = "워케이셔너 사진 이미지 주소", example = "https://avatars.githubusercontent.com/u/46469385?v=4")
 	private String imageUrl;
 
-	@ApiModelProperty(name = "position", notes = "워케이셔너 직무", example = "{\"name\":\"IT_ENGINEER\",\"content\":\"IT 엔지니어 및 보안\"}")
+	@ApiModelProperty(name = "position", notes = "워케이셔너 직무", example = "{\"name\":\"ENGINEER\",\"content\":\"IT 엔지니어 및 보안\"}")
 	private DepartmentTypeDto position;
 
 	@ApiModelProperty(name = "workingYear", notes = "워케이셔너 연차", example = "{\"name\":\"JUNIOR\",\"content\":\"주니어(1~4년)\"}")
@@ -45,7 +45,8 @@ public class WorkerDto {
 	@ApiModelProperty(name = "activities", notes = "희망 활동")
 	private List<ActivityTypeDto> activities;
 
-	private WorkerDto(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String company, String story, int workchats, List<ActivityTypeDto> activities) {
+	private WorkerDto(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear,
+		String company, String story, int workchats, List<ActivityTypeDto> activities) {
 		this.id = id;
 		this.nickname = nickname;
 		this.imageUrl = imageUrl;
@@ -58,7 +59,9 @@ public class WorkerDto {
 	}
 
 	public static WorkerDto of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities) {
-		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(), workchats, activities);
+		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(),
+			userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(),
+			workchats, activities);
 	}
 
 }

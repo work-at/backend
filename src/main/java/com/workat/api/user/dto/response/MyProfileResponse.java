@@ -8,6 +8,7 @@ import com.workat.api.user.dto.DurationTypeDto;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class MyProfileResponse {
 	@ApiModelProperty(name = "imageUrl", notes = "워케이셔너 사진 이미지 주소", example = "https://avatars.githubusercontent.com/u/46469385?v=4")
 	private String imageUrl;
 
-	@ApiModelProperty(name = "position", notes = "워케이셔너 직무", example = "{\"name\":\"IT_ENGINEER\",\"content\":\"IT 엔지니어 및 보안\"}")
+	@ApiModelProperty(name = "position", notes = "워케이셔너 직무", example = "{\"name\":\"ENGINEER\",\"content\":\"IT 엔지니어 및 보안\"}")
 	private DepartmentTypeDto position;
 
 	@ApiModelProperty(name = "workingYear", notes = "워케이셔너 연차", example = "{\"name\":\"JUNIOR\",\"content\":\"주니어(1~4년)\"}")
@@ -49,7 +50,9 @@ public class MyProfileResponse {
 
 	// TODO: 내 소식 - 새 댓글 알람 수 추가 필요
 
-	private MyProfileResponse(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear, String company, String story, boolean certified, int workchats, List<ActivityTypeDto> activities) {
+	private MyProfileResponse(long id, String nickname, String imageUrl, DepartmentType position,
+		DurationType workingYear, String company, String story, boolean certified, int workchats,
+		List<ActivityTypeDto> activities) {
 		this.id = id;
 		this.nickname = nickname;
 		this.imageUrl = imageUrl;
@@ -63,7 +66,9 @@ public class MyProfileResponse {
 	}
 
 	public static MyProfileResponse of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities) {
-		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(), userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(), userProfile.isCertified(), workchats, activities);
+		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(),
+			userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(),
+			userProfile.isCertified(), workchats, activities);
 	}
 
 }

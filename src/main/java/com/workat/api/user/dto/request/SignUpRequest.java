@@ -26,7 +26,7 @@ public class SignUpRequest {
 	@ApiModelProperty(name = "nickname", notes = "유저 닉네임", example = "\"나는스벅라떼좋아\"")
 	private String nickname;
 
-	@ApiModelProperty(name = "position", notes = "직무 타입", example = "\"IT_ENGINEER\"")
+	@ApiModelProperty(name = "position", notes = "직무 타입")
 	private DepartmentType position;
 
 	@ApiModelProperty(name = "workingYear", notes = "연차 타입", example = "\"JUNIOR\"")
