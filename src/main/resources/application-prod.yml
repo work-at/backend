@@ -35,7 +35,7 @@ server:
 
 external:
   kakaoOauth:
-    redirect-url: "http://workat.o-r.kr/login"
+    redirect-url: "https://workat.o-r.kr/login"
 
 resources:
   upload-folder: /home/work_at_prod/images
