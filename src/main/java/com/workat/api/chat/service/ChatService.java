@@ -30,9 +30,7 @@ import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ChatService {
@@ -45,7 +43,7 @@ public class ChatService {
 
 	@Transactional
 	public Long createChatRoom(Long ownerUserId, Long applyUserId) {
-		if (ownerUserId == applyUserId) {
+		if (ownerUserId.equals(applyUserId)) {
 			throw new BadRequestException("자기 자신과 채팅룸을 만들 수 없습니다.");
 		}
 
@@ -208,10 +206,6 @@ public class ChatService {
 		Long applicantId = applicant.getId();
 
 		List<ChatRoom> chatRooms = owner.getChatRooms();
-		log.info("test");
-		log.info(String.valueOf(chatRooms));
-		log.info(String.valueOf(chatRooms));
-		log.info(String.valueOf(chatRooms));
 
 		return owner.getChatRooms()
 			.stream()
