@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CSTypeListResponse {
 
-	@ApiModelProperty(name = "response", notes = "cs 타입", example = "{\"response\":[\"INQUERY\",\"SERVICE_OFFER\",\"ERROR_REPORT\",\"OTHERS\"]}")
+	@ApiModelProperty(name = "response", notes = "cs 타입")
 	private List<CSType> response;
 
 	private CSTypeListResponse(List<CSType> response) {
