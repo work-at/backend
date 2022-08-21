@@ -3,22 +3,25 @@ package com.workat.api.chat.service;
 import static com.workat.domain.chat.entity.ChatMessageSortType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.workat.api.chat.dto.ChatMessageDto;
 import com.workat.api.chat.dto.ChatRoomDto;
 import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
+import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.ChatRoomNotFoundException;
+import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.UserNotFoundException;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.chat.entity.ChatMessage;
@@ -58,6 +61,28 @@ class ChatServiceTest {
 			chatMessageRepository);
 	}
 
+	private List<Users> saveUsers(int size) {
+		List<Users> users = IntStream.range(0, size).mapToObj(idx -> {
+			Users user = Users.of(OauthType.KAKAO, (long)idx);
+
+			UserProfile userProfile = UserProfile.builder()
+				.user(user)
+				.nickname("user" + idx)
+				.imageUrl("user" + idx)
+				.position(DepartmentType.ENGINEER)
+				.workingYear(DurationType.JUNIOR)
+				.build();
+
+			userProfileRepository.save(userProfile);
+
+			return user;
+		}).collect(Collectors.toList());
+
+		usersRepository.saveAll(users);
+
+		return users;
+	}
+
 	@Test
 	void createChatRoom_success() {
 		//given
@@ -88,29 +113,47 @@ class ChatServiceTest {
 		assertThrows(UserNotFoundException.class, () -> chatService.createChatRoom(1L, 2L));
 	}
 
+	@DisplayName("채팅룸은 중복해서 생성될 수 없다.")
+	@Test
+	void createChatRoom_fail_redundantChat() {
+		// given
+		List<Users> users = saveUsers(2);
+
+		Long ownerId = users.get(0).getId();
+		Long applicantId = users.get(1).getId();
+
+		// when
+		chatService.createChatRoom(ownerId, applicantId);
+
+		// then
+		assertThrows(ConflictException.class,
+			() -> chatService.createChatRoom(ownerId, applicantId)
+		);
+	}
+
+	@DisplayName("자기 자신과 채팅룸을 만들 수 없다.")
+	@Test
+	void createChatRoom_fail_self_chat() {
+		// given
+		List<Users> users = saveUsers(1);
+
+		Long ownerId = users.get(0).getId();
+
+		// when
+
+		// then
+		assertThrows(BadRequestException.class,
+			() -> chatService.createChatRoom(ownerId, ownerId)
+		);
+	}
+
 	@Test
 	void confirmChatRooms_success() {
 		//given
-		Users user1 = Users.of(OauthType.KAKAO, 1L);
-		Users user2 = Users.of(OauthType.KAKAO, 2L);
+		List<Users> users = saveUsers(2);
 
-		UserProfile user1Profile = UserProfile.builder()
-			.user(user1)
-			.nickname("user1")
-			.imageUrl("user1")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user1Profile);
-		UserProfile user2Profile = UserProfile.builder()
-			.user(user2)
-			.nickname("user2")
-			.imageUrl("user2")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user2Profile);
-		usersRepository.saveAll(List.of(user1, user2));
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
 
 		Long chatRoomId = chatService.createChatRoom(user1.getId(), user2.getId());
 
@@ -130,26 +173,10 @@ class ChatServiceTest {
 	@Test
 	void getChatRooms_case1_success() {
 		//given
-		Users user1 = Users.of(OauthType.KAKAO, 1L);
-		Users user2 = Users.of(OauthType.KAKAO, 2L);
+		List<Users> users = saveUsers(2);
 
-		UserProfile user1Profile = UserProfile.builder()
-			.user(user1)
-			.nickname("user1")
-			.imageUrl("user1")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user1Profile);
-		UserProfile user2Profile = UserProfile.builder()
-			.user(user2)
-			.nickname("user2")
-			.imageUrl("user2")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user2Profile);
-		usersRepository.saveAll(List.of(user1, user2));
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
 
 		ChatRoom givenChatroom = ChatRoom.of();
 		givenChatroom.assignUsers(user1, user2);
@@ -184,26 +211,10 @@ class ChatServiceTest {
 	@Test
 	void getChatRooms_case2_success() {
 		//given
-		Users user1 = Users.of(OauthType.KAKAO, 1L);
-		Users user2 = Users.of(OauthType.KAKAO, 2L);
+		List<Users> users = saveUsers(2);
 
-		UserProfile user1Profile = UserProfile.builder()
-			.user(user1)
-			.nickname("user1")
-			.imageUrl("user1")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user1Profile);
-		UserProfile user2Profile = UserProfile.builder()
-			.user(user2)
-			.nickname("user2")
-			.imageUrl("user2")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user2Profile);
-		usersRepository.saveAll(List.of(user1, user2));
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
 
 		ChatRoom givenChatroom = ChatRoom.of();
 		givenChatroom.assignUsers(user1, user2);
@@ -221,26 +232,10 @@ class ChatServiceTest {
 	@Test
 	void getChatRooms_case3_success() {
 		//given
-		Users user1 = Users.of(OauthType.KAKAO, 1L);
-		Users user2 = Users.of(OauthType.KAKAO, 2L);
+		List<Users> users = saveUsers(2);
 
-		UserProfile user1Profile = UserProfile.builder()
-			.user(user1)
-			.nickname("user1")
-			.imageUrl("user1")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user1Profile);
-		UserProfile user2Profile = UserProfile.builder()
-			.user(user2)
-			.nickname("user2")
-			.imageUrl("user2")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user2Profile);
-		usersRepository.saveAll(List.of(user1, user2));
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
 
 		ChatRoom givenChatroom = ChatRoom.of();
 		givenChatroom.assignUsers(user1, user2);
@@ -264,30 +259,13 @@ class ChatServiceTest {
 		);
 	}
 
-
 	@Test
 	void getChatRoomMessage_case1_success() {
 		//given
-		Users user1 = Users.of(OauthType.KAKAO, 1L);
-		Users user2 = Users.of(OauthType.KAKAO, 2L);
+		List<Users> users = saveUsers(2);
 
-		UserProfile user1Profile = UserProfile.builder()
-			.user(user1)
-			.nickname("user1")
-			.imageUrl("user1")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user1Profile);
-		UserProfile user2Profile = UserProfile.builder()
-			.user(user2)
-			.nickname("user2")
-			.imageUrl("user2")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user2Profile);
-		usersRepository.saveAll(List.of(user1, user2));
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
 
 		ChatRoom givenChatroom = ChatRoom.of();
 		givenChatroom.assignUsers(user1, user2);
@@ -326,26 +304,10 @@ class ChatServiceTest {
 	@Test
 	void getChatRoomMessage_case2_success() {
 		//given
-		Users user1 = Users.of(OauthType.KAKAO, 1L);
-		Users user2 = Users.of(OauthType.KAKAO, 2L);
+		List<Users> users = saveUsers(2);
 
-		UserProfile user1Profile = UserProfile.builder()
-			.user(user1)
-			.nickname("user1")
-			.imageUrl("user1")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user1Profile);
-		UserProfile user2Profile = UserProfile.builder()
-			.user(user2)
-			.nickname("user2")
-			.imageUrl("user2")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user2Profile);
-		usersRepository.saveAll(List.of(user1, user2));
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
 
 		ChatRoom givenChatroom = ChatRoom.of();
 		givenChatroom.assignUsers(user1, user2);
@@ -384,26 +346,10 @@ class ChatServiceTest {
 	@Test
 	void getChatRoomMessage_case3_success() {
 		//given
-		Users user1 = Users.of(OauthType.KAKAO, 1L);
-		Users user2 = Users.of(OauthType.KAKAO, 2L);
+		List<Users> users = saveUsers(2);
 
-		UserProfile user1Profile = UserProfile.builder()
-			.user(user1)
-			.nickname("user1")
-			.imageUrl("user1")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user1Profile);
-		UserProfile user2Profile = UserProfile.builder()
-			.user(user2)
-			.nickname("user2")
-			.imageUrl("user2")
-			.position(DepartmentType.ENGINEER)
-			.workingYear(DurationType.JUNIOR)
-			.build();
-		userProfileRepository.save(user2Profile);
-		usersRepository.saveAll(List.of(user1, user2));
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
 
 		ChatRoom givenChatroom = ChatRoom.of();
 		givenChatroom.assignUsers(user1, user2);
@@ -442,8 +388,9 @@ class ChatServiceTest {
 	@Test
 	void getChatRooms_success_room_is_empty() {
 		//given
-		Users user = Users.of(OauthType.KAKAO, 1L);
-		usersRepository.save(user);
+		List<Users> users = saveUsers(1);
+
+		Users user = users.get(0);
 
 		//when
 
@@ -474,12 +421,14 @@ class ChatServiceTest {
 	@Test
 	void createChatMessage_fail_room_not_found() {
 		//given
-		Users user = Users.of(OauthType.KAKAO, 1L);
-		usersRepository.save(user);
+		List<Users> users = saveUsers(1);
+
+		Users user = users.get(0);
 
 		//when
 
 		//then
 		assertThrows(ChatRoomNotFoundException.class, () -> chatService.createChatMessage(1L, user.getId(), ""));
 	}
+
 }

@@ -1,5 +1,8 @@
 package com.workat.domain.user.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -8,12 +11,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import net.bytebuddy.utility.RandomString;
 
 import com.workat.domain.BaseEntity;
 import com.workat.domain.auth.OauthType;
+import com.workat.domain.chat.entity.ChatRoom;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -45,13 +50,18 @@ public class Users extends BaseEntity {
 	@Column
 	private boolean trackingOff;
 
-	private Users(OauthType oauthType, Long oauthId) {
+	@OneToMany(mappedBy = "owner")
+	private List<ChatRoom> chatRooms;
+
+	private Users(OauthType oauthType, Long oauthId, List<ChatRoom> chatRooms) {
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
+		this.chatRooms = chatRooms;
 	}
 
 	public static Users of(OauthType oauthType, Long oauthId) {
-		return new Users(oauthType, oauthId);
+
+		return new Users(oauthType, oauthId, new ArrayList<>());
 	}
 
 	public void setVerificationCode() {
