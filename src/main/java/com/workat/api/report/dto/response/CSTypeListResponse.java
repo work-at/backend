@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 public class CSTypeListResponse {
 
 	@ApiModelProperty(name = "response", notes = "cs 타입")
-	private List<CSType> response;
+	private List<CSType> CSTypes;
 
-	private CSTypeListResponse(List<CSType> response) {
-		this.response = response;
+	private CSTypeListResponse(List<CSType> CSTypes) {
+		this.CSTypes = CSTypes;
 	}
 
-	public static CSTypeListResponse of(List<CSType> response) {
-		return new CSTypeListResponse(response);
+	public static CSTypeListResponse of(List<CSType> CSTypes) {
+		return new CSTypeListResponse(CSTypes);
 	}
 }
