@@ -50,13 +50,16 @@ public class ChatRoom extends BaseEntity {
 	public void assignUsers(Users owner, Users applicant) {
 		this.owner = owner;
 		this.applicant = applicant;
+
+		// 연관관계 매핑
+		owner.getChatRooms().add(this);
 	}
 
 	public void chattingConfirm(Long userId) {
 		if (userId.equals(owner.getId())) {
 			this.isStart = true;
 		} else {
-			throw new InvalidParameterException("this user(id : " + userId +") no authority, wrong value");
+			throw new InvalidParameterException("this user(id : " + userId + ") no authority, wrong value");
 		}
 	}
 

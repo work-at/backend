@@ -12,9 +12,11 @@ import com.workat.api.chat.dto.ChatRoomDto;
 import com.workat.api.chat.dto.ChatRoomListUserDto;
 import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
+import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.ChatRoomIsDeletedException;
 import com.workat.common.exception.ChatRoomNotFoundException;
 import com.workat.common.exception.ChatRoomUserNotMatchException;
+import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.common.exception.UserNotFoundException;
 import com.workat.domain.chat.entity.ChatMessage;
@@ -28,29 +30,35 @@ import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ChatService {
 
-	private long pageSize = 50L;
-
 	private final UsersRepository usersRepository;
-
 	private final UserProfileRepository userProfileRepository;
-
 	private final ChatRoomRepository chatRoomRepository;
-
 	private final ChatMessageRepository chatMessageRepository;
+	private final long pageSize = 50L;
 
 	@Transactional
 	public Long createChatRoom(Long ownerUserId, Long applyUserId) {
+		if (ownerUserId == applyUserId) {
+			throw new BadRequestException("자기 자신과 채팅룸을 만들 수 없습니다.");
+		}
+
 		Users findOwnerUser = usersRepository.findById(ownerUserId).orElseThrow(() -> {
 			throw new UserNotFoundException(ownerUserId);
 		});
 		Users findApplyUser = usersRepository.findById(applyUserId).orElseThrow(() -> {
 			throw new UserNotFoundException(applyUserId);
 		});
+
+		if (checkRedundantChat(findOwnerUser, findApplyUser)) {
+			throw new ConflictException("이미 존재하는 채팅입니다.");
+		}
 
 		ChatRoom chatRoom = ChatRoom.of();
 		chatRoom.assignUsers(findOwnerUser, findApplyUser);
@@ -194,6 +202,23 @@ public class ChatService {
 		if (!chatRoom.getOwner().getId().equals(userId) && !chatRoom.getApplicant().getId().equals(userId)) {
 			throw new ChatRoomUserNotMatchException(chatRoom.getId(), userId);
 		}
+	}
+
+	private boolean checkRedundantChat(Users owner, Users applicant) {
+		Long applicantId = applicant.getId();
+
+		List<ChatRoom> chatRooms = owner.getChatRooms();
+		log.info("test");
+		log.info(String.valueOf(chatRooms));
+		log.info(String.valueOf(chatRooms));
+		log.info(String.valueOf(chatRooms));
+
+		return owner.getChatRooms()
+			.stream()
+			.anyMatch(room -> {
+				Long ownerId = room.getApplicant().getId();
+				return ownerId.equals(applicantId);
+			});
 	}
 
 }
