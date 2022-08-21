@@ -37,7 +37,7 @@ public class ChatController {
 
 	@ApiOperation("채팅방을 생성하는 api")
 	@ApiImplicitParams(value = {
-		@ApiImplicitParam(name = "otherUserId", value = "1", required = true, dataType = "long", example = "1"),
+		@ApiImplicitParam(name = "ownerUserId", value = "1", required = true, dataType = "long", example = "1"),
 	})
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "success", response = Long.class)

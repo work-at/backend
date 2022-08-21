@@ -9,6 +9,7 @@ import javax.validation.constraints.Pattern;
 import com.workat.common.annotation.IsValidListSize;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,7 @@ public class UserUpdateRequest {
 	@ApiModelProperty(name = "nickname", notes = "유저 닉네임", example = "\"나는스벅라떼좋아\"")
 	private String nickname;
 
-	@ApiModelProperty(name = "position", notes = "직무 타입", example = "\"IT_ENGINEER\"")
+	@ApiModelProperty(name = "position", notes = "직무 타입")
 	private DepartmentType position;
 
 	@ApiModelProperty(name = "workingYear", notes = "연차 타입", example = "\"JUNIOR\"")
@@ -34,7 +35,8 @@ public class UserUpdateRequest {
 	@IsValidListSize(max = 3, message = "1개 이상 3개 이하의 리스트가 인풋으로 들어와야합니다")
 	private List<String> activities;
 
-	private UserUpdateRequest(String nickname, DepartmentType position, DurationType workingYear, String story, List<String> activities) {
+	private UserUpdateRequest(String nickname, DepartmentType position, DurationType workingYear, String story,
+		List<String> activities) {
 		this.nickname = nickname;
 		this.position = position;
 		this.workingYear = workingYear;
