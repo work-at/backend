@@ -3,7 +3,7 @@ package com.workat.domain.tour.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-import com.workat.domain.tour.RegionCode;
+import com.workat.domain.accommodation.RegionType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +23,7 @@ public class MonthlyRegionVisitor {
 		this.count = count;
 	}
 
-	public static MonthlyRegionVisitor of(RegionCode regionCode, double count) {
+	public static MonthlyRegionVisitor of(RegionType regionCode, double count) {
 		return new MonthlyRegionVisitor(regionCode.getCode(), count);
 	}
 
