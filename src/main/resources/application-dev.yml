@@ -24,6 +24,14 @@ external:
     redirect-url: "http://localhost:5050/login"
 
 resources:
+  images:
+    cafe: /images/cafe_images
+    restaurant:
+      korea: /images/food_images/k_food
+      china: /images/food_images/c_food
+      japan: /images/food_images/j_food
+      wastern: /images/food_images/w_food
+      etc: /images/food_images/etc_food
   upload-folder: /home/work_at_tour/images
   upload-uri: /uploaded
   profile-upload-folder: /profile_images

@@ -3,6 +3,7 @@ package com.workat.api.chat.service;
 import static com.workat.domain.chat.entity.ChatMessageSortType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.workat.api.chat.dto.ChatMessageDto;
 import com.workat.api.chat.dto.ChatRoomDto;
 import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
@@ -29,10 +31,12 @@ import com.workat.domain.chat.entity.ChatRoom;
 import com.workat.domain.chat.repository.message.ChatMessageRepository;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
 import com.workat.domain.config.DataJpaTestConfig;
+import com.workat.domain.user.entity.UserBlocking;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.repository.blocking.UserBlockingRepository;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
 
@@ -50,6 +54,9 @@ class ChatServiceTest {
 	private UserProfileRepository userProfileRepository;
 
 	@Autowired
+	private UserBlockingRepository userBlockingRepository;
+
+	@Autowired
 	private ChatRoomRepository chatRoomRepository;
 
 	@Autowired
@@ -57,8 +64,8 @@ class ChatServiceTest {
 
 	@BeforeEach
 	void init() {
-		this.chatService = new ChatService(usersRepository, userProfileRepository, chatRoomRepository,
-			chatMessageRepository);
+		this.chatService = new ChatService(usersRepository, userProfileRepository, userBlockingRepository,
+			chatRoomRepository, chatMessageRepository);
 	}
 
 	private List<Users> saveUsers(int size) {
@@ -256,6 +263,116 @@ class ChatServiceTest {
 			() -> assertFalse(chatRoom.isStart()),
 			() -> assertTrue(chatRoom.isDeletedByOtherUser()),
 			() -> assertTrue(chatRoom.isAllRead())
+		);
+	}
+
+	@Test
+	void getChatRooms_case4_success() {
+		//given
+		Users user1 = Users.of(OauthType.KAKAO, 1L);
+		Users user2 = Users.of(OauthType.KAKAO, 2L);
+		Users user3 = Users.of(OauthType.KAKAO, 3L);
+		Users user4 = Users.of(OauthType.KAKAO, 4L);
+		Users user5 = Users.of(OauthType.KAKAO, 5L);
+
+		UserProfile user1Profile = UserProfile.builder()
+			.user(user1)
+			.nickname("user1")
+			.imageUrl("user1")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user1Profile);
+		UserProfile user2Profile = UserProfile.builder()
+			.user(user2)
+			.nickname("user2")
+			.imageUrl("user2")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user2Profile);
+		UserProfile user3Profile = UserProfile.builder()
+			.user(user3)
+			.nickname("user3")
+			.imageUrl("user3")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user3Profile);
+		UserProfile user4Profile = UserProfile.builder()
+			.user(user4)
+			.nickname("user4")
+			.imageUrl("user4")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user4Profile);
+		UserProfile user5Profile = UserProfile.builder()
+			.user(user5)
+			.nickname("user5")
+			.imageUrl("user5")
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+		userProfileRepository.save(user5Profile);
+		usersRepository.saveAll(List.of(user1, user2, user3, user4, user5));
+
+		ChatRoom givenChatroom1 = ChatRoom.of();
+		givenChatroom1.assignUsers(user1, user2);
+
+		ChatRoom givenChatroom2 = ChatRoom.of();
+		givenChatroom2.assignUsers(user1, user3);
+
+		ChatRoom givenChatroom3 = ChatRoom.of();
+		givenChatroom3.assignUsers(user1, user4);
+
+		ChatRoom givenChatroom4 = ChatRoom.of();
+		givenChatroom4.assignUsers(user1, user5);
+		chatRoomRepository.saveAll(List.of(givenChatroom1, givenChatroom2, givenChatroom3, givenChatroom4));
+
+		UserBlocking userBlocking1 = UserBlocking.of();
+		userBlocking1.assignUsers(user1, user2);
+
+		UserBlocking userBlocking2 = UserBlocking.of();
+		userBlocking2.assignUsers(user3, user1);
+		userBlockingRepository.saveAll(List.of(userBlocking1, userBlocking2));
+
+		//when
+		givenChatroom2.deleteRoom(user3.getId());
+
+		ChatRoomResponse resultChatRooms = chatService.getChatRooms(user1.getId());
+
+		//then
+		assertEquals(resultChatRooms.getRooms().size(), 3);
+
+		ChatRoomDto chatRoom1 = resultChatRooms.getRooms().get(0);
+		assertAll(
+			() -> assertEquals(chatRoom1.getId(), givenChatroom2.getId()),
+			() -> assertEquals(chatRoom1.getOtherUser().getUserId(), user3.getId()),
+			() -> assertFalse(chatRoom1.isStart()),
+			() -> assertTrue(chatRoom1.isBlockedByOtherUser()),
+			() -> assertTrue(chatRoom1.isDeletedByOtherUser()),
+			() -> assertTrue(chatRoom1.isAllRead())
+		);
+
+		ChatRoomDto chatRoom2 = resultChatRooms.getRooms().get(1);
+		assertAll(
+			() -> assertEquals(chatRoom2.getId(), givenChatroom3.getId()),
+			() -> assertEquals(chatRoom2.getOtherUser().getUserId(), user4.getId()),
+			() -> assertFalse(chatRoom2.isStart()),
+			() -> assertFalse(chatRoom2.isBlockedByOtherUser()),
+			() -> assertFalse(chatRoom2.isDeletedByOtherUser()),
+			() -> assertTrue(chatRoom2.isAllRead())
+		);
+
+		ChatRoomDto chatRoom3 = resultChatRooms.getRooms().get(2);
+		assertAll(
+			() -> assertEquals(chatRoom3.getId(), givenChatroom4.getId()),
+			() -> assertEquals(chatRoom3.getOtherUser().getUserId(), user5.getId()),
+			() -> assertFalse(chatRoom3.isStart()),
+			() -> assertFalse(chatRoom3.isBlockedByOtherUser()),
+			() -> assertFalse(chatRoom3.isDeletedByOtherUser()),
+			() -> assertTrue(chatRoom3.isAllRead())
 		);
 	}
 
