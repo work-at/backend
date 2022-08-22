@@ -24,7 +24,6 @@ import com.workat.domain.chat.entity.ChatMessageSortType;
 import com.workat.domain.chat.entity.ChatRoom;
 import com.workat.domain.chat.repository.message.ChatMessageRepository;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
-import com.workat.domain.user.entity.UserBlocking;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UserProfileRepository;
@@ -106,8 +105,12 @@ public class ChatService {
 				boolean isAllRead = chatMessageRepository.isAllMessageRead(
 					chatRoom.getUsersLastCheckingMessageId(userId), anotherUserId);
 
+				ChatMessage findLastMessage = chatMessageRepository.findLastMessage(chatRoom).orElse(null);
+
 				return ChatRoomDto.builder()
 					.id(chatRoom.getId())
+					.lastMessageId(findLastMessage == null ? null : findLastMessage.getId())
+					.lastMessage(findLastMessage == null ? null : findLastMessage.getMessage())
 					.otherUser(userDto)
 					.isStart(chatRoom.isStart())
 					.isAllRead(isAllRead)
