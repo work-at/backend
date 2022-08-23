@@ -105,7 +105,7 @@ public class ChatService {
 				boolean isAllRead = chatMessageRepository.isAllMessageRead(
 					chatRoom.getUsersLastCheckingMessageId(userId), anotherUserId);
 
-				ChatMessage findLastMessage = chatMessageRepository.findLastMessage(chatRoom).orElse(null);
+				ChatMessage findLastMessage = chatMessageRepository.findTopByRoomOrderByIdDesc(chatRoom).orElse(null);
 
 				return ChatRoomDto.builder()
 					.id(chatRoom.getId())

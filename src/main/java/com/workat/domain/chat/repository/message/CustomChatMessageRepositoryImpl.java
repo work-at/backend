@@ -3,7 +3,6 @@ package com.workat.domain.chat.repository.message;
 import static com.workat.domain.chat.entity.QChatMessage.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.workat.domain.chat.entity.ChatMessage;
@@ -32,14 +31,6 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 			.orderBy(chatMessage.id.asc())
 			.limit(pageSize)
 			.fetch();
-	}
-
-	@Override
-	public Optional<ChatMessage> findLastMessage(ChatRoom chatRoom) {
-		return jpaQueryFactory.selectFrom(chatMessage)
-			.where(chatMessage.room.id.eq(chatRoom.getId()))
-			.orderBy(chatMessage.id.desc())
-			.stream().findFirst();
 	}
 
 	@Override
