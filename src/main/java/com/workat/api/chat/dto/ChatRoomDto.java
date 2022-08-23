@@ -18,6 +18,8 @@ public class ChatRoomDto {
 
 	private ChatRoomListUserDto otherUser;
 
+	private Long lastMessageId;
+
 	private String lastMessage;
 
 	private boolean isStart;

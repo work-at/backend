@@ -171,10 +171,22 @@ class ChatServiceTest {
 		chatRoom.chattingConfirm(user1.getId());
 		assertTrue(chatRoom.isStart());
 
+		ChatMessage chatMessage1 = ChatMessage.of(user1.getId(), "1");
+		chatMessage1.assignRoom(chatRoom);
+		ChatMessage chatMessage2 = ChatMessage.of(user1.getId(), "2");
+		chatMessage2.assignRoom(chatRoom);
+		ChatMessage chatMessage3 = ChatMessage.of(user1.getId(), "3");
+		chatMessage3.assignRoom(chatRoom);
+		ChatMessage chatMessage4 = ChatMessage.of(user1.getId(), "4");
+		chatMessage4.assignRoom(chatRoom);
+		chatMessageRepository.saveAll(List.of(chatMessage1, chatMessage2, chatMessage3, chatMessage4));
+
 		ChatRoomResponse response = chatService.getChatRooms(user1.getId());
 
 		//then
 		assertEquals(response.getRooms().size(), 1);
+		assertEquals(response.getRooms().get(0).getLastMessage(), "4");
+		assertEquals(response.getRooms().get(0).getLastMessageId(), chatMessage4.getId());
 	}
 
 	@Test
