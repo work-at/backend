@@ -1,6 +1,7 @@
 package com.workat.domain.chat.entity;
 
 import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -43,6 +44,8 @@ public class ChatRoom extends BaseEntity {
 
 	private boolean isApplicantDeleted;
 
+	private LocalDateTime messageUpdatedTime = LocalDateTime.now();
+
 	public static ChatRoom of() {
 		return new ChatRoom();
 	}
@@ -61,6 +64,10 @@ public class ChatRoom extends BaseEntity {
 		} else {
 			throw new InvalidParameterException("this user(id : " + userId + ") no authority, wrong value");
 		}
+	}
+
+	public void setMessageUpdatedTime() {
+		this.messageUpdatedTime = LocalDateTime.now();
 	}
 
 	// TODO: 2022/08/17 추후 owner, applicant 구분하는 로직 람다를 이용해서 리팩터링할 예정
@@ -131,5 +138,9 @@ public class ChatRoom extends BaseEntity {
 		} else {
 			throw new InvalidParameterException("this room not contain userId = " + userId);
 		}
+	}
+
+	public boolean isOwner(Long userId) {
+		return owner.getId().equals(userId);
 	}
 }

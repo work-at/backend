@@ -20,6 +20,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
 	public List<ChatRoom> findAllByUser(Users user) {
 		return queryFactory.selectFrom(chatRoom)
 			.where(chatRoom.owner.eq(user).or(chatRoom.applicant.eq(user)))
+			.orderBy(chatRoom.messageUpdatedTime.desc())
 			.fetch();
 	}
 }
