@@ -85,7 +85,6 @@ public class LocationService {
 		}
 
 		List<LocationBriefDto> locationBriefs = locations.stream()
-			.limit(100L)
 			.map(location -> {
 				long locationId = location.getId();
 				List<ReviewDto> locationReviews = reviewService.getLocationReviews(locationId, category);
