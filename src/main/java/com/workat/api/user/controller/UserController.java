@@ -90,7 +90,7 @@ public class UserController {
 	}
 
 	@PutMapping("/api/v1/user/tracking")
-	public ResponseEntity<?> getCompanyVerifyEmailRemain(@UserValidation Users user, @RequestParam boolean turnOff) {
+	public ResponseEntity<?> toggleUserTracking(@UserValidation Users user, @RequestParam boolean turnOff) {
 		userService.changeUserTracking(user, turnOff);
 		return ResponseEntity.ok().build();
 	}
