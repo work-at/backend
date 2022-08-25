@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.workat.api.review.dto.ReviewDto;
 import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.dto.request.ReviewRequest;
-import com.workat.common.exception.ConflictException;
+import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.locationReview.entity.BaseReview;
 import com.workat.domain.locationReview.entity.CafeReview;
@@ -118,14 +119,12 @@ public class ReviewService {
 		final Location location = locationRepository.findById(locationId)
 			.orElseThrow(() -> new NotFoundException("No location found for the id"));
 
-		final List<CafeReview> optionalCafeReviews = cafeReviewRepository.findAllByLocation_IdAndUser_Id(
+		final Optional<CafeReview> optionalCafeReview = cafeReviewRepository.findByLocation_IdAndUser_Id(
 			locationId,
 			user.getId());
 
-		log.info(String.valueOf(optionalCafeReviews));
-
-		if (!optionalCafeReviews.isEmpty()) {
-			throw new ConflictException("There is already a review posted with this user id.");
+		if (optionalCafeReview.isPresent()) {
+			throw new BadRequestException("There is already a review posted with this user id.");
 		}
 
 		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
@@ -144,12 +143,12 @@ public class ReviewService {
 		final Location location = locationRepository.findById(locationId)
 			.orElseThrow(() -> new NotFoundException("No location found for the id"));
 
-		final List<RestaurantReview> optionalRestaurantReviews = restaurantReviewRepository.findAllByLocation_IdAndUser_Id(
+		final Optional<RestaurantReview> optionalRestaurantReview = restaurantReviewRepository.findByLocation_IdAndUser_Id(
 			locationId,
 			user.getId());
 
-		if (!optionalRestaurantReviews.isEmpty()) {
-			throw new ConflictException("There is already a review posted with this user id.");
+		if (optionalRestaurantReview.isPresent()) {
+			throw new BadRequestException("There is already a review posted with this user id.");
 		}
 
 		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
