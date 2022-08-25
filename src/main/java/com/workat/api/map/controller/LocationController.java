@@ -125,7 +125,7 @@ public class LocationController {
 	public ResponseEntity<LocationDetailResponse> getRestaurantById(@UserValidation Users user,
 		@PathVariable("locationId") long locationId) {
 		LocationDetailResponse dto =
-			locationService.getLocationById(LocationCategory.CAFE, locationId, user.getId());
+			locationService.getLocationById(LocationCategory.RESTAURANT, locationId, user.getId());
 		return ResponseEntity.ok(dto);
 	}
 }
