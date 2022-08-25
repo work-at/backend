@@ -22,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.workat.api.review.dto.ReviewDto;
 import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.dto.request.ReviewRequest;
-import com.workat.common.exception.BadRequestException;
+import com.workat.common.exception.ConflictException;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.DataJpaTestConfig;
 import com.workat.domain.config.MysqlContainerBaseTest;
@@ -298,7 +298,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 		// then
 		final long locationId = location.getId();
-		assertThrows(BadRequestException.class, () -> {
+		assertThrows(ConflictException.class, () -> {
 			reviewService.addCafeReview(locationId, reviewRequest1, user);
 			reviewService.addCafeReview(locationId, reviewRequest2, user);
 		});
@@ -339,7 +339,7 @@ public class ReviewServiceTest extends MysqlContainerBaseTest {
 
 		// then
 		final long locationId = location.getId();
-		assertThrows(BadRequestException.class, () -> {
+		assertThrows(ConflictException.class, () -> {
 			reviewService.addRestaurantReview(locationId, reviewRequest1, user);
 			reviewService.addRestaurantReview(locationId, reviewRequest2, user);
 		});
