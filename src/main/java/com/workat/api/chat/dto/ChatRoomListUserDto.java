@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ChatRoomListUserDto {
 
+	private boolean isOwner;
+
 	private Long userId;
 
 	private String userNickname;

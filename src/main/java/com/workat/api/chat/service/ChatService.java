@@ -95,6 +95,7 @@ public class ChatService {
 					.isEmpty();
 
 				ChatRoomListUserDto userDto = ChatRoomListUserDto.builder()
+					.isOwner(chatRoom.isOwner(anotherUserId))
 					.userId(anotherUserId)
 					.userNickname(anotherUserProfile.getNickname())
 					.position(anotherUserProfile.getPosition().getType())
@@ -151,6 +152,10 @@ public class ChatService {
 
 		ChatMessage chatMessage = ChatMessage.of(writerId, message);
 		chatMessage.assignRoom(findRoom);
+
+		findRoom.setMessageUpdatedTime();
+		chatRoomRepository.save(findRoom);
+
 		return chatMessageRepository.save(chatMessage).getId();
 	}
 
