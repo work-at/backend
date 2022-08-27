@@ -43,4 +43,13 @@ public class ChatMessage extends BaseEntity {
 		this.room = room;
 	}
 
+	@Override
+	public String toString() {
+		return "ChatMessage{" +
+			"id=" + id +
+			", room=" + room +
+			", writerId=" + writerId +
+			", message='" + message + '\'' +
+			'}';
+	}
 }

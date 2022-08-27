@@ -31,7 +31,9 @@ import com.workat.domain.user.repository.UsersRepository;
 import com.workat.domain.user.repository.blocking.UserBlockingRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ChatService {
@@ -163,6 +165,8 @@ public class ChatService {
 	public ChatMessageResponse getChatMessages(Long chatRoomId, Long messageId, ChatMessageSortType sortType) {
 		ChatRoom findRoom = getChatRoomFromRepository(chatRoomId);
 
+		log.info("getChatMessages findRoom : " + findRoom);
+
 		List<ChatMessage> result;
 		if (sortType == ChatMessageSortType.AFTER) {
 			result = chatMessageRepository.findRecentMessage(findRoom, messageId, pageSize);
@@ -171,6 +175,8 @@ public class ChatService {
 		} else {
 			throw new InvalidParameterException("chat message sort type not valid");
 		}
+
+		log.info("getChatMessages result size : " + result.toString());
 
 		return ChatMessageResponse.of(result.stream()
 			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage(),
