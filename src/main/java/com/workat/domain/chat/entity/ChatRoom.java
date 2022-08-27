@@ -143,4 +143,19 @@ public class ChatRoom extends BaseEntity {
 	public boolean isOwner(Long userId) {
 		return owner.getId().equals(userId);
 	}
+
+	@Override
+	public String toString() {
+		return "ChatRoom{" +
+			"id=" + id +
+			", owner=" + owner +
+			", applicant=" + applicant +
+			", ownerLastCheckingMessageId=" + ownerLastCheckingMessageId +
+			", applicantLastCheckingMessageId=" + applicantLastCheckingMessageId +
+			", isStart=" + isStart +
+			", isOwnerDeleted=" + isOwnerDeleted +
+			", isApplicantDeleted=" + isApplicantDeleted +
+			", messageUpdatedTime=" + messageUpdatedTime +
+			'}';
+	}
 }

@@ -108,9 +108,9 @@ public class ChatController {
 		@ApiResponse(code = 200, message = "success", response = ChatMessageResponse.class)
 	})
 	@GetMapping("/api/v1/chattings/{roomId}/messages")
-	public ResponseEntity<ChatMessageResponse> getMessageByRoom(@PathVariable Long roomId,
-		@RequestParam(required = false) Long messageId, @RequestParam ChatMessageSortType sortType) {
+	public ResponseEntity<ChatMessageResponse> getMessageByRoom(@UserValidation Users user, @PathVariable Long roomId,
+		@RequestParam(required = false) Long messageId, @RequestParam(required = false) ChatMessageSortType sortType) {
 		return ResponseEntity.ok(
-			chatService.getChatMessages(roomId, messageId == null ? Long.MAX_VALUE : messageId, sortType));
+			chatService.getChatMessages(user, roomId, messageId, sortType));
 	}
 }

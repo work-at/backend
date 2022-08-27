@@ -7,6 +7,8 @@ import com.workat.domain.chat.entity.ChatRoom;
 
 public interface CustomChatMessageRepository {
 
+	List<ChatMessage> findInitMessage(ChatRoom chatRoom, long messageId, long pageSize);
+
 	List<ChatMessage> findLatestMessage(ChatRoom chatRoom, long messageId, long pageSize);
 
 	List<ChatMessage> findRecentMessage(ChatRoom chatRoom, long messageId, long pageSize);

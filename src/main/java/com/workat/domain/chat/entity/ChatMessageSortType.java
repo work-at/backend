@@ -1,11 +1,11 @@
 package com.workat.domain.chat.entity;
 
 public enum ChatMessageSortType {
-	BEFORE, AFTER;
+	BEFORE, AFTER, INIT;
 
 	public static ChatMessageSortType of(String name) {
 		if (name == null) {
-			throw new RuntimeException("chat message sort type not match, name value = " + name);
+			return INIT;
 		}
 
 		name = name.toUpperCase();

@@ -1,6 +1,7 @@
 package com.workat.api.chat.service;
 
 import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,9 @@ import com.workat.domain.user.repository.UsersRepository;
 import com.workat.domain.user.repository.blocking.UserBlockingRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ChatService {
@@ -160,17 +163,25 @@ public class ChatService {
 	}
 
 	@Transactional(readOnly = true)
-	public ChatMessageResponse getChatMessages(Long chatRoomId, Long messageId, ChatMessageSortType sortType) {
+	public ChatMessageResponse getChatMessages(Users user, Long chatRoomId, Long messageId,
+		ChatMessageSortType sortType) {
 		ChatRoom findRoom = getChatRoomFromRepository(chatRoomId);
 
+		long value = messageId == null ? findRoom.getUsersLastCheckingMessageId(user.getId()) : messageId;
+		log.info("messageId : " + messageId + ", value : " + value);
+
 		List<ChatMessage> result;
-		if (sortType == ChatMessageSortType.AFTER) {
-			result = chatMessageRepository.findRecentMessage(findRoom, messageId, pageSize);
+		if (sortType == null || sortType == ChatMessageSortType.INIT) {
+			result = chatMessageRepository.findInitMessage(findRoom, value, pageSize);
+		} else if (sortType == ChatMessageSortType.AFTER) {
+			result = chatMessageRepository.findRecentMessage(findRoom, value, pageSize);
 		} else if (sortType == ChatMessageSortType.BEFORE) {
-			result = chatMessageRepository.findLatestMessage(findRoom, messageId, pageSize);
+			result = chatMessageRepository.findLatestMessage(findRoom, value, pageSize);
 		} else {
 			throw new InvalidParameterException("chat message sort type not valid");
 		}
+
+		log.info("getChatMessages result size : " + result.size());
 
 		return ChatMessageResponse.of(result.stream()
 			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage(),

@@ -424,7 +424,7 @@ class ChatServiceTest {
 		chatRoomRepository.save(givenChatroom);
 
 		//when
-		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(),
 			givenMessage1.getId(), AFTER);
 
 		//then
@@ -466,7 +466,7 @@ class ChatServiceTest {
 		chatRoomRepository.save(givenChatroom);
 
 		//when
-		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(),
 			givenMessage7.getId(), AFTER);
 
 		//then
@@ -508,7 +508,7 @@ class ChatServiceTest {
 		chatRoomRepository.save(givenChatroom);
 
 		//when
-		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(),
 			givenMessage3.getId(), BEFORE);
 
 		//then
@@ -550,11 +550,107 @@ class ChatServiceTest {
 		chatRoomRepository.save(givenChatroom);
 
 		//when
-		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(),
 			givenMessage3.getId(), AFTER);
 
 		//then
 		assertEquals(resultMessageResponse.getMessages().size(), 5);
+	}
+
+	@Test
+	void getChatRoomMessage_case5_success() {
+		//given
+		List<Users> users = saveUsers(2);
+
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+
+		ArrayList<ChatMessage> givenMessages = new ArrayList<>();
+		for (int i = 1; i <= 100; i++) {
+			ChatMessage givenMessage = ChatMessage.of(user1.getId(), "test" + i);
+			givenMessage.assignRoom(givenChatroom);
+			givenMessages.add(givenMessage);
+		}
+		chatMessageRepository.saveAll(givenMessages);
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessages.get(70).getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(60).getId());
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(), null,
+			AFTER);
+
+		//then
+		assertEquals(resultMessageResponse.getMessages().size(), 29);
+	}
+
+	@Test
+	void getChatRoomMessage_case6_success() {
+		//given
+		List<Users> users = saveUsers(2);
+
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+
+		ArrayList<ChatMessage> givenMessages = new ArrayList<>();
+		for (int i = 1; i <= 100; i++) {
+			ChatMessage givenMessage = ChatMessage.of(user1.getId(), "test" + i);
+			givenMessage.assignRoom(givenChatroom);
+			givenMessages.add(givenMessage);
+		}
+		chatMessageRepository.saveAll(givenMessages);
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessages.get(70).getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(60).getId());
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(), null,
+			BEFORE);
+
+		//then
+		assertEquals(resultMessageResponse.getMessages().size(), 50);
+		assertEquals(resultMessageResponse.getMessages().get(0).getId(), givenMessages.get(20).getId());
+	}
+
+	@Test
+	void getChatRoomMessage_case7_success() {
+		//given
+		List<Users> users = saveUsers(2);
+
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+
+		ArrayList<ChatMessage> givenMessages = new ArrayList<>();
+		for (int i = 1; i <= 150; i++) {
+			ChatMessage givenMessage = ChatMessage.of(user1.getId(), "test" + i);
+			givenMessage.assignRoom(givenChatroom);
+			givenMessages.add(givenMessage);
+		}
+		chatMessageRepository.saveAll(givenMessages);
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessages.get(70).getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(60).getId());
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(), null,
+			INIT);
+
+		//then
+		assertEquals(resultMessageResponse.getMessages().size(), 101);
+		assertEquals(resultMessageResponse.getMessages().get(0).getId(), givenMessages.get(20).getId());
+		assertEquals(resultMessageResponse.getMessages().get(100).getId(), givenMessages.get(120).getId());
 	}
 
 	@Test
