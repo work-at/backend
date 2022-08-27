@@ -165,7 +165,8 @@ public class ChatService {
 	public ChatMessageResponse getChatMessages(Users user, Long chatRoomId, Long messageId, ChatMessageSortType sortType) {
 		ChatRoom findRoom = getChatRoomFromRepository(chatRoomId);
 
-		long value = findRoom.getUsersLastCheckingMessageId(user.getId());
+		long value = messageId == null ? findRoom.getUsersLastCheckingMessageId(user.getId()) : messageId;
+		log.info("messageId : " + messageId + ", value : " + value);
 
 		List<ChatMessage> result;
 		if (sortType == ChatMessageSortType.AFTER) {
