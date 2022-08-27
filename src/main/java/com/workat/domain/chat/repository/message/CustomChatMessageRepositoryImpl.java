@@ -21,7 +21,7 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 	public List<ChatMessage> findLatestMessage(ChatRoom chatRoom, long messageId, long pageSize) {
 		List<ChatMessage> result = jpaQueryFactory.selectFrom(chatMessage)
 			.where(chatMessage.room.id.eq(chatRoom.getId()).and(chatMessage.id.lt(messageId)))
-			.orderBy(chatMessage.id.asc())
+			.orderBy(chatMessage.id.desc())
 			.limit(pageSize)
 			.fetch();
 		log.info("findLatestMessages get messageId : " + messageId);

@@ -1,6 +1,7 @@
 package com.workat.api.chat.service;
 
 import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -173,6 +174,7 @@ public class ChatService {
 			result = chatMessageRepository.findRecentMessage(findRoom, value, pageSize);
 		} else if (sortType == ChatMessageSortType.BEFORE) {
 			result = chatMessageRepository.findLatestMessage(findRoom, value, pageSize);
+			Collections.reverse(result);
 		} else {
 			throw new InvalidParameterException("chat message sort type not valid");
 		}

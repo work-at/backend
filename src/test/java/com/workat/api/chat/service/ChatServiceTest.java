@@ -558,6 +558,69 @@ class ChatServiceTest {
 	}
 
 	@Test
+	void getChatRoomMessage_case5_success() {
+		//given
+		List<Users> users = saveUsers(2);
+
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+
+		ArrayList<ChatMessage> givenMessages = new ArrayList<>();
+		for (int i = 1; i <= 100; i++) {
+			ChatMessage givenMessage = ChatMessage.of(user1.getId(), "test" + i);
+			givenMessage.assignRoom(givenChatroom);
+			givenMessages.add(givenMessage);
+		}
+		chatMessageRepository.saveAll(givenMessages);
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessages.get(70).getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(60).getId());
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(), null,
+			AFTER);
+
+		//then
+		assertEquals(resultMessageResponse.getMessages().size(), 29);
+	}
+
+	@Test
+	void getChatRoomMessage_case6_success() {
+		//given
+		List<Users> users = saveUsers(2);
+
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+
+		ArrayList<ChatMessage> givenMessages = new ArrayList<>();
+		for (int i = 1; i <= 100; i++) {
+			ChatMessage givenMessage = ChatMessage.of(user1.getId(), "test" + i);
+			givenMessage.assignRoom(givenChatroom);
+			givenMessages.add(givenMessage);
+		}
+		chatMessageRepository.saveAll(givenMessages);
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessages.get(70).getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(60).getId());
+		chatRoomRepository.save(givenChatroom);
+
+		//when
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(), null,
+			BEFORE);
+
+		//then
+		assertEquals(resultMessageResponse.getMessages().size(), 50);
+		assertEquals(resultMessageResponse.getMessages().get(0).getId(), givenMessages.get(20).getId());
+	}
+
+	@Test
 	void getChatRooms_success_room_is_empty() {
 		//given
 		List<Users> users = saveUsers(1);
