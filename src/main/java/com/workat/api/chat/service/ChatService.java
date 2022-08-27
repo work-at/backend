@@ -178,7 +178,7 @@ public class ChatService {
 			throw new InvalidParameterException("chat message sort type not valid");
 		}
 
-		log.info("getChatMessages result size : " + result.toString());
+		log.info("getChatMessages result size : " + result.size());
 
 		return ChatMessageResponse.of(result.stream()
 			.map(message -> ChatMessageDto.of(message.getId(), message.getWriterId(), message.getMessage(),

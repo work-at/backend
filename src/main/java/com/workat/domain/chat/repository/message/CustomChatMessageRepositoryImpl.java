@@ -25,7 +25,7 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 			.limit(pageSize)
 			.fetch();
 		log.info("findLatestMessages get messageId : " + messageId);
-		log.info("findLatestMessages : " + result.toString());
+		log.info("findLatestMessages size: " + result.size());
 		return result;
 	}
 
@@ -37,7 +37,7 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 			.limit(pageSize)
 			.fetch();
 		log.info("findLatestMessages get messageId : " + messageId);
-		log.info("findLatestMessages : " + result.toString());
+		log.info("findLatestMessages size: " + result.size());
 		return result;
 	}
 
