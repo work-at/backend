@@ -424,7 +424,7 @@ class ChatServiceTest {
 		chatRoomRepository.save(givenChatroom);
 
 		//when
-		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(),
 			givenMessage1.getId(), AFTER);
 
 		//then
@@ -466,7 +466,7 @@ class ChatServiceTest {
 		chatRoomRepository.save(givenChatroom);
 
 		//when
-		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(),
 			givenMessage7.getId(), AFTER);
 
 		//then
@@ -508,7 +508,7 @@ class ChatServiceTest {
 		chatRoomRepository.save(givenChatroom);
 
 		//when
-		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(),
 			givenMessage3.getId(), BEFORE);
 
 		//then
@@ -550,7 +550,7 @@ class ChatServiceTest {
 		chatRoomRepository.save(givenChatroom);
 
 		//when
-		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(givenChatroom.getId(),
+		ChatMessageResponse resultMessageResponse = chatService.getChatMessages(user1, givenChatroom.getId(),
 			givenMessage3.getId(), AFTER);
 
 		//then

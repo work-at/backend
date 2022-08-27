@@ -162,10 +162,12 @@ public class ChatService {
 	}
 
 	@Transactional(readOnly = true)
-	public ChatMessageResponse getChatMessages(Long chatRoomId, Long messageId, ChatMessageSortType sortType) {
+	public ChatMessageResponse getChatMessages(Users user, Long chatRoomId, Long messageId, ChatMessageSortType sortType) {
 		ChatRoom findRoom = getChatRoomFromRepository(chatRoomId);
 
-		log.info("getChatMessages findRoom : " + findRoom);
+		if (messageId == null) {
+			messageId = findRoom.getUsersLastCheckingMessageId(user.getId());
+		}
 
 		List<ChatMessage> result;
 		if (sortType == ChatMessageSortType.AFTER) {
