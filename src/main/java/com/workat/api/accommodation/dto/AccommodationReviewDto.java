@@ -2,7 +2,7 @@ package com.workat.api.accommodation.dto;
 
 import java.util.List;
 
-import com.workat.domain.tag.dto.TagWithCountDto;
+import com.workat.domain.tag.dto.TagCountDto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class AccommodationReviewDto {
 
 	@ApiModelProperty(name = "reviews")
-	private List<TagWithCountDto> reviews;
+	private List<TagCountDto> reviews;
 
 	@ApiModelProperty(name = "userReviewed", notes = "유저가 리뷰를 남겼는지 여부")
 	private boolean userReviewed;
@@ -22,13 +22,13 @@ public class AccommodationReviewDto {
 	@ApiModelProperty(name = "userCount", notes = "리뷰 남긴 유저 수")
 	private int userCount;
 
-	private AccommodationReviewDto(List<TagWithCountDto> reviews, boolean userReviewed, int userCount) {
+	private AccommodationReviewDto(List<TagCountDto> reviews, boolean userReviewed, int userCount) {
 		this.reviews = reviews;
 		this.userReviewed = userReviewed;
 		this.userCount = userCount;
 	}
 
-	public static AccommodationReviewDto of(List<TagWithCountDto> reviews, boolean userReviewed, int userCount) {
+	public static AccommodationReviewDto of(List<TagCountDto> reviews, boolean userReviewed, int userCount) {
 		return new AccommodationReviewDto(reviews, userReviewed, userCount);
 	}
 }
