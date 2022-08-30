@@ -37,17 +37,17 @@ public class AccommodationReview {
 	@Enumerated(EnumType.STRING)
 	private AccommodationReviewTag tag;
 
-	private AccommodationReview(Accommodation accommodation,
-		Users user,
-		AccommodationReviewTag tag) {
+	private AccommodationReview(AccommodationReviewTag tag,
+		Accommodation accommodation,
+		Users user
+	) {
+		this.tag = tag;
 		this.accommodation = accommodation;
 		this.user = user;
-		this.tag = tag;
 	}
 
-	public static AccommodationReview of(Accommodation accommodation,
-		Users user,
-		AccommodationReviewTag tag) {
-		return new AccommodationReview(accommodation, user, tag);
+	public static AccommodationReview of(AccommodationReviewTag tag, Accommodation accommodation,
+		Users user) {
+		return new AccommodationReview(tag, accommodation, user);
 	}
 }
