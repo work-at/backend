@@ -5,6 +5,7 @@ import static com.workat.domain.chat.entity.QChatMessage.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.workat.domain.chat.entity.ChatMessage;
@@ -20,18 +21,33 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<ChatMessage> findInitMessage(ChatRoom chatRoom, long messageId, long pageSize) {
+	public Optional<ChatMessage> findLastMessage(ChatRoom chatRoom, long userId) {
+		return Optional.ofNullable(jpaQueryFactory.selectFrom(chatMessage)
+			.where(chatMessage.room.id.eq(chatRoom.getId())
+				.and(chatMessage.id.gt(userId == chatRoom.getOwner().getId() ?
+					chatRoom.getOwnerLastDeletedMessageId() : chatRoom.getApplicantLastDeletedMessageId())))
+			.orderBy(chatMessage.id.desc())
+			.limit(1)
+			.fetchOne());
+	}
+
+	@Override
+	public List<ChatMessage> findInitMessage(ChatRoom chatRoom, long userId, long messageId, long pageSize) {
 		ArrayList<ChatMessage> result = new ArrayList<>();
 
 		List<ChatMessage> beforeMessageId = jpaQueryFactory.selectFrom(chatMessage)
-			.where(chatMessage.room.id.eq(chatRoom.getId()).and(chatMessage.id.loe(messageId)))
+			.where(chatMessage.room.id.eq(chatRoom.getId())
+				.and(chatMessage.id.gt(getDeletedLastMessageId(chatRoom, userId)))
+				.and(chatMessage.id.loe(messageId)))
 			.orderBy(chatMessage.id.desc())
 			.limit(pageSize + 1)
 			.fetch();
 		Collections.reverse(beforeMessageId);
 
 		List<ChatMessage> afterMessageId = jpaQueryFactory.selectFrom(chatMessage)
-			.where(chatMessage.room.id.eq(chatRoom.getId()).and(chatMessage.id.gt(messageId)))
+			.where(chatMessage.room.id.eq(chatRoom.getId())
+				.and(chatMessage.id.gt(getDeletedLastMessageId(chatRoom, userId)))
+				.and(chatMessage.id.gt(messageId)))
 			.orderBy(chatMessage.id.asc())
 			.limit(pageSize)
 			.fetch();
@@ -43,9 +59,11 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 	}
 
 	@Override
-	public List<ChatMessage> findLatestMessage(ChatRoom chatRoom, long messageId, long pageSize) {
+	public List<ChatMessage> findLatestMessage(ChatRoom chatRoom, long userId, long messageId, long pageSize) {
 		List<ChatMessage> result = jpaQueryFactory.selectFrom(chatMessage)
-			.where(chatMessage.room.id.eq(chatRoom.getId()).and(chatMessage.id.lt(messageId)))
+			.where(chatMessage.room.id.eq(chatRoom.getId())
+				.and(chatMessage.id.gt(getDeletedLastMessageId(chatRoom, userId)))
+				.and(chatMessage.id.lt(messageId)))
 			.orderBy(chatMessage.id.desc())
 			.limit(pageSize)
 			.fetch();
@@ -55,9 +73,11 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 	}
 
 	@Override
-	public List<ChatMessage> findRecentMessage(ChatRoom chatRoom, long messageId, long pageSize) {
+	public List<ChatMessage> findRecentMessage(ChatRoom chatRoom, long userId, long messageId, long pageSize) {
 		return jpaQueryFactory.selectFrom(chatMessage)
-			.where(chatMessage.room.id.eq(chatRoom.getId()).and(chatMessage.id.gt(messageId)))
+			.where(chatMessage.room.id.eq(chatRoom.getId())
+				.and(chatMessage.id.gt(getDeletedLastMessageId(chatRoom, userId)))
+				.and(chatMessage.id.gt(messageId)))
 			.orderBy(chatMessage.id.asc())
 			.limit(pageSize)
 			.fetch();
@@ -68,5 +88,10 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 		return jpaQueryFactory.selectFrom(chatMessage)
 			.where(chatMessage.id.gt(lastMessageId).and(chatMessage.writerId.eq(otherUserId)))
 			.stream().findAny().isEmpty();
+	}
+
+	private long getDeletedLastMessageId(ChatRoom chatRoom, long userId) {
+		return userId == chatRoom.getOwner().getId() ? chatRoom.getOwnerLastDeletedMessageId() :
+			chatRoom.getApplicantLastDeletedMessageId();
 	}
 }

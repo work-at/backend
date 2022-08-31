@@ -82,8 +82,8 @@ public class ChatController {
 	@ApiOperation("채팅방을 나가는 api")
 	@ApiResponse(code = 200, message = "success")
 	@DeleteMapping("/api/v1/chattings/{roomId}")
-	public void deleteChattingRoom(@UserValidation Users user, @PathVariable Long roomId) {
-		chatService.deleteChatRoom(user.getId(), roomId);
+	public void deleteChattingRoom(@UserValidation Users user, @PathVariable Long roomId, @RequestParam Long lastMessageId) {
+		chatService.deleteChatRoom(user.getId(), roomId, lastMessageId);
 	}
 
 	@ApiOperation("채팅 메세지를 생성하는 api")
