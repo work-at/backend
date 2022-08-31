@@ -50,18 +50,13 @@ public class Users extends BaseEntity {
 	@Column
 	private boolean trackingOff;
 
-	@OneToMany(mappedBy = "owner")
-	private List<ChatRoom> chatRooms;
-
-	private Users(OauthType oauthType, Long oauthId, List<ChatRoom> chatRooms) {
+	private Users(OauthType oauthType, Long oauthId) {
 		this.oauthType = oauthType;
 		this.oauthId = oauthId;
-		this.chatRooms = chatRooms;
 	}
 
 	public static Users of(OauthType oauthType, Long oauthId) {
-
-		return new Users(oauthType, oauthId, new ArrayList<>());
+		return new Users(oauthType, oauthId);
 	}
 
 	public void setVerificationCode() {

@@ -1,7 +1,6 @@
 package com.workat.api.chat.service;
 
 import java.security.InvalidParameterException;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,10 +13,11 @@ import com.workat.api.chat.dto.ChatRoomListUserDto;
 import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.common.exception.BadRequestException;
+import com.workat.common.exception.ChatMessageNotFoundException;
+import com.workat.common.exception.ChatMessageRoomNotMatchException;
 import com.workat.common.exception.ChatRoomIsDeletedException;
 import com.workat.common.exception.ChatRoomNotFoundException;
 import com.workat.common.exception.ChatRoomUserNotMatchException;
-import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.common.exception.UserNotFoundException;
 import com.workat.domain.chat.entity.ChatMessage;
@@ -60,16 +60,18 @@ public class ChatService {
 		Users findOwnerUser = usersRepository.findById(ownerUserId).orElseThrow(() -> {
 			throw new UserNotFoundException(ownerUserId);
 		});
+
 		Users findApplyUser = usersRepository.findById(applyUserId).orElseThrow(() -> {
 			throw new UserNotFoundException(applyUserId);
 		});
 
-		if (checkRedundantChat(findOwnerUser, findApplyUser)) {
-			throw new ConflictException("이미 존재하는 채팅입니다.");
-		}
+		ChatRoom chatRoom = chatRoomRepository.findByUserIds(ownerUserId, applyUserId).orElse(ChatRoom.of());
 
-		ChatRoom chatRoom = ChatRoom.of();
-		chatRoom.assignUsers(findOwnerUser, findApplyUser);
+		if (chatRoom.isFirstCreated()) {
+			chatRoom.assignUsers(findOwnerUser, findApplyUser);
+		} else {
+			chatRoom.revivalRoom(applyUserId);
+		}
 
 		return chatRoomRepository.save(chatRoom).getId();
 	}
@@ -109,7 +111,7 @@ public class ChatService {
 				boolean isAllRead = chatMessageRepository.isAllMessageRead(
 					chatRoom.getUsersLastCheckingMessageId(userId), anotherUserId);
 
-				ChatMessage findLastMessage = chatMessageRepository.findTopByRoomOrderByIdDesc(chatRoom).orElse(null);
+				ChatMessage findLastMessage = chatMessageRepository.findLastMessage(chatRoom, userId).orElse(null);
 
 				return ChatRoomDto.builder()
 					.id(chatRoom.getId())
@@ -129,7 +131,7 @@ public class ChatService {
 	}
 
 	@Transactional
-	public void deleteChatRoom(Long userId, Long chatRoomId) {
+	public void deleteChatRoom(Long userId, Long chatRoomId, Long lastMessageId) {
 		Users findUser = usersRepository.findById(userId).orElseThrow(() -> {
 			throw new UserNotFoundException(userId);
 		});
@@ -138,7 +140,17 @@ public class ChatService {
 
 		validateChatRoom(findRoom, findUser.getId());
 
-		findRoom.deleteRoom(userId);
+		ChatMessage findChatMessage = chatMessageRepository.findById(lastMessageId).orElseThrow(() -> {
+			throw new ChatMessageNotFoundException(lastMessageId);
+		});
+
+		validateChatMessage(findChatMessage, findRoom.getId());
+
+		findRoom.deleteRoom(userId, lastMessageId);
+
+		if (findRoom.isDeletedByMe(userId) && findRoom.isDeletedByOther(userId)) {
+			chatRoomRepository.deleteById(findRoom.getId());
+		}
 
 		chatRoomRepository.save(findRoom);
 	}
@@ -172,11 +184,11 @@ public class ChatService {
 
 		List<ChatMessage> result;
 		if (sortType == null || sortType == ChatMessageSortType.INIT) {
-			result = chatMessageRepository.findInitMessage(findRoom, value, pageSize);
+			result = chatMessageRepository.findInitMessage(findRoom, user.getId(), value, pageSize);
 		} else if (sortType == ChatMessageSortType.AFTER) {
-			result = chatMessageRepository.findRecentMessage(findRoom, value, pageSize);
+			result = chatMessageRepository.findRecentMessage(findRoom, user.getId(), value, pageSize);
 		} else if (sortType == ChatMessageSortType.BEFORE) {
-			result = chatMessageRepository.findLatestMessage(findRoom, value, pageSize);
+			result = chatMessageRepository.findLatestMessage(findRoom, user.getId(), value, pageSize);
 		} else {
 			throw new InvalidParameterException("chat message sort type not valid");
 		}
@@ -224,10 +236,6 @@ public class ChatService {
 			throw new ChatRoomNotFoundException(roomId);
 		});
 
-		if (room.isOwnerDeleted() || room.isApplicantDeleted()) {
-			throw new ChatRoomIsDeletedException(roomId);
-		}
-
 		return room;
 	}
 
@@ -237,16 +245,10 @@ public class ChatService {
 		}
 	}
 
-	private boolean checkRedundantChat(Users owner, Users applicant) {
-		Long applicantId = applicant.getId();
-
-		List<ChatRoom> chatRooms = owner.getChatRooms();
-
-		return chatRooms.stream()
-			.anyMatch(room -> {
-				Long ownerId = room.getApplicant().getId();
-				return ownerId.equals(applicantId);
-			});
+	private void validateChatMessage(ChatMessage chatMessage, Long roomId) {
+		if (!chatMessage.getRoom().getId().equals(roomId)) {
+			throw new ChatMessageRoomNotMatchException(chatMessage.getRoom().getId(), roomId);
+		}
 	}
 
 }

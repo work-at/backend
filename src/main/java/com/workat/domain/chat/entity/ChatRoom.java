@@ -38,6 +38,12 @@ public class ChatRoom extends BaseEntity {
 
 	private Long applicantLastCheckingMessageId;
 
+	private Long ownerLastDeletedMessageId;
+
+	private Long applicantLastDeletedMessageId;
+
+	private boolean isFirstCreated;
+
 	private boolean isStart;
 
 	private boolean isOwnerDeleted;
@@ -47,15 +53,19 @@ public class ChatRoom extends BaseEntity {
 	private LocalDateTime messageUpdatedTime = LocalDateTime.now();
 
 	public static ChatRoom of() {
-		return new ChatRoom();
+		ChatRoom chatRoom = new ChatRoom();
+		chatRoom.isFirstCreated = true;
+		chatRoom.ownerLastCheckingMessageId = -1L;
+		chatRoom.applicantLastCheckingMessageId = 0L;
+		chatRoom.ownerLastDeletedMessageId = -1L;
+		chatRoom.applicantLastDeletedMessageId = 0L;
+		return chatRoom;
 	}
 
 	public void assignUsers(Users owner, Users applicant) {
 		this.owner = owner;
 		this.applicant = applicant;
-
-		// 연관관계 매핑
-		owner.getChatRooms().add(this);
+		this.isFirstCreated = false;
 	}
 
 	public void chattingConfirm(Long userId) {
@@ -91,6 +101,16 @@ public class ChatRoom extends BaseEntity {
 		}
 	}
 
+	public Long getUsersLastDeletedMessageId(Long userId) {
+		if (userId.equals(owner.getId())) {
+			return this.ownerLastDeletedMessageId != null ? this.ownerLastDeletedMessageId : 0;
+		} else if (userId.equals(applicant.getId())) {
+			return this.applicantLastDeletedMessageId != null ? this.applicantLastDeletedMessageId : 0;
+		} else {
+			throw new InvalidParameterException("this room not contains user, userId = " + userId);
+		}
+	}
+
 	public Long getAnotherOwnerUserId(Long userId) {
 		Long ownerUserId = owner.getId();
 		Long applyUserId = applicant.getId();
@@ -104,13 +124,29 @@ public class ChatRoom extends BaseEntity {
 		}
 	}
 
-	public void deleteRoom(Long userId) {
+	public void deleteRoom(Long userId, Long lastMessageId) {
 		Long ownerUserId = owner.getId();
 		Long applyUserId = applicant.getId();
 		if (userId.equals(ownerUserId)) {
 			this.isOwnerDeleted = true;
+			this.ownerLastCheckingMessageId = lastMessageId;
+			this.ownerLastDeletedMessageId = lastMessageId;
 		} else if (userId.equals(applyUserId)) {
 			this.isApplicantDeleted = true;
+			this.applicantLastCheckingMessageId = lastMessageId;
+			this.applicantLastDeletedMessageId = lastMessageId;
+		} else {
+			throw new InvalidParameterException("this room not contain userId = " + userId);
+		}
+	}
+
+	public void revivalRoom(Long userId) {
+		Long ownerUserId = owner.getId();
+		Long applyUserId = applicant.getId();
+		if (userId.equals(ownerUserId)) {
+			this.isOwnerDeleted = false;
+		} else if (userId.equals(applyUserId)) {
+			this.isApplicantDeleted = false;
 		} else {
 			throw new InvalidParameterException("this room not contain userId = " + userId);
 		}
@@ -142,20 +178,5 @@ public class ChatRoom extends BaseEntity {
 
 	public boolean isOwner(Long userId) {
 		return owner.getId().equals(userId);
-	}
-
-	@Override
-	public String toString() {
-		return "ChatRoom{" +
-			"id=" + id +
-			", owner=" + owner +
-			", applicant=" + applicant +
-			", ownerLastCheckingMessageId=" + ownerLastCheckingMessageId +
-			", applicantLastCheckingMessageId=" + applicantLastCheckingMessageId +
-			", isStart=" + isStart +
-			", isOwnerDeleted=" + isOwnerDeleted +
-			", isApplicantDeleted=" + isApplicantDeleted +
-			", messageUpdatedTime=" + messageUpdatedTime +
-			'}';
 	}
 }
