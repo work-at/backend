@@ -139,8 +139,8 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public MyProfileResponse getSelfUserProfile(Long userId) {
-		UserProfile userProfile = userProfileRepository.findById(userId)
+	public MyProfileResponse getSelfUserProfile(Users user) {
+		UserProfile userProfile = userProfileRepository.findById(user.getId())
 			.orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		int workchats = chatRoomRepository.findAllByUser(userProfile.getUser()).size();
 		List<ActivityTypeDto> activityTypes = userActivityRepository.findByUser_Id(userProfile.getId()).stream()
@@ -148,7 +148,7 @@ public class UserService {
 			.map(activity -> ActivityTypeDto.of(activity.name(), activity.getType()))
 			.collect(Collectors.toList());
 
-		return MyProfileResponse.of(userProfile, workchats, activityTypes);
+		return MyProfileResponse.of(userProfile, workchats, activityTypes, user.isTrackingOff());
 	}
 
 	@Transactional
