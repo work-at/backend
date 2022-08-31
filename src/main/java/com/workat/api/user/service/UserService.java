@@ -167,7 +167,7 @@ public class UserService {
 			.map(ActivityType::of)
 			.map(activityType -> UserActivity.of(user, activityType))
 			.collect(Collectors.toList());
-
+		userActivityRepository.deleteByUser_Id(user.getId());
 		userActivityRepository.saveAll(activityTypes);
 	}
 
