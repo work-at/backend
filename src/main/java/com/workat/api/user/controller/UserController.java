@@ -29,7 +29,6 @@ import com.workat.domain.user.entity.Users;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = "User Api")
 @RequiredArgsConstructor
@@ -56,7 +55,7 @@ public class UserController {
 
 	@GetMapping("/api/v1/user/self")
 	public ResponseEntity<MyProfileResponse> getSelfUserProfile(@UserValidation Users user) {
-		MyProfileResponse response = userService.getSelfUserProfile(user.getId());
+		MyProfileResponse response = userService.getSelfUserProfile(user);
 		return ResponseEntity.ok(response);
 	}
 

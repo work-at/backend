@@ -48,11 +48,12 @@ public class MyProfileResponse {
 	@ApiModelProperty(name = "activities", notes = "희망 활동")
 	private List<ActivityTypeDto> activities;
 
-	// TODO: 내 소식 - 새 댓글 알람 수 추가 필요
+	@ApiModelProperty(name = "trackingOff", notes = "내 위치 정보 노출하기 꺼진 상태")
+	private boolean trackingOff;
 
 	private MyProfileResponse(long id, String nickname, String imageUrl, DepartmentType position,
 		DurationType workingYear, String company, String story, boolean certified, int workchats,
-		List<ActivityTypeDto> activities) {
+		List<ActivityTypeDto> activities, boolean trackingOff) {
 		this.id = id;
 		this.nickname = nickname;
 		this.imageUrl = imageUrl;
@@ -63,12 +64,13 @@ public class MyProfileResponse {
 		this.certified = certified;
 		this.workchats = workchats;
 		this.activities = activities;
+		this.trackingOff = trackingOff;
 	}
 
-	public static MyProfileResponse of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities) {
+	public static MyProfileResponse of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities, boolean trackingOff) {
 		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(),
 			userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(),
-			userProfile.isCertified(), workchats, activities);
+			userProfile.isCertified(), workchats, activities, trackingOff);
 	}
 
 }
