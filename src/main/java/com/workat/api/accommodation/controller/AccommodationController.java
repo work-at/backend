@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
 import com.workat.api.accommodation.service.AccommodationService;
+import com.workat.common.annotation.UserValidation;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.user.entity.Users;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -43,7 +45,7 @@ public class AccommodationController {
 		@ApiParam(value = "페이지 사이즈", example = "10", type = "integer")
 		@RequestParam(required = false, defaultValue = "10") int pageSize
 	) {
-		AccommodationsResponse response = accommodationService.getAccommodations(
+		final AccommodationsResponse response = accommodationService.getAccommodations(
 			region, infoTagName, topReviewTagName, pageNumber, pageSize);
 
 		return ResponseEntity.ok(response);
@@ -54,8 +56,8 @@ public class AccommodationController {
 	@ApiImplicitParam(name = "accommodationId", value = "Accommodation Id", required = true, dataType = "long", example = "1")
 	@GetMapping("/api/v1/accommodations/{accommodationId}")
 	public ResponseEntity<AccommodationResponse> getAccommodation(
-		@PathVariable("accommodationId") long accommodationId) {
-		AccommodationResponse response = accommodationService.getAccommodation(accommodationId);
+		@PathVariable("accommodationId") long accommodationId, @UserValidation Users user) {
+		final AccommodationResponse response = accommodationService.getAccommodation(accommodationId, user.getId());
 
 		return ResponseEntity.ok(response);
 	}

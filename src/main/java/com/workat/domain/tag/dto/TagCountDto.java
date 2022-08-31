@@ -7,20 +7,20 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class TagWithCountDto {
+public class TagCountDto {
 
 	@ApiModelProperty(name = "review tag", example = "{ \"name\": \"VIEW\", \"content\": \"뷰가 좋아요\" }")
 	private TagDto tag;
 
 	@ApiModelProperty(name = "review count", example = "3")
-	private int count;
+	private long count;
 
-	private TagWithCountDto(TagDto tag, int count) {
+	private TagCountDto(TagDto tag, long count) {
 		this.tag = tag;
 		this.count = count;
 	}
 
-	public static TagWithCountDto of(TagDto tag, int count) {
-		return new TagWithCountDto(tag, count);
+	public static TagCountDto of(TagDto tag, long count) {
+		return new TagCountDto(tag, count);
 	}
 }
