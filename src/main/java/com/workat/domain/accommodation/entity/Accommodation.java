@@ -39,6 +39,9 @@ public class Accommodation {
 	private String imgUrl;
 
 	@Column
+	private String thumbnailImgUrl;
+
+	@Column
 	private Long price;
 
 	@Column
@@ -59,6 +62,7 @@ public class Accommodation {
 	@Builder
 	public Accommodation(RegionType regionType,
 		String name,
+		String thumbnailImgUrl,
 		String imgUrl,
 		Long price,
 		String phone,
@@ -69,6 +73,7 @@ public class Accommodation {
 		this.regionType = regionType;
 		this.name = name;
 		this.imgUrl = imgUrl;
+		this.thumbnailImgUrl = thumbnailImgUrl;
 		this.price = price;
 		this.phone = phone;
 		this.roadAddressName = roadAddressName;
