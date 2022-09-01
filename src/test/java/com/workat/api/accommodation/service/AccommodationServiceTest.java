@@ -1,9 +1,11 @@
 package com.workat.api.accommodation.service;
 
+import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,7 +22,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.workat.api.accommodation.dto.AccommodationDetailDto;
 import com.workat.domain.accommodation.entity.Accommodation;
+import com.workat.domain.accommodation.entity.AccommodationInfo;
 import com.workat.domain.accommodation.entity.AccommodationReview;
+import com.workat.domain.accommodation.repository.AccommodationInfoRepository;
 import com.workat.domain.accommodation.repository.AccommodationRepository;
 import com.workat.domain.accommodation.repository.AccommodationReviewRepository;
 import com.workat.domain.auth.OauthType;
@@ -29,6 +33,7 @@ import com.workat.domain.config.MysqlContainerBaseTest;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagCountDto;
+import com.workat.domain.tag.dto.TagDto;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
@@ -47,6 +52,9 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 	private AccommodationRepository accommodationRepository;
 
 	@Autowired
+	private AccommodationInfoRepository accommodationInfoRepository;
+
+	@Autowired
 	private AccommodationReviewRepository accommodationReviewRepository;
 
 	@Autowired
@@ -55,7 +63,9 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 	@BeforeEach
 	void setUp() {
 		this.accommodationService = new AccommodationService(accommodationRepository,
-			accommodationReviewRepository);
+			accommodationReviewRepository,
+			accommodationInfoRepository);
+
 	}
 
 	@DisplayName("getAccommodation 메소드는 accommodationId 에 매핑된 accommodation entity 에 해당하는 데이터를 반환해야 한다")
@@ -63,23 +73,33 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 	void getAccommodationTest() {
 		// given
 		Accommodation accommodation = saveAccommodations(1).get(0);
+		List<AccommodationInfo> accommodationInfos = accommodationInfoRepository.findAllByAccommodation(
+			accommodation);
+		HashSet<TagDto> accommodationInfoDtos = accommodationInfos.stream()
+			.map(AccommodationInfo::getTag)
+			.map(TagDto::of)
+			.collect(toCollection(HashSet::new));
 		Users user = saveUsers(1).get(0);
 
 		// when
-		AccommodationDetailDto accommodationDto = accommodationService.getAccommodation(accommodation.getId(),
+		AccommodationDetailDto given = accommodationService.getAccommodation(accommodation.getId(),
 			user.getId()).getAccommodationDetail();
+
+		HashSet<TagDto> givenInfoTags = given.getInfoTags();
 
 		// then
 		assertAll(
-			() -> assertEquals(accommodationDto.getId(), accommodation.getId()),
-			() -> assertEquals(accommodationDto.getName(), accommodation.getName()),
-			() -> assertEquals(accommodationDto.getImgUrl(), accommodation.getImgUrl()),
-			() -> assertEquals(accommodationDto.getPrice(), accommodation.getPrice()),
-			() -> assertEquals(accommodationDto.getPhone(), accommodation.getPhone()),
-			() -> assertEquals(accommodationDto.getRoadAddressName(), accommodation.getRoadAddressName()),
-			() -> assertEquals(accommodationDto.getPlaceUrl(), accommodation.getPlaceUrl()),
-			() -> assertEquals(accommodationDto.getRelatedUrl(), accommodation.getRelatedUrl()),
-			() -> assertEquals(accommodationDto.getInfoTags(), accommodation.getInfoTags())
+			() -> assertEquals(given.getId(), accommodation.getId()),
+			() -> assertEquals(given.getName(), accommodation.getName()),
+			() -> assertEquals(given.getImgUrl(), accommodation.getImgUrl()),
+			() -> assertEquals(given.getPrice(), accommodation.getPrice()),
+			() -> assertEquals(given.getPhone(), accommodation.getPhone()),
+			() -> assertEquals(given.getRoadAddressName(), accommodation.getRoadAddressName()),
+			() -> assertEquals(given.getPlaceUrl(), accommodation.getPlaceUrl()),
+			() -> assertEquals(given.getRelatedUrl(), accommodation.getRelatedUrl()),
+			() -> assertEquals(
+				accommodationInfoDtos.size(),
+				givenInfoTags.size())
 		);
 	}
 
@@ -200,15 +220,17 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 						.roadAddressName("roadAddressName" + mockValue)
 						.placeUrl("placeUrl" + mockValue)
 						.relatedUrl("relatedUrl" + mockValue)
-						.infos(new ArrayList<>())
 						.build();
 
-					accommodation.getInfoTags().addAll(
-						Arrays.asList(AccommodationInfoTag.NEAR_CITY,
+					List<AccommodationInfo> accommodationInfos = Arrays.asList(AccommodationInfoTag.NEAR_CITY,
 							AccommodationInfoTag.WORKSPACE,
 							AccommodationInfoTag.SHARED_WORKSPACE
-						)
-					);
+						).stream()
+						.map(tag ->
+							AccommodationInfo.of(AccommodationInfoTag.NEAR_CITY, accommodation)
+						).collect(Collectors.toList());
+
+					accommodationInfoRepository.saveAll(accommodationInfos);
 
 					return accommodation;
 				}

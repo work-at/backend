@@ -1,6 +1,6 @@
 package com.workat.api.accommodation.dto;
 
-import java.util.List;
+import java.util.HashSet;
 
 import com.workat.domain.tag.dto.TagDto;
 
@@ -39,11 +39,11 @@ public class AccommodationDetailDto {
 	private String relatedUrl;
 
 	@ApiModelProperty(name = "infoTags", notes = "Accommodation info tags", example = "[ { \"name\": \"NEAR_CITY\", \"content\": \"도시 인근\" }, { \"name\": \"WORKSPACE\", \"content\": \"숙소 내 업무 공간\" }, { \"name\": \"SHARED_WORKSPACE\", \"content\": \"공용업무공간\" } ]")
-	private List<TagDto> infoTags;
+	private HashSet<TagDto> infoTags;
 
 	public AccommodationDetailDto(long id, String name, String imgUrl, long price, String phone,
 		String roadAddressName, String placeUrl, String relatedUrl,
-		List<TagDto> infoTags) {
+		HashSet<TagDto> infoTags) {
 		this.id = id;
 		this.name = name;
 		this.imgUrl = imgUrl;
