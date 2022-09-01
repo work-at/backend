@@ -2,13 +2,15 @@ package com.workat.api.accommodation.service;
 
 import static java.util.stream.Collectors.*;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,24 +52,34 @@ public class AccommodationService {
 		int pageSize
 	) {
 
+		PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "id");
+
+		Page<Accommodation> pageableAccommodations = accommodationRepository.findAllByRegionType(region, pageRequest);
+
+		List<AccommodationDto> AccommodationDtos = pageableAccommodations.stream()
+			.map(accommodation -> {
+				List<AccommodationReview> reviews = accommodationReviewRepository.findAllByAccommodation_Id(
+					accommodation.getId());
+
+				HashSet<TagDto> tagsDtoSet = reviews.stream()
+					.sorted(Comparator.comparing(AccommodationReview::getTag))
+					.map(AccommodationReview::getTag)
+					.map(TagDto::of)
+					.collect(toCollection(HashSet::new));
+
+				return AccommodationDto.of(
+					accommodation.getId(),
+					accommodation.getName(),
+					accommodation.getPrice(),
+					accommodation.getThumbnailImgUrl(),
+					tagsDtoSet);
+			}).collect(toList());
+
 		return AccommodationsResponse.of(
-			Arrays.asList(AccommodationDto.of(1L, "그랜드워커힐서울", 235000L,
-					"https://lh5.googleusercontent.com/p/AF1QipOKO_7oTuHLK31fOjhqp13KompnHRxgi_2_oOVT=w253-h168-k-no",
-					Arrays.asList(
-						TagDto.of(AccommodationReviewTag.FOCUS),
-						TagDto.of(AccommodationReviewTag.SERVE_MEAL),
-						TagDto.of(AccommodationReviewTag.WIFI)
-					)
-				),
-				AccommodationDto.of(2L, "씨마크호텔", 135000L,
-					"https://lh5.googleusercontent.com/proxy/pxIAn34FA3bpLmWfDBKZe6uTiFdb7JrocuP7tzcLTTWcINIqCKLsuADqZW65VteN0bZ28rWStDjNwGjBNhr4_V8KHjBW7aWhNkORBP3Jw9UFmeqive-omWDVIUh5HwVj29V9wi_7iOoUKcvCG6XduQ6Bl2MYyQ=w253-h184-k-no",
-					Arrays.asList(
-						TagDto.of(AccommodationReviewTag.WIFI),
-						TagDto.of(AccommodationReviewTag.POWER),
-						TagDto.of(AccommodationReviewTag.SERVE_MEAL)
-					)
-				)
-			), pageNumber, pageSize, 150
+			AccommodationDtos,
+			pageableAccommodations.getNumber(),
+			pageableAccommodations.getSize(),
+			pageableAccommodations.getTotalPages()
 		);
 	}
 

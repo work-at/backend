@@ -1,6 +1,6 @@
 package com.workat.api.accommodation.dto;
 
-import java.util.List;
+import java.util.HashSet;
 
 import com.workat.domain.tag.dto.TagDto;
 
@@ -19,9 +19,9 @@ public class AccommodationDto {
 
 	private String imgUrl;
 
-	private List<TagDto> topReviewTags;
+	private HashSet<TagDto> topReviewTags;
 
-	private AccommodationDto(long id, String name, long price, String imgUrl, List<TagDto> topReviewTags) {
+	private AccommodationDto(long id, String name, long price, String imgUrl, HashSet<TagDto> topReviewTags) {
 		this.id = id;
 		this.name = name;
 		this.price = price;
@@ -29,7 +29,7 @@ public class AccommodationDto {
 		this.topReviewTags = topReviewTags;
 	}
 
-	public static AccommodationDto of(long id, String name, long price, String imgUrl, List<TagDto> topReviewTags) {
+	public static AccommodationDto of(long id, String name, long price, String imgUrl, HashSet<TagDto> topReviewTags) {
 		return new AccommodationDto(id, name, price, imgUrl, topReviewTags);
 	}
 }

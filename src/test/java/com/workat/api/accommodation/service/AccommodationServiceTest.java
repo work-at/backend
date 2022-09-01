@@ -21,6 +21,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.workat.api.accommodation.dto.AccommodationDetailDto;
+import com.workat.api.accommodation.dto.AccommodationDto;
+import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.entity.AccommodationInfo;
 import com.workat.domain.accommodation.entity.AccommodationReview;
@@ -189,6 +191,21 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		}
 	}
 
+	@DisplayName("getAccommodations 메소드는 accommodation entity 에 해당하는 데이터를 반환해야 한다")
+	@Test
+	void getAccommodations() {
+		// given
+		List<Accommodation> accommodations = saveAccommodations(3);
+
+		// when
+		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations(RegionType.SEOUL, null, null,
+			0,
+			10).getAccommodations();
+
+		// then
+		assertEquals(accommodations.size(), accommodationDtos.size());
+	}
+
 	private List<Users> saveUsers(int size) {
 		return IntStream.range(0, size)
 			.mapToObj(idx -> {
@@ -213,6 +230,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 					String mockValue = String.valueOf(idx);
 
 					Accommodation accommodation = Accommodation.builder()
+						.regionType(RegionType.SEOUL)
 						.name("name" + mockValue)
 						.imgUrl("imgUrl" + mockValue)
 						.price(Long.valueOf(mockValue))
