@@ -20,7 +20,9 @@ import com.workat.api.accommodation.dto.response.AccommodationsResponse;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
+import com.workat.domain.accommodation.entity.AccommodationInfo;
 import com.workat.domain.accommodation.entity.AccommodationReview;
+import com.workat.domain.accommodation.repository.AccommodationInfoRepository;
 import com.workat.domain.accommodation.repository.AccommodationRepository;
 import com.workat.domain.accommodation.repository.AccommodationReviewRepository;
 import com.workat.domain.tag.AccommodationInfoTag;
@@ -37,6 +39,8 @@ public class AccommodationService {
 	private final AccommodationRepository accommodationRepository;
 
 	private final AccommodationReviewRepository accommodationReviewRepository;
+
+	private final AccommodationInfoRepository accommodationInfoRepository;
 
 	public AccommodationsResponse getAccommodations(
 		RegionType region,
@@ -75,7 +79,11 @@ public class AccommodationService {
 				throw new NotFoundException("accommodation is not found");
 			});
 
-		final AccommodationDetailDto accommodationDetailDto = convertAccommodationDetailDto(accommodation);
+		final List<AccommodationInfo> accommodationInfos = accommodationInfoRepository.findAllByAccommodation(
+			accommodation);
+
+		final AccommodationDetailDto accommodationDetailDto = convertAccommodationDetailDto(accommodation,
+			accommodationInfos);
 
 		final List<AccommodationReview> accommodationReviews = accommodationReviewRepository.findAllByAccommodation_Id(
 			accommodationId);
@@ -90,7 +98,8 @@ public class AccommodationService {
 		);
 	}
 
-	private AccommodationDetailDto convertAccommodationDetailDto(Accommodation accommodation) {
+	private AccommodationDetailDto convertAccommodationDetailDto(Accommodation accommodation,
+		List<AccommodationInfo> accommodationInfos) {
 
 		return AccommodationDetailDto.builder()
 			.id(accommodation.getId())
@@ -101,9 +110,10 @@ public class AccommodationService {
 			.roadAddressName(accommodation.getRoadAddressName())
 			.placeUrl(accommodation.getPlaceUrl())
 			.relatedUrl(accommodation.getRelatedUrl())
-			.infoTags(accommodation.getInfoTags().stream()
+			.infoTags(accommodationInfos.stream()
+				.map(AccommodationInfo::getTag)
 				.map(TagDto::of)
-				.collect(Collectors.toList()))
+				.collect(toCollection(HashSet::new)))
 			.build();
 	}
 
