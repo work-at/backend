@@ -1,5 +1,8 @@
 package com.workat.domain.accommodation.entity;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -7,8 +10,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
+import com.workat.api.accommodation.dto.CsvAccommodationDto;
 import com.workat.domain.accommodation.RegionType;
+import com.workat.domain.tag.AccommodationInfoTag;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -59,7 +65,8 @@ public class Accommodation {
 		Long price,
 		String phone,
 		String roadAddressName,
-		String placeUrl, String relatedUrl
+		String placeUrl,
+		String relatedUrl
 	) {
 		this.regionType = regionType;
 		this.name = name;
@@ -72,4 +79,18 @@ public class Accommodation {
 		this.relatedUrl = relatedUrl;
 	}
 
+	public static Accommodation of() {
+		return new Accommodation();
+	}
+
+	public void update(CsvAccommodationDto dto) {
+		this.regionType = dto.getRegionType();
+		this.name = dto.getName();
+		this.thumbnailImgUrl = dto.getThumbnailImgUrl();
+		this.imgUrl = dto.getImgUrl();
+		this.roadAddressName = dto.getRoadAddress();
+		this.phone = dto.getPhone();
+		this.price = Long.parseLong(dto.getPrice().replaceAll("[^0-9]", ""));
+		this.relatedUrl = dto.getRelatedUrl();
+	}
 }

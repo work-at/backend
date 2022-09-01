@@ -8,6 +8,6 @@ import com.workat.domain.accommodation.entity.Accommodation;
 
 public interface AccommodationRepository extends JpaRepository<Accommodation, Long> {
 
-	Optional<Accommodation> findById(Long accommodationId);
+	Optional<Accommodation> findByName(String name);
 
 }
