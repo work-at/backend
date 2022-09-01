@@ -31,4 +31,5 @@ public enum RegionType {
 	public static RegionType getRandom() {
 		return ALL.get(RANDOM.nextInt(SIZE));
 	}
+
 }
