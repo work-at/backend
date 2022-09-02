@@ -1,5 +1,7 @@
 package com.workat.api.accommodation.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.workat.api.accommodation.dto.AccommodationDto;
 import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
+import com.workat.api.accommodation.dto.response.AccommodationCurationsResponse;
 import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
 import com.workat.api.accommodation.service.AccommodationService;
@@ -76,5 +80,27 @@ public class AccommodationController {
 		accommodationService.addAccommodationReview(accommodationId, reviewRequest, user);
 
 		return ResponseEntity.ok().build();
+	}
+
+	@ResponseStatus(value = HttpStatus.OK)
+	@ApiOperation("Accommodation 큐레이션")
+	@GetMapping("/api/v1/accommodations/curations")
+	public ResponseEntity<AccommodationCurationsResponse> getAccommodationCurations() {
+		final AccommodationCurationsResponse response = accommodationService.getAccommodationCurations();
+
+		return ResponseEntity.ok(response);
+	}
+
+	@ResponseStatus(value = HttpStatus.OK)
+	@ApiOperation("Accommodation 이름 검색")
+	@ApiImplicitParam(name = "accommodationName", value = "Accommodation Name", required = true, dataType = "String", example = "워커힐")
+	@GetMapping("/api/v1/accommodations/names")
+	public ResponseEntity<List<AccommodationDto>> getAccommodationWithName(
+		@ApiParam(value = "accommodationName", example = "워커힐", type = "string")
+		@RequestParam(required = false) String accommodationName
+	) {
+		List<AccommodationDto> response = accommodationService.getAccommodationsWithName(accommodationName);
+
+		return ResponseEntity.ok(response);
 	}
 }

@@ -14,10 +14,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.workat.api.accommodation.dto.AccommodationCuration;
 import com.workat.api.accommodation.dto.AccommodationDetailDto;
 import com.workat.api.accommodation.dto.AccommodationDto;
 import com.workat.api.accommodation.dto.AccommodationReviewDto;
 import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
+import com.workat.api.accommodation.dto.response.AccommodationCurationsResponse;
 import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
 import com.workat.common.exception.ConflictException;
@@ -58,33 +60,16 @@ public class AccommodationService {
 
 		final PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "id");
 
-		final Page<Accommodation> accommodationPages = getAccommodationPages(
+		final Page<Accommodation> accommodationPages = getAccommodationPagesWithFilter(
 			pageRequest,
 			region,
 			infoTag,
 			reviewTag);
 
-		final List<AccommodationDto> AccommodationDtos = accommodationPages.stream()
-			.map(accommodation -> {
-				List<AccommodationReview> reviews = accommodationReviewRepository.findAllByAccommodation_Id(
-					accommodation.getId());
-
-				HashSet<TagDto> tagsDtoSet = reviews.stream()
-					.sorted(Comparator.comparing(AccommodationReview::getTag))
-					.map(AccommodationReview::getTag)
-					.map(TagDto::of)
-					.collect(toCollection(HashSet::new));
-
-				return AccommodationDto.of(
-					accommodation.getId(),
-					accommodation.getName(),
-					accommodation.getPrice(),
-					accommodation.getThumbnailImgUrl(),
-					tagsDtoSet);
-			}).collect(toList());
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(accommodationPages.getContent());
 
 		return AccommodationsResponse.of(
-			AccommodationDtos,
+			accommodationDtos,
 			accommodationPages.getNumber(),
 			accommodationPages.getSize(),
 			accommodationPages.getTotalElements()
@@ -142,7 +127,25 @@ public class AccommodationService {
 		accommodationReviewRepository.saveAll(accommodationReviews);
 	}
 
-	private Page<Accommodation> getAccommodationPages(
+	@Transactional(readOnly = true)
+	public AccommodationCurationsResponse getAccommodationCurations() {
+
+		List<Accommodation> accommodations = accommodationRepository.findAllByRandom(5);
+
+		return AccommodationCurationsResponse.of(
+			accommodations.stream()
+				.map(accommodation -> AccommodationCuration.of(
+					accommodation.getId(),
+					accommodation.getName(),
+					accommodation.getRegionType(),
+					accommodation.getImgUrl()
+				))
+				.collect(toList())
+		);
+	}
+
+	@Transactional(readOnly = true)
+	public Page<Accommodation> getAccommodationPagesWithFilter(
 		PageRequest pageRequest,
 		RegionType region,
 		AccommodationInfoTag infoTag,
@@ -164,6 +167,40 @@ public class AccommodationService {
 		}
 
 		return accommodationRepository.findAll(pageRequest);
+	}
+
+	@Transactional(readOnly = true)
+	public List<AccommodationDto> getAccommodationsWithName(String name) {
+
+		// TODO: getAccommodations 와 통합해보기
+		final List<Accommodation> accommodations = accommodationRepository.findAllByNameContaining(name);
+
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(accommodations);
+
+		return accommodationDtos;
+	}
+
+	@Transactional(readOnly = true)
+	public List<AccommodationDto> convertAccommodationDto(List<Accommodation> accommodations) {
+
+		return accommodations.stream()
+			.map(accommodation -> {
+				List<AccommodationReview> reviews = accommodationReviewRepository.findAllByAccommodation_Id(
+					accommodation.getId());
+
+				HashSet<TagDto> tagsDtoSet = reviews.stream()
+					.sorted(Comparator.comparing(AccommodationReview::getTag))
+					.map(AccommodationReview::getTag)
+					.map(TagDto::of)
+					.collect(toCollection(HashSet::new));
+
+				return AccommodationDto.of(
+					accommodation.getId(),
+					accommodation.getName(),
+					accommodation.getPrice(),
+					accommodation.getThumbnailImgUrl(),
+					tagsDtoSet);
+			}).collect(toList());
 	}
 
 	private AccommodationDetailDto convertAccommodationDetailDto(Accommodation accommodation,

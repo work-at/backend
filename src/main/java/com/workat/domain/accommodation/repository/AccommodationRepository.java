@@ -14,9 +14,13 @@ import com.workat.domain.accommodation.entity.Accommodation;
 
 public interface AccommodationRepository extends JpaRepository<Accommodation, Long> {
 
+	Optional<Accommodation> findById(Long accommodationId);
+
 	Page<Accommodation> findAll(Pageable pageable);
 
 	Page<Accommodation> findAllByRegionType(RegionType region, Pageable pageable);
+
+	List<Accommodation> findAllByNameContaining(String name);
 
 	@Query(value = "SELECT *"
 		+ "FROM accommodation a JOIN accommodation_info ai ON a.id = ai.accommodation_id "
@@ -38,7 +42,7 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
 		Pageable pageable
 	);
 
-	List<Accommodation> findAllByName(String name);
-
-	Optional<Accommodation> findById(Long accommodationId);
+	@Query(value = "SELECT * FROM accommodation a ORDER BY RAND() LIMIT :limitNum",
+		nativeQuery = true)
+	List<Accommodation> findAllByRandom(int limitNum);
 }
