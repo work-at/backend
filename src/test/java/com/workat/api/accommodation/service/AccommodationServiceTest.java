@@ -206,6 +206,63 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		assertEquals(accommodations.size(), accommodationDtos.size());
 	}
 
+	@DisplayName("getAccommodations 메소드는 상위 count 에 해당하는 리뷰 태그들을 필드로 반환해야 한다")
+	@Test
+	void getAccommodations_top_reviews() {
+		// given
+		Accommodation accommodation = saveAccommodations(1).get(0);
+		List<Users> users = saveUsers(15);
+
+		// when
+		List<AccommodationReview> reviewPart1 = users.subList(0, 5) // 1st 가장 큼
+			.stream()
+			.map(user -> AccommodationReview.of(AccommodationReviewTag.FOCUS, accommodation, user))
+			.collect(Collectors.toList());
+
+		List<AccommodationReview> reviewPart2 = users.subList(5, 9) // 2nd
+			.stream()
+			.map(user -> AccommodationReview.of(AccommodationReviewTag.SERVE_MEAL, accommodation, user))
+			.collect(Collectors.toList());
+
+		List<AccommodationReview> reviewPart3 = users.subList(9, 12) // 3rd
+			.stream()
+			.map(user -> AccommodationReview.of(AccommodationReviewTag.POWER, accommodation, user))
+			.collect(Collectors.toList());
+
+		final ArrayList<AccommodationReview> reviews = new ArrayList<>();
+		Stream.of(reviewPart1, reviewPart2, reviewPart3).forEach(reviews::addAll);
+
+		accommodationReviewRepository.saveAll(reviews);
+
+		users.subList(12, 15).stream()
+			.forEach(user -> {
+				List<AccommodationReview> allTagReviews = AccommodationReviewTag.ALL.stream()
+					.map(tag -> AccommodationReview.of(tag, accommodation, user))
+					.collect(toList());
+
+				accommodationReviewRepository.saveAll(allTagReviews);
+			});
+
+		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations(RegionType.SEOUL, null, null,
+			0,
+			10).getAccommodations();
+
+		// then
+		accommodationDtos.stream()
+			.forEach(dto -> {
+				List<AccommodationReviewTag> tags = dto.getTopReviewTags().stream()
+					.map(tagDto -> AccommodationReviewTag.of(tagDto.getName()))
+					.collect(toList());
+
+				assertAll(
+					() -> assertTrue(tags.contains(AccommodationReviewTag.FOCUS)),
+					() -> assertTrue(tags.contains(AccommodationReviewTag.SERVE_MEAL)),
+					() -> assertTrue(tags.contains(AccommodationReviewTag.POWER))
+				);
+			});
+
+	}
+
 	private List<Users> saveUsers(int size) {
 		return IntStream.range(0, size)
 			.mapToObj(idx -> {
