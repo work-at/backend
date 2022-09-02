@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -185,14 +186,20 @@ public class AccommodationService {
 
 		return accommodations.stream()
 			.map(accommodation -> {
-				List<AccommodationReview> reviews = accommodationReviewRepository.findAllByAccommodation_Id(
-					accommodation.getId());
 
-				HashSet<TagDto> tagsDtoSet = reviews.stream()
-					.sorted(Comparator.comparing(AccommodationReview::getTag))
-					.map(AccommodationReview::getTag)
-					.map(TagDto::of)
-					.collect(toCollection(HashSet::new));
+				// TODO: 효율적인 방법으로 고치기
+				LinkedHashSet<TagDto> tagsDtoSet = AccommodationReviewTag.ALL.stream()
+					.map(tag -> {
+						Long count = accommodationReviewRepository.countByTag(tag);
+
+						return TagCountDto.of(TagDto.of(tag), count);
+					})
+					.sorted(Comparator
+						.comparingLong(TagCountDto::getCount)
+						.reversed())
+					.limit(3)
+					.map(TagCountDto::getTag)
+					.collect(toCollection(LinkedHashSet::new));
 
 				return AccommodationDto.of(
 					accommodation.getId(),
