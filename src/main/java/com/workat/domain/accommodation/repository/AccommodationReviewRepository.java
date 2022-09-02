@@ -10,4 +10,6 @@ public interface AccommodationReviewRepository extends JpaRepository<Accommodati
 
 	List<AccommodationReview> findAllByAccommodation_Id(Long accommodationId);
 
+	List<AccommodationReview> findAllByAccommodation_IdAndUser_Id(Long accommodationId, Long userId);
+
 }

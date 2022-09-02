@@ -2,21 +2,27 @@ package com.workat.api.accommodation.service;
 
 import static java.util.stream.Collectors.*;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.workat.api.accommodation.dto.AccommodationCuration;
 import com.workat.api.accommodation.dto.AccommodationDetailDto;
 import com.workat.api.accommodation.dto.AccommodationDto;
 import com.workat.api.accommodation.dto.AccommodationReviewDto;
+import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
+import com.workat.api.accommodation.dto.response.AccommodationCurationsResponse;
 import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
+import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
@@ -29,6 +35,7 @@ import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagCountDto;
 import com.workat.domain.tag.dto.TagDto;
+import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,32 +49,30 @@ public class AccommodationService {
 
 	private final AccommodationInfoRepository accommodationInfoRepository;
 
+	@Transactional(readOnly = true)
 	public AccommodationsResponse getAccommodations(
 		RegionType region,
-		AccommodationInfoTag infoTagName,
-		AccommodationReviewTag accommodationReviewTag,
+		AccommodationInfoTag infoTag,
+		AccommodationReviewTag reviewTag,
 		int pageNumber,
 		int pageSize
 	) {
 
+		final PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "id");
+
+		final Page<Accommodation> accommodationPages = getAccommodationPagesWithFilter(
+			pageRequest,
+			region,
+			infoTag,
+			reviewTag);
+
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(accommodationPages.getContent());
+
 		return AccommodationsResponse.of(
-			Arrays.asList(AccommodationDto.of(1L, "그랜드워커힐서울", 235000L,
-					"https://lh5.googleusercontent.com/p/AF1QipOKO_7oTuHLK31fOjhqp13KompnHRxgi_2_oOVT=w253-h168-k-no",
-					Arrays.asList(
-						TagDto.of(AccommodationReviewTag.FOCUS),
-						TagDto.of(AccommodationReviewTag.SERVE_MEAL),
-						TagDto.of(AccommodationReviewTag.WIFI)
-					)
-				),
-				AccommodationDto.of(2L, "씨마크호텔", 135000L,
-					"https://lh5.googleusercontent.com/proxy/pxIAn34FA3bpLmWfDBKZe6uTiFdb7JrocuP7tzcLTTWcINIqCKLsuADqZW65VteN0bZ28rWStDjNwGjBNhr4_V8KHjBW7aWhNkORBP3Jw9UFmeqive-omWDVIUh5HwVj29V9wi_7iOoUKcvCG6XduQ6Bl2MYyQ=w253-h184-k-no",
-					Arrays.asList(
-						TagDto.of(AccommodationReviewTag.WIFI),
-						TagDto.of(AccommodationReviewTag.POWER),
-						TagDto.of(AccommodationReviewTag.SERVE_MEAL)
-					)
-				)
-			), pageNumber, pageSize, 150
+			accommodationDtos,
+			accommodationPages.getNumber(),
+			accommodationPages.getSize(),
+			accommodationPages.getTotalElements()
 		);
 	}
 
@@ -96,6 +101,106 @@ public class AccommodationService {
 			accommodationDetailDto,
 			accommodationReviewDto
 		);
+	}
+
+	@Transactional
+	public void addAccommodationReview(long accommodationId, AccommodationReviewRequest reviewRequest, Users user) {
+
+		final Accommodation accommodation = accommodationRepository.findById(accommodationId)
+			.orElseThrow(() -> new NotFoundException("No accommodation found for the id"));
+
+		final List<AccommodationReview> optionalAccommodationReviews = accommodationReviewRepository.findAllByAccommodation_IdAndUser_Id(
+			accommodation.getId(),
+			user.getId());
+
+		if (!optionalAccommodationReviews.isEmpty()) {
+			throw new ConflictException("There is already a review posted with this user id.");
+		}
+
+		final HashSet<String> reviewTagNames = reviewRequest.getTagNames();
+
+		final List<AccommodationReview> accommodationReviews = reviewTagNames.stream()
+			.map(AccommodationReviewTag::of)
+			.map(tag -> AccommodationReview.of(tag, accommodation, user))
+			.collect(toList());
+
+		accommodationReviewRepository.saveAll(accommodationReviews);
+	}
+
+	@Transactional(readOnly = true)
+	public AccommodationCurationsResponse getAccommodationCurations() {
+
+		List<Accommodation> accommodations = accommodationRepository.findAllByRandom(5);
+
+		return AccommodationCurationsResponse.of(
+			accommodations.stream()
+				.map(accommodation -> AccommodationCuration.of(
+					accommodation.getId(),
+					accommodation.getName(),
+					accommodation.getRegionType(),
+					accommodation.getImgUrl()
+				))
+				.collect(toList())
+		);
+	}
+
+	@Transactional(readOnly = true)
+	public Page<Accommodation> getAccommodationPagesWithFilter(
+		PageRequest pageRequest,
+		RegionType region,
+		AccommodationInfoTag infoTag,
+		AccommodationReviewTag reviewTag
+	) {
+		// TODO: 좀 더 깔끔한 방법 생각해보기
+		if (region != null && infoTag != null) {
+			return accommodationRepository.findAllByRegionAndInfoTag(region.getValue(),
+				infoTag.getName(),
+				pageRequest);
+		}
+
+		if (region == null && infoTag != null) {
+			return accommodationRepository.findAllByInfoTag(infoTag.getName(), pageRequest);
+		}
+
+		if (infoTag == null && region != null) {
+			return accommodationRepository.findAllByRegionType(region, pageRequest);
+		}
+
+		return accommodationRepository.findAll(pageRequest);
+	}
+
+	@Transactional(readOnly = true)
+	public List<AccommodationDto> getAccommodationsWithName(String name) {
+
+		// TODO: getAccommodations 와 통합해보기
+		final List<Accommodation> accommodations = accommodationRepository.findAllByNameContaining(name);
+
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(accommodations);
+
+		return accommodationDtos;
+	}
+
+	@Transactional(readOnly = true)
+	public List<AccommodationDto> convertAccommodationDto(List<Accommodation> accommodations) {
+
+		return accommodations.stream()
+			.map(accommodation -> {
+				List<AccommodationReview> reviews = accommodationReviewRepository.findAllByAccommodation_Id(
+					accommodation.getId());
+
+				HashSet<TagDto> tagsDtoSet = reviews.stream()
+					.sorted(Comparator.comparing(AccommodationReview::getTag))
+					.map(AccommodationReview::getTag)
+					.map(TagDto::of)
+					.collect(toCollection(HashSet::new));
+
+				return AccommodationDto.of(
+					accommodation.getId(),
+					accommodation.getName(),
+					accommodation.getPrice(),
+					accommodation.getThumbnailImgUrl(),
+					tagsDtoSet);
+			}).collect(toList());
 	}
 
 	private AccommodationDetailDto convertAccommodationDetailDto(Accommodation accommodation,

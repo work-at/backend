@@ -23,10 +23,10 @@ public class AccommodationsResponse {
 	private int pageSize;
 
 	@ApiModelProperty(name = "totalCount", example = "150")
-	private int totalCount;
+	private long totalCount;
 
 	private AccommodationsResponse(List<AccommodationDto> accommodations, int pageNumber, int pageSize,
-		int totalCount) {
+		long totalCount) {
 		this.accommodations = accommodations;
 		this.pageNumber = pageNumber;
 		this.pageSize = pageSize;
@@ -34,7 +34,7 @@ public class AccommodationsResponse {
 	}
 
 	public static AccommodationsResponse of(List<AccommodationDto> accommodations, int pageNumber, int pageSize,
-		int totalCount) {
+		long totalCount) {
 		return new AccommodationsResponse(accommodations, pageNumber, pageSize, totalCount);
 	}
 }
