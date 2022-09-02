@@ -20,6 +20,15 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
 
 	@Query(value = "SELECT *"
 		+ "FROM accommodation a JOIN accommodation_info ai ON a.id = ai.accommodation_id "
+		+ "WHERE (ai.tag IS NULL OR ai.tag = :infoTag)",
+		nativeQuery = true)
+	Page<Accommodation> findAllByInfoTag(
+		@Param("infoTag") String infoTag,
+		Pageable pageable
+	);
+
+	@Query(value = "SELECT *"
+		+ "FROM accommodation a JOIN accommodation_info ai ON a.id = ai.accommodation_id "
 		+ "WHERE (a.region_type IS NULL OR a.region_type = :regionType)"
 		+ "AND (ai.tag IS NULL OR ai.tag = :infoTag) ",
 		nativeQuery = true)

@@ -56,24 +56,15 @@ public class AccommodationService {
 		int pageSize
 	) {
 
-		PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "id");
+		final PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "id");
 
-		Page<Accommodation> pageableAccommodations;
+		final Page<Accommodation> accommodationPages = getAccommodationPages(
+			pageRequest,
+			region,
+			infoTag,
+			reviewTag);
 
-		if (region == null) {
-			pageableAccommodations = accommodationRepository.findAll(pageRequest);
-		} else if (infoTag != null) {
-			pageableAccommodations = accommodationRepository.findAllByRegionAndInfoTag(
-				region.getValue(),
-				infoTag.getName(),
-				pageRequest);
-		} else {
-			pageableAccommodations = accommodationRepository.findAllByRegionType(
-				region,
-				pageRequest);
-		}
-
-		List<AccommodationDto> AccommodationDtos = pageableAccommodations.stream()
+		final List<AccommodationDto> AccommodationDtos = accommodationPages.stream()
 			.map(accommodation -> {
 				List<AccommodationReview> reviews = accommodationReviewRepository.findAllByAccommodation_Id(
 					accommodation.getId());
@@ -94,9 +85,9 @@ public class AccommodationService {
 
 		return AccommodationsResponse.of(
 			AccommodationDtos,
-			pageableAccommodations.getNumber(),
-			pageableAccommodations.getSize(),
-			pageableAccommodations.getTotalElements()
+			accommodationPages.getNumber(),
+			accommodationPages.getSize(),
+			accommodationPages.getTotalElements()
 		);
 	}
 
@@ -149,6 +140,30 @@ public class AccommodationService {
 			.collect(toList());
 
 		accommodationReviewRepository.saveAll(accommodationReviews);
+	}
+
+	private Page<Accommodation> getAccommodationPages(
+		PageRequest pageRequest,
+		RegionType region,
+		AccommodationInfoTag infoTag,
+		AccommodationReviewTag reviewTag
+	) {
+		// TODO: 좀 더 깔끔한 방법 생각해보기
+		if (region != null && infoTag != null) {
+			return accommodationRepository.findAllByRegionAndInfoTag(region.getValue(),
+				infoTag.getName(),
+				pageRequest);
+		}
+
+		if (region == null && infoTag != null) {
+			return accommodationRepository.findAllByInfoTag(infoTag.getName(), pageRequest);
+		}
+
+		if (infoTag == null && region != null) {
+			return accommodationRepository.findAllByRegionType(region, pageRequest);
+		}
+
+		return accommodationRepository.findAll(pageRequest);
 	}
 
 	private AccommodationDetailDto convertAccommodationDetailDto(Accommodation accommodation,
