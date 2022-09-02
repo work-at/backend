@@ -44,9 +44,10 @@ public class AccommodationService {
 
 	private final AccommodationInfoRepository accommodationInfoRepository;
 
+	@Transactional(readOnly = true)
 	public AccommodationsResponse getAccommodations(
 		RegionType region,
-		AccommodationInfoTag infoTagName,
+		AccommodationInfoTag infoTag,
 		AccommodationReviewTag accommodationReviewTag,
 		int pageNumber,
 		int pageSize
@@ -54,7 +55,21 @@ public class AccommodationService {
 
 		PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "id");
 
-		Page<Accommodation> pageableAccommodations = accommodationRepository.findAllByRegionType(region, pageRequest);
+		Page<Accommodation> pageableAccommodations;
+
+		if (region == null) {
+			pageableAccommodations = accommodationRepository.findAll(pageRequest);
+		} else if (infoTag != null) {
+			pageableAccommodations = accommodationRepository.findAllByRegionAndInfoTag(
+				region.getValue(),
+				infoTag.getName(),
+				pageRequest);
+		} else {
+			pageableAccommodations = accommodationRepository.findAllByRegionType(
+				region,
+				pageRequest);
+
+		}
 
 		List<AccommodationDto> AccommodationDtos = pageableAccommodations.stream()
 			.map(accommodation -> {
@@ -79,7 +94,7 @@ public class AccommodationService {
 			AccommodationDtos,
 			pageableAccommodations.getNumber(),
 			pageableAccommodations.getSize(),
-			pageableAccommodations.getTotalPages()
+			pageableAccommodations.getTotalElements()
 		);
 	}
 
