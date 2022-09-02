@@ -17,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.workat.api.accommodation.dto.AccommodationDetailDto;
 import com.workat.api.accommodation.dto.AccommodationDto;
 import com.workat.api.accommodation.dto.AccommodationReviewDto;
+import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
 import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
+import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
@@ -31,6 +33,7 @@ import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagCountDto;
 import com.workat.domain.tag.dto.TagDto;
+import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
 
@@ -48,7 +51,7 @@ public class AccommodationService {
 	public AccommodationsResponse getAccommodations(
 		RegionType region,
 		AccommodationInfoTag infoTag,
-		AccommodationReviewTag accommodationReviewTag,
+		AccommodationReviewTag reviewTag,
 		int pageNumber,
 		int pageSize
 	) {
@@ -68,7 +71,6 @@ public class AccommodationService {
 			pageableAccommodations = accommodationRepository.findAllByRegionType(
 				region,
 				pageRequest);
-
 		}
 
 		List<AccommodationDto> AccommodationDtos = pageableAccommodations.stream()
@@ -123,6 +125,30 @@ public class AccommodationService {
 			accommodationDetailDto,
 			accommodationReviewDto
 		);
+	}
+
+	@Transactional
+	public void addAccommodationReview(long accommodationId, AccommodationReviewRequest reviewRequest, Users user) {
+
+		final Accommodation accommodation = accommodationRepository.findById(accommodationId)
+			.orElseThrow(() -> new NotFoundException("No accommodation found for the id"));
+
+		final List<AccommodationReview> optionalAccommodationReviews = accommodationReviewRepository.findAllByAccommodation_IdAndUser_Id(
+			accommodation.getId(),
+			user.getId());
+
+		if (!optionalAccommodationReviews.isEmpty()) {
+			throw new ConflictException("There is already a review posted with this user id.");
+		}
+
+		final HashSet<String> reviewTagNames = reviewRequest.getTagNames();
+
+		final List<AccommodationReview> accommodationReviews = reviewTagNames.stream()
+			.map(AccommodationReviewTag::of)
+			.map(tag -> AccommodationReview.of(tag, accommodation, user))
+			.collect(toList());
+
+		accommodationReviewRepository.saveAll(accommodationReviews);
 	}
 
 	private AccommodationDetailDto convertAccommodationDetailDto(Accommodation accommodation,

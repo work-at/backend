@@ -32,5 +32,4 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
 	List<Accommodation> findAllByName(String name);
 
 	Optional<Accommodation> findById(Long accommodationId);
-
 }
