@@ -16,6 +16,8 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
 
 	Optional<Accommodation> findById(Long accommodationId);
 
+	Optional<Accommodation> findByName(String name);
+
 	Page<Accommodation> findAll(Pageable pageable);
 
 	Page<Accommodation> findAllByRegionType(RegionType region, Pageable pageable);
