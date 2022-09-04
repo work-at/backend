@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.workat.api.accommodation.dto.CsvAccommodationDto;
-import com.workat.common.exception.NotFoundException;
 import com.workat.common.util.FileReadUtils;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
