@@ -37,10 +37,12 @@ import com.workat.domain.map.repository.worker.WorkerLocationRedisRepository;
 import com.workat.domain.user.activity.ActivityType;
 import com.workat.domain.user.entity.UserActivity;
 import com.workat.domain.user.entity.UserBlocking;
+import com.workat.domain.user.entity.UserEmailLimit;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.filter.FilterEmail;
 import com.workat.domain.user.repository.UserActivityRepository;
+import com.workat.domain.user.repository.UserEmailLimitRepository;
 import com.workat.domain.user.repository.blocking.UserBlockingRepository;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
@@ -80,6 +82,8 @@ public class UserService {
 	private final AuthorizationService authorizationService;
 
 	private final ChatRoomRepository chatRoomRepository;
+
+	private final UserEmailLimitRepository userEmailLimitRepository;
 
 	public AuthResponse login(OauthType oauthType, long oauthId) {
 		final boolean userExist = validateUserExistWithOauthId(oauthType, oauthId);
@@ -200,8 +204,11 @@ public class UserService {
 	public void sendCompanyVerifyEmail(Users user, EmailCertifyRequest request, String siteURL) throws
 		UnsupportedEncodingException,
 		MessagingException {
-		if (user.getEmailRequestRemain() == 0) {
-			throw new ForbiddenException("email 인증 요청이 모두 소모되었습니다");
+		if (user.getEmailRequestRemain() == 5) {
+			if (userEmailLimitRepository.existsById(user.getId())) {
+				throw new ForbiddenException("email 인증 요청이 모두 소모되었습니다");
+			}
+			user.resetEmailRequestCount();
 		}
 
 		if (FilterEmail.anyMatch(request.getEmail())) {
@@ -210,7 +217,12 @@ public class UserService {
 
 		UserProfile userProfile = userProfileRepository.findById(user.getId())
 			.orElseThrow(() -> new NotFoundException("user not found"));
-		user.decreaseEmailRequestRemain();
+		user.increseEmailRequestCount();
+		if (user.getEmailRequestRemain() == 5) {
+			UserEmailLimit userEmailLimit = UserEmailLimit.of(user.getId());
+			userEmailLimitRepository.save(userEmailLimit);
+		}
+
 		user.setVerificationCode();
 		userRepository.save(user);
 
