@@ -1,8 +1,5 @@
 package com.workat.domain.user.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,15 +8,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import net.bytebuddy.utility.RandomString;
 
 import com.workat.domain.BaseEntity;
 import com.workat.domain.auth.OauthType;
-import com.workat.domain.chat.entity.ChatRoom;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,7 +39,7 @@ public class Users extends BaseEntity {
 	private String verificationCode;
 
 	@Column
-	private int emailRequestRemain = 5;
+	private int emailRequestRemain = 0;
 
 	@Column
 	private boolean trackingOff;
@@ -67,8 +61,12 @@ public class Users extends BaseEntity {
 		this.verificationCode = null;
 	}
 
-	public void decreaseEmailRequestRemain() {
-		emailRequestRemain--;
+	public void increseEmailRequestCount() {
+		emailRequestRemain++;
+	}
+
+	public void resetEmailRequestCount() {
+		emailRequestRemain = 0;
 	}
 
 	public void turnOnTracking() {
