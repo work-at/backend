@@ -67,8 +67,8 @@ public class MyProfileResponse {
 		this.trackingOff = trackingOff;
 	}
 
-	public static MyProfileResponse of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities, boolean trackingOff) {
-		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(),
+	public static MyProfileResponse of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities, boolean trackingOff, String baseUrl) {
+		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), baseUrl + userProfile.getImageUrl(),
 			userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(),
 			userProfile.isCertified(), workchats, activities, trackingOff);
 	}

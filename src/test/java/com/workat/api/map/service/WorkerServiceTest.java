@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.workat.api.map.dto.WorkerDto;
 import com.workat.api.map.dto.response.WorkerListResponse;
 import com.workat.api.map.dto.response.WorkerSizeResponse;
+import com.workat.common.util.UrlUtils;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.chat.repository.room.ChatRoomCustomRepository;
 import com.workat.domain.chat.repository.room.ChatRoomRepository;
@@ -35,6 +36,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 	private static WorkerLocation workerLocation, workerLocation1, workerLocation2;
 	private static Users user;
 	private static UserProfile userProfile;
+	private static String baseUrl = "http://localhost:8080";
 
 	@Autowired
 	private WorkerLocationRedisRepository workerLocationRedisRepository;
@@ -91,7 +93,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, 5);
+		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, 5, baseUrl);
 
 		//then
 		Assertions.assertEquals(response.getResponse().size(), 1);
@@ -113,7 +115,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		//given
 
 		//when
-		WorkerDto response = workerService.findWorkerById(user.getId());
+		WorkerDto response = workerService.findWorkerById(user.getId(), baseUrl);
 
 		//then
 		Assertions.assertAll(

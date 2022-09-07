@@ -58,8 +58,8 @@ public class WorkerDto {
 		this.activities = activities;
 	}
 
-	public static WorkerDto of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities) {
-		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(),
+	public static WorkerDto of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities, String baseUrl) {
+		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), baseUrl + userProfile.getImageUrl(),
 			userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(),
 			workchats, activities);
 	}

@@ -1,5 +1,7 @@
 package com.workat.api.map.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +14,7 @@ import com.workat.api.map.dto.response.WorkerPinResponse;
 import com.workat.api.map.dto.response.WorkerSizeResponse;
 import com.workat.api.map.service.WorkerService;
 import com.workat.common.annotation.UserValidation;
+import com.workat.common.util.UrlUtils;
 import com.workat.domain.user.entity.Users;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +27,19 @@ public class WorkerController {
 	private final WorkerService workerService;
 
 	@GetMapping("/api/v1/map/workers/{userId}")
-	public ResponseEntity<WorkerDto> findWorkerById(@PathVariable("userId") Long userId) {
-		WorkerDto response = workerService.findWorkerById(userId);
+	public ResponseEntity<WorkerDto> findWorkerById(@PathVariable("userId") Long userId, HttpServletRequest request) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
+		WorkerDto response = workerService.findWorkerById(userId, baseUrl);
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/api/v1/map/workers")
-	public ResponseEntity<WorkerListResponse> findNearWorker(@UserValidation Users user, @RequestParam(defaultValue = "5.0") double kilometer) {
-		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, kilometer);
+	public ResponseEntity<WorkerListResponse> findNearWorker(
+		@UserValidation Users user,
+		@RequestParam(defaultValue = "5.0") double kilometer,
+		HttpServletRequest request) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
+		WorkerListResponse response = workerService.findAllWorkerByLocationNear(user, kilometer, baseUrl);
 		return ResponseEntity.ok(response);
 	}
 

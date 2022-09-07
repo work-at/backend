@@ -25,6 +25,7 @@ import com.workat.api.user.dto.response.EmailLimitResponseDto;
 import com.workat.api.user.dto.response.MyProfileResponse;
 import com.workat.api.user.service.UserService;
 import com.workat.common.annotation.UserValidation;
+import com.workat.common.util.UrlUtils;
 import com.workat.domain.user.entity.Users;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,8 +55,9 @@ public class UserController {
 	}
 
 	@GetMapping("/api/v1/user/self")
-	public ResponseEntity<MyProfileResponse> getSelfUserProfile(@UserValidation Users user) {
-		MyProfileResponse response = userService.getSelfUserProfile(user);
+	public ResponseEntity<MyProfileResponse> getSelfUserProfile(@UserValidation Users user, HttpServletRequest request) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
+		MyProfileResponse response = userService.getSelfUserProfile(user, baseUrl);
 		return ResponseEntity.ok(response);
 	}
 

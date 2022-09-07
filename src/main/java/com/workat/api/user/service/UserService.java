@@ -143,7 +143,7 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public MyProfileResponse getSelfUserProfile(Users user) {
+	public MyProfileResponse getSelfUserProfile(Users user, String baseUrl) {
 		UserProfile userProfile = userProfileRepository.findById(user.getId())
 			.orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		int workchats = chatRoomRepository.findAllByUser(userProfile.getUser()).size();
@@ -152,7 +152,7 @@ public class UserService {
 			.map(activity -> ActivityTypeDto.of(activity.name(), activity.getType()))
 			.collect(Collectors.toList());
 
-		return MyProfileResponse.of(userProfile, workchats, activityTypes, user.isTrackingOff());
+		return MyProfileResponse.of(userProfile, workchats, activityTypes, user.isTrackingOff(), baseUrl);
 	}
 
 	@Transactional
