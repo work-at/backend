@@ -43,7 +43,7 @@ public class WorkerService {
 	private final UserActivityRepository userActivityRepository;
 
 	@Transactional(readOnly = true)
-	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer) {
+	public WorkerListResponse findAllWorkerByLocationNear(Users user, double kilometer, String baseUrl) {
 		if (user.isTrackingOff()) {
 			throw new BadRequestException("내 위치 공유 옵션을 켜야합니다");
 		}
@@ -61,7 +61,7 @@ public class WorkerService {
 					.map(UserActivity::getActivity)
 					.map(activity -> ActivityTypeDto.of(activity.name(), activity.getType()))
 					.collect(Collectors.toList());
-				return WorkerDto.of(userProfile, workchats, activityTypes);
+				return WorkerDto.of(userProfile, workchats, activityTypes, baseUrl);
 			})
 			.collect(Collectors.toList());
 
@@ -96,7 +96,7 @@ public class WorkerService {
 	}
 
 	@Transactional(readOnly = true)
-	public WorkerDto findWorkerById(Long userId) {
+	public WorkerDto findWorkerById(Long userId, String baseUrl) {
 		// TODO: 내 위치 공유 옵션을 끌 경우 워케이셔너 조회 자체가 불가능한지 여부 결정
 		UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new NotFoundException("워케이셔너가 존재하지 않습니다"));
 		int workchats = chatRoomRepository.findAllByUser(userProfile.getUser()).size();
@@ -104,7 +104,7 @@ public class WorkerService {
 			.map(UserActivity::getActivity)
 			.map(activity -> ActivityTypeDto.of(activity.name(), activity.getType()))
 			.collect(Collectors.toList());
-		return WorkerDto.of(userProfile, workchats, activityTypes);
+		return WorkerDto.of(userProfile, workchats, activityTypes, baseUrl);
 	}
 
 	private List<WorkerLocation> getWorkerByLocationNear(Users user, double kilometer) {
