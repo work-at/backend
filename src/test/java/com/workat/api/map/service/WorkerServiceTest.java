@@ -120,7 +120,7 @@ public class WorkerServiceTest extends MultipleDatasourceBaseTest {
 		//then
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(response.getId(), user.getId()),
-			() -> Assertions.assertEquals(response.getImageUrl(), userProfile.getImageUrl()),
+			() -> Assertions.assertEquals(response.getImageUrl(), baseUrl + userProfile.getImageUrl()),
 			() -> Assertions.assertEquals(response.getPosition().getName(), userProfile.getPosition().name()),
 			() -> Assertions.assertEquals(response.getWorkingYear().getName(), userProfile.getWorkingYear().name())
 		);
