@@ -88,5 +88,6 @@ public class Accommodation extends BaseEntity {
 		this.phone = dto.getPhone();
 		this.price = Long.parseLong(dto.getPrice().replaceAll("[^0-9]", ""));
 		this.relatedUrl = dto.getRelatedUrl();
+		this.placeUrl = dto.getPlaceUrl();
 	}
 }

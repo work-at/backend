@@ -21,7 +21,7 @@ public class CsvAccommodationDto {
 
 	private String name;
 
-	private String relatedUrl;
+	private String placeUrl;
 
 	private String roadAddress;
 
@@ -41,6 +41,8 @@ public class CsvAccommodationDto {
 
 	private String nearCity;
 
+	private String relatedUrl;
+
 	private String thumbnailImgUrl;
 
 	private String imgUrl;
@@ -58,10 +60,6 @@ public class CsvAccommodationDto {
 					continue;
 				}
 				field.set(dto, line.get(index++));
-
-				if (index + 2 == fields.length) {
-					break;
-				}
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(CsvAccommodationDto.class.getSimpleName() + " factory exception : " + e);
 			}
