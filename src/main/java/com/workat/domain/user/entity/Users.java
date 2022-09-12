@@ -14,6 +14,7 @@ import net.bytebuddy.utility.RandomString;
 
 import com.workat.domain.BaseEntity;
 import com.workat.domain.auth.OauthType;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +31,7 @@ public class Users extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column
-	private OauthType oauthType;
+	private OauthType oauthType; // TODO: oauth 에 의존적인 부분들 수정해보기
 
 	@Column(unique = true)
 	private Long oauthId;
