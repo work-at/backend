@@ -41,11 +41,13 @@ import com.workat.domain.user.entity.UserEmailLimit;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.filter.FilterEmail;
+import com.workat.domain.user.job.DepartmentType;
+import com.workat.domain.user.job.DurationType;
 import com.workat.domain.user.repository.UserActivityRepository;
 import com.workat.domain.user.repository.UserEmailLimitRepository;
-import com.workat.domain.user.repository.blocking.UserBlockingRepository;
 import com.workat.domain.user.repository.UserProfileRepository;
 import com.workat.domain.user.repository.UsersRepository;
+import com.workat.domain.user.repository.blocking.UserBlockingRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,44 +57,45 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UserService {
 
+	private final JavaMailSender mailSender;
+	private final UsersRepository userRepository;
+	private final UserProfileRepository userProfileRepository;
+	private final UserBlockingRepository userBlockingRepository;
+	private final WorkerLocationRedisRepository workerLocationRedisRepository;
+	private final UserActivityRepository userActivityRepository;
+	private final AuthorizationService authorizationService;
+	private final ChatRoomRepository chatRoomRepository;
+	private final UserEmailLimitRepository userEmailLimitRepository;
+
 	@Value("${resources.upload-folder:/home/work_at_tour/images}")
 	private String resourcesLocation;
-
 	@Value("${resources.upload-uri:/uploaded}")
 	private String uploadUri;
-
 	@Value("${resources.profile-upload-folder:/profile_images}")
 	private String profileFolder;
-
 	@Value("${spring.mail.username}")
 	private String fromAddress;
 
-	private final JavaMailSender mailSender;
-
-	private final UsersRepository userRepository;
-
-	private final UserProfileRepository userProfileRepository;
-
-	private final UserBlockingRepository userBlockingRepository;
-
-	private final WorkerLocationRedisRepository workerLocationRedisRepository;
-
-	private final UserActivityRepository userActivityRepository;
-
-	private final AuthorizationService authorizationService;
-
-	private final ChatRoomRepository chatRoomRepository;
-
-	private final UserEmailLimitRepository userEmailLimitRepository;
-
-	public AuthResponse login(OauthType oauthType, long oauthId) {
+	public AuthResponse loginWithOauth(OauthType oauthType, long oauthId) {
 		final boolean userExist = validateUserExistWithOauthId(oauthType, oauthId);
 
 		if (!userExist) {
 			return AuthResponse.ResponseForSignup(oauthId);
 		}
+
 		final Users user = userRepository.findByOauthTypeAndOauthId(oauthType, oauthId)
 			.orElseThrow(() -> new NotFoundException("user not found"));
+
+		final String accessToken = authorizationService.createAccessToken(user.getId());
+
+		return AuthResponse.ResponseForLogin(accessToken);
+	}
+
+	@Transactional
+	public AuthResponse loginForTest(long testId) {
+		final Users user = userRepository.findByOauthTypeAndOauthId(OauthType.TEST, testId)
+			.orElseGet(() -> saveTestUser(testId));
+
 		final String accessToken = authorizationService.createAccessToken(user.getId());
 
 		return AuthResponse.ResponseForLogin(accessToken);
@@ -315,5 +318,24 @@ public class UserService {
 		userBlocking.assignUsers(findReportingUser, findBlockedUser);
 
 		userBlockingRepository.save(userBlocking);
+	}
+
+	@Transactional
+	public Users saveTestUser(long testOauthId) {
+		Users user = Users.of(OauthType.TEST, testOauthId);
+
+		UserProfile userProfile = UserProfile.builder()
+			.user(user)
+			.nickname("테스트맨_" + testOauthId)
+			.imageUrl("") // TODO: 테스트용 계정 프로필 이미지 추가
+			.position(DepartmentType.ENGINEER)
+			.workingYear(DurationType.JUNIOR)
+			.build();
+
+		userProfileRepository.save(userProfile);
+
+		userRepository.save(user);
+
+		return user;
 	}
 }
