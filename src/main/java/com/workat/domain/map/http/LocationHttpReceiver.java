@@ -14,7 +14,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.workat.api.map.dto.request.LocationTriggerRequest;
 import com.workat.common.exception.InternalServerException;
 import com.workat.common.exception.base.BusinessException;
 import com.workat.domain.map.entity.LocationCategory;

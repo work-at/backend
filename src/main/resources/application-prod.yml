@@ -7,7 +7,7 @@ spring:
       ddl-auto: update
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://34.64.37.69:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://34.64.37.69:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
     username: root
     password: workatworkat
     hikari:
@@ -38,14 +38,6 @@ external:
     redirect-url: "https://workat.o-r.kr/login"
 
 resources:
-  images:
-    cafe: /images/cafe_images
-    restaurant:
-      korea: /images/food_images/k_food
-      china: /images/food_images/c_food
-      japan: /images/food_images/j_food
-      wastern: /images/food_images/w_food
-      etc: /images/food_images/etc_food
   upload-folder: /home/work_at_prod/images
   upload-uri: /uploaded
   profile-upload-folder: /profile_images

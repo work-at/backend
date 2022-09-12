@@ -43,6 +43,12 @@ public class Location extends BaseEntity {
 	private String placeName;
 
 	@Column
+	private String thumbnailImageUrl;
+
+	@Column
+	String fullImageUrl;
+
+	@Column
 	private String placeUrl;
 
 	@Column
@@ -68,6 +74,8 @@ public class Location extends BaseEntity {
 			.placeName(dto.getPlaceName())
 			.placeUrl(dto.getPlaceUrl())
 			.placeCategory(dto.getCategoryName())
+			.thumbnailImageUrl(dto.getThumbnailImageUrl())
+			.fullImageUrl(dto.getFullImageUrl())
 			.addressName(dto.getAddressName())
 			.roadAddressName(dto.getRoadAddressName())
 			.longitude(Double.parseDouble(dto.getX()))
@@ -83,6 +91,12 @@ public class Location extends BaseEntity {
 		this.roadAddressName = dto.getRoadAddressName();
 		this.longitude = Double.parseDouble(dto.getX());
 		this.latitude = Double.parseDouble(dto.getY());
+		return this;
+	}
+
+	public Location setImages(String[] images) {
+		this.thumbnailImageUrl = images[0];
+		this.fullImageUrl = images[1];
 		return this;
 	}
 }

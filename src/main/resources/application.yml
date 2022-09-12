@@ -34,6 +34,9 @@ spring:
           starttls:
             enable: true
 
+server:
+  host: 34.64.253.54
+
 external:
   kakaoOauth:
     clientId: "7052acd04b3385c80fac9bb40d8b5a32"

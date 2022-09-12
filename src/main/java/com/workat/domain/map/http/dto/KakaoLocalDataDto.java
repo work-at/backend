@@ -34,10 +34,12 @@ public class KakaoLocalDataDto {
 
 	private String roadAddressName;
 
+	private String thumbnailImageUrl;
+
+	private String fullImageUrl;
+
 	@Builder
-	public KakaoLocalDataDto(String id, String phone, String placeName, String placeUrl, String categoryName, String x,
-		String y,
-		String addressName, String roadAddressName) {
+	public KakaoLocalDataDto(String id, String phone, String placeName, String placeUrl, String categoryName, String x, String y, String addressName, String roadAddressName) {
 		this.id = id;
 		this.phone = phone;
 		this.placeName = placeName;
@@ -47,6 +49,11 @@ public class KakaoLocalDataDto {
 		this.y = y;
 		this.addressName = addressName;
 		this.roadAddressName = roadAddressName;
+	}
+
+	public void updateImages(String[] imageUrls) {
+		this.thumbnailImageUrl = imageUrls[0];
+		this.fullImageUrl = imageUrls[1];
 	}
 
 }

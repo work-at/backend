@@ -25,7 +25,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.workat.api.map.dto.LocationDetailDto;
 import com.workat.api.map.dto.request.LocationTriggerRequest;
-import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.NotFoundException;
@@ -74,12 +73,15 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	@Autowired
 	private RestaurantReviewRepository restaurantReviewRepository;
 
+	@Autowired
+	private LocationImageGenerator imageGenerator;
+
 	@BeforeEach
 	void setUp() {
 		this.locationHttpReceiver = new LocationHttpReceiver(restTemplate);
 		this.reviewService = new ReviewService(cafeReviewRepository, restaurantReviewRepository, locationRepository);
 		this.locationService = new LocationService(locationHttpReceiver, reviewService, locationRepository,
-			areaRepository);
+			areaRepository, imageGenerator);
 	}
 
 	@Test
@@ -90,7 +92,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertThrows(BadRequestException.class,
-			() -> locationService.getLocations(false, null, 1.0, 1.0, 1));
+			() -> locationService.getLocations(false, "", null, 1.0, 1.0, 1));
 	}
 
 	@Test
@@ -100,7 +102,8 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		//when
 
 		//then
-		assertEquals(Collections.emptyList(), locationService.getLocations(false, LocationCategory.RESTAURANT, 1.0, 1.0, 1).getLocations());
+		assertEquals(Collections.emptyList(),
+			locationService.getLocations(false, "", LocationCategory.RESTAURANT, 1.0, 1.0, 1).getLocations());
 	}
 
 	@Test
@@ -110,7 +113,8 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		//when
 
 		//then
-		assertEquals(Collections.emptyList(), locationService.getLocations(false, LocationCategory.RESTAURANT, 1.0, 1.0, 1).getLocations());
+		assertEquals(Collections.emptyList(),
+			locationService.getLocations(false, "", LocationCategory.RESTAURANT, 1.0, 1.0, 1).getLocations());
 	}
 
 	// TODO: 2022/07/13 거리 관련 로직 확정전이라 exception이 무조건 발생
@@ -184,7 +188,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		//when
 
 		//then
-		assertThrows(NotFoundException.class, () -> locationService.getLocationById(LocationCategory.CAFE, 1L, 1L));
+		assertThrows(NotFoundException.class, () -> locationService.getLocationById("", LocationCategory.CAFE, 1L, 1L));
 	}
 
 	@Test
@@ -215,7 +219,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		long locationid = locationRepository.save(given).getId();
 
 		//when
-		LocationDetailDto result = locationService.getLocationById(LocationCategory.CAFE, locationid, 1L)
+		LocationDetailDto result = locationService.getLocationById("", LocationCategory.CAFE, locationid, 1L)
 			.getLocationDetail();
 
 		//then
@@ -260,6 +264,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 					.placeUrl(i)
 					.addressName(i)
 					.roadAddressName(i)
+					.categoryName("")
 					.build();
 			})
 			.collect(Collectors.toList());
