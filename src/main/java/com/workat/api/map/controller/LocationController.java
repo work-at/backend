@@ -1,5 +1,6 @@
 package com.workat.api.map.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import com.workat.api.map.dto.response.LocationDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.map.service.LocationService;
 import com.workat.common.annotation.UserValidation;
+import com.workat.common.util.UrlUtils;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.user.entity.Users;
 
@@ -44,11 +46,13 @@ public class LocationController {
 		@ApiResponse(code = 200, message = "success")
 	})
 	@GetMapping("/api/v1/map/cafes")
-	public ResponseEntity<LocationResponse> getCafes(@UserValidation Users user,
+	public ResponseEntity<LocationResponse> getCafes(HttpServletRequest request, @UserValidation Users user,
 		@NotNull @RequestParam double longitude,
 		@NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
-		LocationResponse response = locationService.getLocations(false, LocationCategory.CAFE, longitude, latitude,
+		String baseUrl = UrlUtils.getBaseUrl(request);
+		LocationResponse response = locationService.getLocations(false, baseUrl, LocationCategory.CAFE, longitude,
+			latitude,
 			radius);
 		return ResponseEntity.ok(response);
 	}
@@ -63,22 +67,25 @@ public class LocationController {
 		@ApiResponse(code = 200, message = "success")
 	})
 	@GetMapping("/api/v1/map/cafes/pin")
-	public ResponseEntity<LocationResponse> getCafesPin(@UserValidation Users user,
+	public ResponseEntity<LocationResponse> getCafesPin(HttpServletRequest request, @UserValidation Users user,
 		@NotNull @RequestParam double longitude,
 		@NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationResponse response =
-			locationService.getLocations(true, LocationCategory.CAFE, longitude, latitude, radius);
+			locationService.getLocations(true, baseUrl, LocationCategory.CAFE, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
 	}
 
 	@ApiOperation("카페의 상세 정보를 가져오기")
 	@ApiImplicitParam(name = "locationId", value = "카페의 Id", required = true, dataType = "long", example = "1")
 	@GetMapping("/api/v1/map/cafes/{locationId}")
-	public ResponseEntity<LocationDetailResponse> getCafeById(@PathVariable("locationId") long locationId,
+	public ResponseEntity<LocationDetailResponse> getCafeById(HttpServletRequest request,
+		@PathVariable("locationId") long locationId,
 		@UserValidation Users user) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationDetailResponse dto =
-			locationService.getLocationById(LocationCategory.CAFE, locationId, user.getId());
+			locationService.getLocationById(baseUrl, LocationCategory.CAFE, locationId, user.getId());
 		return ResponseEntity.ok(dto);
 	}
 
@@ -92,12 +99,13 @@ public class LocationController {
 		@ApiResponse(code = 200, message = "success")
 	})
 	@GetMapping("/api/v1/map/restaurants")
-	public ResponseEntity<LocationResponse> getRestaurants(@UserValidation Users user,
+	public ResponseEntity<LocationResponse> getRestaurants(HttpServletRequest request, @UserValidation Users user,
 		@NotNull @RequestParam double longitude,
 		@NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationResponse response =
-			locationService.getLocations(false, LocationCategory.RESTAURANT, longitude, latitude, radius);
+			locationService.getLocations(false, baseUrl, LocationCategory.RESTAURANT, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
 	}
 
@@ -111,21 +119,24 @@ public class LocationController {
 		@ApiResponse(code = 200, message = "success")
 	})
 	@GetMapping("/api/v1/map/restaurants/pin")
-	public ResponseEntity<LocationResponse> getRestaurantsPin(@UserValidation Users user,
+	public ResponseEntity<LocationResponse> getRestaurantsPin(HttpServletRequest request, @UserValidation Users user,
 		@NotNull @RequestParam double longitude, @NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationResponse response =
-			locationService.getLocations(true, LocationCategory.RESTAURANT, longitude, latitude, radius);
+			locationService.getLocations(true, baseUrl, LocationCategory.RESTAURANT, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
 	}
 
 	@ApiOperation("음식점의 상세 정보를 가져오기")
 	@ApiImplicitParam(name = "locationId", value = "음식점의 Id", required = true, dataType = "long", example = "1")
 	@GetMapping("/api/v1/map/restaurants/{locationId}")
-	public ResponseEntity<LocationDetailResponse> getRestaurantById(@UserValidation Users user,
+	public ResponseEntity<LocationDetailResponse> getRestaurantById(HttpServletRequest request,
+		@UserValidation Users user,
 		@PathVariable("locationId") long locationId) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationDetailResponse dto =
-			locationService.getLocationById(LocationCategory.RESTAURANT, locationId, user.getId());
+			locationService.getLocationById(baseUrl, LocationCategory.RESTAURANT, locationId, user.getId());
 		return ResponseEntity.ok(dto);
 	}
 }

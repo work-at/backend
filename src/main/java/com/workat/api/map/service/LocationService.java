@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,11 +56,12 @@ public class LocationService {
 
 	private final AreaRepository areaRepository;
 
+	private final LocationImageGenerator imageGenerator;
+
 	// TODO: 2022/07/31 pin 과 brief 를 분리해보기
 	@Transactional(readOnly = true)
-	public LocationResponse<? extends LocationDto> getLocations(boolean isPin, LocationCategory category,
-		double longitude, double latitude,
-		int radius) {
+	public LocationResponse<? extends LocationDto> getLocations(boolean isPin, String baseUrl,
+		LocationCategory category, double longitude, double latitude, int radius) {
 
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
@@ -103,9 +103,9 @@ public class LocationService {
 					.category(location.getCategory())
 					.placeName(location.getPlaceName())
 					.roadAddressName(location.getRoadAddressName())
-					.thumbnailImageUrl(generateImageUrl(category, location.getPlaceCategory()))
 					.reviewCount(reviewCount)
 					.topReviews(topReviews)
+					.thumbnailImageUrl(baseUrl + location.getThumbnailImageUrl())
 					.build();
 			})
 			.collect(Collectors.toList());
@@ -113,7 +113,8 @@ public class LocationService {
 		return LocationResponse.of(locationBriefs);
 	}
 
-	public LocationDetailResponse getLocationById(LocationCategory category, long locationId, long userId) {
+	public LocationDetailResponse getLocationById(String baseUrl, LocationCategory category, long locationId,
+		long userId) {
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
 		}
@@ -133,6 +134,7 @@ public class LocationService {
 			.roadAddressName(location.getRoadAddressName())
 			.phone(location.getPhone())
 			.placeUrl(location.getPlaceUrl())
+			.fullImageUrl(baseUrl + location.getFullImageUrl())
 			.build();
 
 		final ReviewWithUserDto locationLocationReviewDto = reviewService.getLocationReviewsWithUser(
@@ -163,6 +165,11 @@ public class LocationService {
 					for (int y = -3; y <= 3; y++) {
 						List<KakaoLocalDataDto> locationDtos = locationHttpReceiver.updateLocations(category,
 							MapPoint.of(area.getLongitude() + (x / 100.0), area.getLatitude() + (y / 100.0)), 5000);
+
+						for (KakaoLocalDataDto locationDto : locationDtos) {
+							locationDto.updateImages(imageGenerator.generateImageUrl(locationDto.getCategoryName()));
+						}
+
 						List<Location> locations = locationDtos.stream()
 							.filter(distinctByKey(KakaoLocalDataDto::getId))
 							.map(dto -> {
@@ -191,7 +198,6 @@ public class LocationService {
 
 	private void readSeoulSubwayCsv() {
 		//호선, 역명, 주소, lat, long
-		//1,2,4호선 완료
 		String seoulSubwayCsvPath = "/csv/seoul_subway_3.csv";
 		URL url = getClass().getResource(seoulSubwayCsvPath);
 
@@ -212,32 +218,6 @@ public class LocationService {
 			.collect(Collectors.toList());
 
 		areaRepository.saveAll(result);
-	}
-
-	private String generateImageUrl(LocationCategory category, String placeCategory) {
-
-		if (category == LocationCategory.CAFE) {
-			return "";
-		}
-
-		if (placeCategory.contains("한식")) {
-			return "";
-		}
-
-		if (placeCategory.contains("일식")) {
-			return "";
-		}
-
-		if (placeCategory.contains("중식")) {
-			return "";
-		}
-
-		if (placeCategory.contains("양식")) {
-			return "";
-		}
-
-		//기타
-		return "";
 	}
 
 	private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
