@@ -2,6 +2,7 @@ package com.workat.api.user.dto.request;
 
 import static lombok.AccessLevel.*;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import com.workat.domain.auth.OauthType;
@@ -26,9 +27,11 @@ public class SignUpRequest {
 	@ApiModelProperty(name = "nickname", notes = "유저 닉네임", example = "\"나는스벅라떼좋아\"")
 	private String nickname;
 
+	@NotNull(message = "직무는 필수 값입니다.")
 	@ApiModelProperty(name = "position", notes = "직무 타입")
 	private DepartmentType position;
 
+	@NotNull(message = "연차는 필수 값입니다.")
 	@ApiModelProperty(name = "workingYear", notes = "연차 타입", example = "\"JUNIOR\"")
 	private DurationType workingYear;
 

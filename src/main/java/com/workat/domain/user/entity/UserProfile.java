@@ -17,6 +17,7 @@ import javax.validation.constraints.Pattern;
 import com.workat.domain.BaseEntity;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,10 +43,12 @@ public class UserProfile extends BaseEntity {
 	@Column(unique = true)
 	private String nickname;
 
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column
 	private DepartmentType position;
 
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column
 	private DurationType workingYear;
@@ -63,7 +66,8 @@ public class UserProfile extends BaseEntity {
 	private String company;
 
 	@Builder
-	public UserProfile(Users user, String nickname, DepartmentType position, DurationType workingYear, String imageUrl, String story, boolean certified, String company) {
+	public UserProfile(Users user, String nickname, DepartmentType position, DurationType workingYear, String imageUrl,
+		String story, boolean certified, String company) {
 		this.id = user.getId();
 		this.user = user;
 		this.nickname = nickname;
