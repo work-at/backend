@@ -2,6 +2,7 @@ package com.workat.api.user.dto.response;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.workat.api.user.dto.ActivityTypeDto;
 import com.workat.api.user.dto.DepartmentTypeDto;
 import com.workat.api.user.dto.DurationTypeDto;
@@ -24,6 +25,7 @@ public class MyProfileResponse {
 	@ApiModelProperty(name = "nickname", notes = "워케이셔너 닉네임", example = "이름여덟글자제한")
 	private String nickname;
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@ApiModelProperty(name = "imageUrl", notes = "워케이셔너 사진 이미지 주소", example = "https://avatars.githubusercontent.com/u/46469385?v=4")
 	private String imageUrl;
 
@@ -56,7 +58,7 @@ public class MyProfileResponse {
 		List<ActivityTypeDto> activities, boolean trackingOff, String baseUrl) {
 		this.id = id;
 		this.nickname = nickname;
-		this.imageUrl = imageUrl == null ? null : baseUrl + null;
+		this.imageUrl = imageUrl == null || imageUrl.isBlank() ? null : baseUrl + imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
 		this.company = company;
