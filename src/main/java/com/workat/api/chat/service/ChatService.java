@@ -148,10 +148,6 @@ public class ChatService {
 
 		findRoom.deleteRoom(userId, lastMessageId);
 
-		if (findRoom.isDeletedByMe(userId) && findRoom.isDeletedByOther(userId)) {
-			chatRoomRepository.deleteById(findRoom.getId());
-		}
-
 		chatRoomRepository.save(findRoom);
 	}
 

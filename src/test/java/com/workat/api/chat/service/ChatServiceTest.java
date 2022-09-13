@@ -758,4 +758,42 @@ class ChatServiceTest {
 		assertEquals(givenMessages.get(249).getId(), response4.getMessages().get(49).getId());
 	}
 
+	@Test
+	void deleteChatRoom_case3() {
+		//given
+		List<Users> users = saveUsers(2);
+
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+
+		ArrayList<ChatMessage> givenMessages = new ArrayList<>();
+		for (int i = 1; i <= 250; i++) {
+			ChatMessage givenMessage = ChatMessage.of(user1.getId(), "test" + i);
+			givenMessage.assignRoom(givenChatroom);
+			givenMessages.add(givenMessage);
+		}
+		chatMessageRepository.saveAll(givenMessages);
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessages.get(0).getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(99).getId());
+		chatRoomRepository.save(givenChatroom);
+
+		chatService.deleteChatRoom(user2.getId(), givenChatroom.getId(), givenChatroom.getApplicantLastCheckingMessageId());
+
+		chatService.createChatRoom(user1.getId(), user2.getId());
+
+		//when
+		ChatRoomResponse user1Response = chatService.getChatRooms(user1.getId());
+		ChatRoomResponse user2Response =  chatService.getChatRooms(user2.getId());
+
+		ChatRoomDto resultChatRoom1 = user1Response.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom1.getId());
+
+		ChatRoomDto resultChatRoom2 = user2Response.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom2.getId());
+	}
+
 }
