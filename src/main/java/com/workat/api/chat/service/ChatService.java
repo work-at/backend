@@ -109,7 +109,7 @@ public class ChatService {
 					.build();
 
 				boolean isAllRead = chatMessageRepository.isAllMessageRead(
-					chatRoom.getUsersLastCheckingMessageId(userId), anotherUserId);
+					chatRoom.getUsersLastCheckingMessageId(userId), userId, anotherUserId);
 
 				ChatMessage findLastMessage = chatMessageRepository.findLastMessage(chatRoom, userId).orElse(null);
 
@@ -120,7 +120,6 @@ public class ChatService {
 					.otherUser(userDto)
 					.isStart(chatRoom.isStart())
 					.isAllRead(isAllRead)
-					.isDeletedByOtherUser(chatRoom.isDeletedByOther(userId))
 					.isBlockedByOtherUser(isBlocked)
 					.createdDate(chatRoom.getCreatedDate())
 					.build();
@@ -148,6 +147,10 @@ public class ChatService {
 
 		findRoom.deleteRoom(userId, lastMessageId);
 
+		if (findRoom.isDeletedByMe(userId) && findRoom.isDeletedByOther(userId)) {
+			chatRoomRepository.deleteById(findRoom.getId());
+		}
+
 		chatRoomRepository.save(findRoom);
 	}
 
@@ -163,11 +166,14 @@ public class ChatService {
 
 		ChatMessage chatMessage = ChatMessage.of(writerId, message);
 		chatMessage.assignRoom(findRoom);
+		chatMessageRepository.save(chatMessage);
 
 		findRoom.setMessageUpdatedTime();
+		findRoom.setOthersDeleted(writerId);
+		findRoom.setUsersLastCheckingMessageId(writerId, chatMessage.getId());
 		chatRoomRepository.save(findRoom);
 
-		return chatMessageRepository.save(chatMessage).getId();
+		return chatMessage.getId();
 	}
 
 	@Transactional(readOnly = true)

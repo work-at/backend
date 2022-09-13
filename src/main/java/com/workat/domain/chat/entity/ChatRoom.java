@@ -176,6 +176,18 @@ public class ChatRoom extends BaseEntity {
 		}
 	}
 
+	public void setOthersDeleted(Long userId) {
+		Long ownerUserId = owner.getId();
+		Long applyUserId = applicant.getId();
+		if (userId.equals(ownerUserId)) {
+			this.isApplicantDeleted = false;
+		} else if (userId.equals(applyUserId)) {
+			this.isOwnerDeleted = false;
+		} else {
+			throw new InvalidParameterException("this room not contain userId = " + userId);
+		}
+	}
+
 	public boolean isOwner(Long userId) {
 		return owner.getId().equals(userId);
 	}

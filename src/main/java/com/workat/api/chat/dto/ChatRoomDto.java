@@ -26,8 +26,6 @@ public class ChatRoomDto {
 
 	private boolean isAllRead;
 
-	private boolean isDeletedByOtherUser;
-
 	private boolean isBlockedByOtherUser;
 
 	private LocalDateTime createdDate;

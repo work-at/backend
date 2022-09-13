@@ -255,7 +255,6 @@ class ChatServiceTest {
 			() -> assertEquals(chatRoom.getId(), givenChatroom.getId()),
 			() -> assertEquals(chatRoom.getOtherUser().getUserId(), user1.getId()),
 			() -> assertFalse(chatRoom.isStart()),
-			() -> assertFalse(chatRoom.isDeletedByOtherUser()),
 			() -> assertTrue(chatRoom.isAllRead()),
 			() -> assertTrue(chatRoom.getOtherUser().isOwner())
 		);
@@ -314,16 +313,19 @@ class ChatServiceTest {
 
 		ChatRoom givenChatroom1 = ChatRoom.of();
 		givenChatroom1.assignUsers(user1, user2);
+		chatRoomRepository.save(givenChatroom1);
 
 		ChatRoom givenChatroom2 = ChatRoom.of();
 		givenChatroom2.assignUsers(user1, user3);
+		chatRoomRepository.save(givenChatroom2);
 
 		ChatRoom givenChatroom3 = ChatRoom.of();
 		givenChatroom3.assignUsers(user1, user4);
+		chatRoomRepository.save(givenChatroom3);
 
 		ChatRoom givenChatroom4 = ChatRoom.of();
 		givenChatroom4.assignUsers(user1, user5);
-		chatRoomRepository.saveAll(List.of(givenChatroom1, givenChatroom2, givenChatroom3, givenChatroom4));
+		chatRoomRepository.save(givenChatroom4);
 
 		UserBlocking userBlocking1 = UserBlocking.of();
 		userBlocking1.assignUsers(user1, user2);
@@ -333,8 +335,6 @@ class ChatServiceTest {
 		userBlockingRepository.saveAll(List.of(userBlocking1, userBlocking2));
 
 		//when
-		givenChatroom2.deleteRoom(user3.getId(), 0L);
-
 		ChatRoomResponse resultChatRooms = chatService.getChatRooms(user1.getId());
 
 		//then
@@ -346,17 +346,16 @@ class ChatServiceTest {
 			() -> assertEquals(chatRoom1.getOtherUser().getUserId(), user5.getId()),
 			() -> assertFalse(chatRoom1.isStart()),
 			() -> assertFalse(chatRoom1.isBlockedByOtherUser()),
-			() -> assertFalse(chatRoom1.isDeletedByOtherUser()),
 			() -> assertTrue(chatRoom1.isAllRead())
 		);
 
 		ChatRoomDto chatRoom2 = resultChatRooms.getRooms().get(1);
+		System.out.println(chatRoom2.getOtherUser().getUserNickname());
 		assertAll(
 			() -> assertEquals(chatRoom2.getId(), givenChatroom3.getId()),
 			() -> assertEquals(chatRoom2.getOtherUser().getUserId(), user4.getId()),
 			() -> assertFalse(chatRoom2.isStart()),
 			() -> assertFalse(chatRoom2.isBlockedByOtherUser()),
-			() -> assertFalse(chatRoom2.isDeletedByOtherUser()),
 			() -> assertTrue(chatRoom2.isAllRead())
 		);
 
@@ -366,7 +365,6 @@ class ChatServiceTest {
 			() -> assertEquals(chatRoom3.getOtherUser().getUserId(), user3.getId()),
 			() -> assertFalse(chatRoom3.isStart()),
 			() -> assertTrue(chatRoom3.isBlockedByOtherUser()),
-			() -> assertTrue(chatRoom3.isDeletedByOtherUser()),
 			() -> assertTrue(chatRoom3.isAllRead())
 		);
 	}
@@ -733,7 +731,8 @@ class ChatServiceTest {
 		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(99).getId());
 		chatRoomRepository.save(givenChatroom);
 
-		chatService.deleteChatRoom(user2.getId(), givenChatroom.getId(), givenChatroom.getApplicantLastCheckingMessageId());
+		chatService.deleteChatRoom(user2.getId(), givenChatroom.getId(),
+			givenChatroom.getApplicantLastCheckingMessageId());
 
 		chatService.createChatRoom(user1.getId(), user2.getId());
 
@@ -745,13 +744,15 @@ class ChatServiceTest {
 		assertEquals(50, response2.getMessages().size());
 		assertEquals(givenMessages.get(149).getId(), response2.getMessages().get(49).getId());
 
-		chatService.postRoomLastUserCheckingMessage(user2.getId(), givenChatroom.getId(), response2.getMessages().get(49).getId());
+		chatService.postRoomLastUserCheckingMessage(user2.getId(), givenChatroom.getId(),
+			response2.getMessages().get(49).getId());
 		ChatMessageResponse response3 = chatService.getChatMessages(user2, givenChatroom.getId(), null, AFTER);
 
 		assertEquals(50, response3.getMessages().size());
 		assertEquals(givenMessages.get(199).getId(), response3.getMessages().get(49).getId());
 
-		chatService.postRoomLastUserCheckingMessage(user2.getId(), givenChatroom.getId(), response3.getMessages().get(49).getId());
+		chatService.postRoomLastUserCheckingMessage(user2.getId(), givenChatroom.getId(),
+			response3.getMessages().get(49).getId());
 		ChatMessageResponse response4 = chatService.getChatMessages(user2, givenChatroom.getId(), null, AFTER);
 
 		assertEquals(50, response4.getMessages().size());
@@ -781,19 +782,141 @@ class ChatServiceTest {
 		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(99).getId());
 		chatRoomRepository.save(givenChatroom);
 
-		chatService.deleteChatRoom(user2.getId(), givenChatroom.getId(), givenChatroom.getApplicantLastCheckingMessageId());
+		chatService.deleteChatRoom(user2.getId(), givenChatroom.getId(),
+			givenChatroom.getApplicantLastCheckingMessageId());
 
 		chatService.createChatRoom(user1.getId(), user2.getId());
 
 		//when
 		ChatRoomResponse user1Response = chatService.getChatRooms(user1.getId());
-		ChatRoomResponse user2Response =  chatService.getChatRooms(user2.getId());
+		ChatRoomResponse user2Response = chatService.getChatRooms(user2.getId());
 
 		ChatRoomDto resultChatRoom1 = user1Response.getRooms().get(0);
 		assertEquals(givenChatroom.getId(), resultChatRoom1.getId());
 
 		ChatRoomDto resultChatRoom2 = user2Response.getRooms().get(0);
 		assertEquals(givenChatroom.getId(), resultChatRoom2.getId());
+	}
+
+	@Test
+	void deleteChatRoom_case4() {
+		//given
+		List<Users> users = saveUsers(2);
+
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+
+		ArrayList<ChatMessage> givenMessages = new ArrayList<>();
+		for (int i = 1; i <= 250; i++) {
+			ChatMessage givenMessage = ChatMessage.of(user1.getId(), "test" + i);
+			givenMessage.assignRoom(givenChatroom);
+			givenMessages.add(givenMessage);
+		}
+		chatMessageRepository.saveAll(givenMessages);
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessages.get(givenMessages.size() - 1).getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(99).getId());
+		chatRoomRepository.save(givenChatroom);
+
+		chatService.deleteChatRoom(user2.getId(), givenChatroom.getId(),
+			givenChatroom.getApplicantLastCheckingMessageId());
+
+		//when
+		ChatRoomResponse user1Response = chatService.getChatRooms(user1.getId());
+		ChatRoomDto resultChatRoom1 = user1Response.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom1.getId());
+		assertTrue(resultChatRoom1.isAllRead());
+
+		chatService.createChatMessage(givenChatroom.getId(), user1.getId(), "aaa");
+
+		ChatRoomResponse user1Response2 = chatService.getChatRooms(user1.getId());
+		ChatRoomDto resultChatRoom2 = user1Response2.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom2.getId());
+		assertTrue(resultChatRoom2.isAllRead());
+
+		chatService.createChatRoom(user1.getId(), user2.getId());
+
+		ChatRoomResponse user1Response3 = chatService.getChatRooms(user1.getId());
+		ChatRoomDto resultChatRoom3 = user1Response3.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom3.getId());
+		assertTrue(resultChatRoom3.isAllRead());
+
+		ChatRoomResponse user2Response1 = chatService.getChatRooms(user2.getId());
+		ChatRoomDto resultChatRoom4 = user2Response1.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom4.getId());
+		assertFalse(resultChatRoom4.isAllRead());
+	}
+
+	@Test
+	void deleteChatRoom_case5() {
+		//given
+		List<Users> users = saveUsers(2);
+
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
+
+		ChatRoom givenChatroom = ChatRoom.of();
+		givenChatroom.assignUsers(user1, user2);
+
+		ArrayList<ChatMessage> givenMessages = new ArrayList<>();
+		for (int i = 1; i <= 250; i++) {
+			ChatMessage givenMessage = ChatMessage.of(user1.getId(), "test" + i);
+			givenMessage.assignRoom(givenChatroom);
+			givenMessages.add(givenMessage);
+		}
+		chatMessageRepository.saveAll(givenMessages);
+
+		givenChatroom.setUsersLastCheckingMessageId(user1.getId(), givenMessages.get(givenMessages.size() - 1).getId());
+		givenChatroom.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(99).getId());
+		chatRoomRepository.save(givenChatroom);
+
+		chatService.deleteChatRoom(user2.getId(), givenChatroom.getId(),
+			givenChatroom.getApplicantLastCheckingMessageId());
+
+		//when
+		ChatRoomResponse user1Response = chatService.getChatRooms(user1.getId());
+		ChatRoomDto resultChatRoom1 = user1Response.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom1.getId());
+		assertTrue(resultChatRoom1.isAllRead());
+
+		assertEquals(Collections.emptyList(), chatService.getChatRooms(user2.getId()).getRooms());
+
+		chatService.createChatMessage(givenChatroom.getId(), user1.getId(), "aaa");
+
+		ChatRoomResponse user1Response2 = chatService.getChatRooms(user1.getId());
+		ChatRoomDto resultChatRoom3 = user1Response2.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom3.getId());
+		assertTrue(resultChatRoom3.isAllRead());
+
+		chatService.createChatRoom(user1.getId(), user2.getId());
+
+		ChatRoomResponse user1Response3 = chatService.getChatRooms(user1.getId());
+		ChatRoomDto resultChatRoom4 = user1Response3.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom4.getId());
+		assertTrue(resultChatRoom4.isAllRead());
+
+		ChatRoomResponse user2Response2 = chatService.getChatRooms(user2.getId());
+		ChatRoomDto resultChatRoom5 = user2Response2.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom5.getId());
+		assertFalse(resultChatRoom5.isAllRead());
+		assertEquals("aaa", resultChatRoom5.getLastMessage());
+
+		chatService.createChatMessage(givenChatroom.getId(), user2.getId(), "aaaaa");
+
+		ChatRoomResponse user1Response4 = chatService.getChatRooms(user1.getId());
+		ChatRoomDto resultChatRoom6 = user1Response4.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom6.getId());
+		assertFalse(resultChatRoom6.isAllRead());
+		assertEquals("aaaaa", resultChatRoom6.getLastMessage());
+
+		ChatRoomResponse user2Response3 = chatService.getChatRooms(user2.getId());
+		ChatRoomDto resultChatRoom7 = user2Response3.getRooms().get(0);
+		assertEquals(givenChatroom.getId(), resultChatRoom7.getId());
+		assertTrue(resultChatRoom7.isAllRead());
+		assertEquals("aaaaa", resultChatRoom7.getLastMessage());
 	}
 
 }
