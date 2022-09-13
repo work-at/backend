@@ -46,10 +46,10 @@ public class WorkerDto {
 	private List<ActivityTypeDto> activities;
 
 	private WorkerDto(long id, String nickname, String imageUrl, DepartmentType position, DurationType workingYear,
-		String company, String story, int workchats, List<ActivityTypeDto> activities) {
+		String company, String story, int workchats, List<ActivityTypeDto> activities, String baseUrl) {
 		this.id = id;
 		this.nickname = nickname;
-		this.imageUrl = imageUrl;
+		this.imageUrl = imageUrl == null ? null : baseUrl + imageUrl;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
 		this.company = company;
@@ -59,9 +59,9 @@ public class WorkerDto {
 	}
 
 	public static WorkerDto of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities, String baseUrl) {
-		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), baseUrl + userProfile.getImageUrl(),
+		return new WorkerDto(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(),
 			userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(),
-			workchats, activities);
+			workchats, activities, baseUrl);
 	}
 
 }
