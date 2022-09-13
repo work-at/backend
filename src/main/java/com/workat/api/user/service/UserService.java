@@ -207,7 +207,7 @@ public class UserService {
 	public void sendCompanyVerifyEmail(Users user, EmailCertifyRequest request, String siteURL) throws
 		UnsupportedEncodingException,
 		MessagingException {
-		if (user.getEmailRequestRemain() == 5) {
+		if (user.getEmailRequestRemain() == 0) {
 			if (userEmailLimitRepository.existsById(user.getId())) {
 				throw new ForbiddenException("email 인증 요청이 모두 소모되었습니다");
 			}
@@ -220,8 +220,8 @@ public class UserService {
 
 		UserProfile userProfile = userProfileRepository.findById(user.getId())
 			.orElseThrow(() -> new NotFoundException("user not found"));
-		user.increseEmailRequestCount();
-		if (user.getEmailRequestRemain() == 5) {
+		user.decreaseEmailRequestCount();
+		if (user.getEmailRequestRemain() == 0) {
 			UserEmailLimit userEmailLimit = UserEmailLimit.of(user.getId());
 			userEmailLimitRepository.save(userEmailLimit);
 		}

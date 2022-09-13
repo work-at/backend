@@ -40,7 +40,7 @@ public class Users extends BaseEntity {
 	private String verificationCode;
 
 	@Column
-	private int emailRequestRemain = 0;
+	private int emailRequestRemain = 5;
 
 	@Column
 	private boolean trackingOff;
@@ -62,12 +62,12 @@ public class Users extends BaseEntity {
 		this.verificationCode = null;
 	}
 
-	public void increseEmailRequestCount() {
-		emailRequestRemain++;
+	public void decreaseEmailRequestCount() {
+		emailRequestRemain--;
 	}
 
 	public void resetEmailRequestCount() {
-		emailRequestRemain = 0;
+		emailRequestRemain = 5;
 	}
 
 	public void turnOnTracking() {
