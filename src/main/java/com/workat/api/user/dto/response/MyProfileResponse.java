@@ -53,10 +53,10 @@ public class MyProfileResponse {
 
 	private MyProfileResponse(long id, String nickname, String imageUrl, DepartmentType position,
 		DurationType workingYear, String company, String story, boolean certified, int workchats,
-		List<ActivityTypeDto> activities, boolean trackingOff) {
+		List<ActivityTypeDto> activities, boolean trackingOff, String baseUrl) {
 		this.id = id;
 		this.nickname = nickname;
-		this.imageUrl = imageUrl;
+		this.imageUrl = imageUrl == null ? null : baseUrl + null;
 		this.position = DepartmentTypeDto.of(position.name(), position.getType());
 		this.workingYear = DurationTypeDto.of(workingYear.name(), workingYear.getType());
 		this.company = company;
@@ -68,9 +68,9 @@ public class MyProfileResponse {
 	}
 
 	public static MyProfileResponse of(UserProfile userProfile, int workchats, List<ActivityTypeDto> activities, boolean trackingOff, String baseUrl) {
-		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), baseUrl + userProfile.getImageUrl(),
+		return new MyProfileResponse(userProfile.getId(), userProfile.getNickname(), userProfile.getImageUrl(),
 			userProfile.getPosition(), userProfile.getWorkingYear(), userProfile.getCompany(), userProfile.getStory(),
-			userProfile.isCertified(), workchats, activities, trackingOff);
+			userProfile.isCertified(), workchats, activities, trackingOff, baseUrl);
 	}
 
 }
