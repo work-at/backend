@@ -15,7 +15,6 @@ import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.common.exception.BadRequestException;
 import com.workat.common.exception.ChatMessageNotFoundException;
 import com.workat.common.exception.ChatMessageRoomNotMatchException;
-import com.workat.common.exception.ChatRoomIsDeletedException;
 import com.workat.common.exception.ChatRoomNotFoundException;
 import com.workat.common.exception.ChatRoomUserNotMatchException;
 import com.workat.common.exception.NotFoundException;
@@ -77,7 +76,7 @@ public class ChatService {
 	}
 
 	@Transactional(readOnly = true)
-	public ChatRoomResponse getChatRooms(Long userId) {
+	public ChatRoomResponse getChatRooms(String baseUrl, Long userId) {
 		Users findUser = usersRepository.findById(userId).orElseThrow(() -> {
 			throw new UserNotFoundException(userId);
 		});
@@ -105,7 +104,7 @@ public class ChatService {
 					.userNickname(anotherUserProfile.getNickname())
 					.position(anotherUserProfile.getPosition().getType())
 					.workingYear(anotherUserProfile.getWorkingYear().getType())
-					.userProfileUrl(anotherUserProfile.getImageUrl())
+					.userProfileUrl(baseUrl + anotherUserProfile.getImageUrl())
 					.build();
 
 				boolean isAllRead = chatMessageRepository.isAllMessageRead(

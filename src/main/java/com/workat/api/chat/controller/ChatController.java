@@ -2,6 +2,8 @@ package com.workat.api.chat.controller;
 
 import java.net.URI;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +18,7 @@ import com.workat.api.chat.dto.response.ChatMessageResponse;
 import com.workat.api.chat.dto.response.ChatRoomResponse;
 import com.workat.api.chat.service.ChatService;
 import com.workat.common.annotation.UserValidation;
+import com.workat.common.util.UrlUtils;
 import com.workat.domain.chat.entity.ChatMessageSortType;
 import com.workat.domain.user.entity.Users;
 
@@ -75,14 +78,16 @@ public class ChatController {
 		@ApiResponse(code = 200, message = "success", response = ChatRoomResponse.class)
 	})
 	@GetMapping("/api/v1/users/chattings")
-	public ResponseEntity<ChatRoomResponse> getChattingByUser(@UserValidation Users user) {
-		return ResponseEntity.ok(chatService.getChatRooms(user.getId()));
+	public ResponseEntity<ChatRoomResponse> getChattingByUser(HttpServletRequest request, @UserValidation Users user) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
+		return ResponseEntity.ok(chatService.getChatRooms(baseUrl, user.getId()));
 	}
 
 	@ApiOperation("채팅방을 나가는 api")
 	@ApiResponse(code = 200, message = "success")
 	@DeleteMapping("/api/v1/chattings/{roomId}")
-	public void deleteChattingRoom(@UserValidation Users user, @PathVariable Long roomId, @RequestParam Long lastMessageId) {
+	public void deleteChattingRoom(@UserValidation Users user, @PathVariable Long roomId,
+		@RequestParam Long lastMessageId) {
 		chatService.deleteChatRoom(user.getId(), roomId, lastMessageId);
 	}
 
