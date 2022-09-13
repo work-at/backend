@@ -2,6 +2,8 @@ package com.workat.api.accommodation.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,7 @@ import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
 import com.workat.api.accommodation.service.AccommodationService;
 import com.workat.common.annotation.UserValidation;
+import com.workat.common.util.UrlUtils;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
@@ -41,6 +44,7 @@ public class AccommodationController {
 	@ApiOperation("Accommodation 복수건 조회")
 	@GetMapping("/api/v1/accommodations")
 	public ResponseEntity<AccommodationsResponse> getAccommodations(
+		HttpServletRequest request,
 		@ApiParam(value = "지역", example = "SEOUL", type = "string")
 		@RequestParam(required = false) RegionType region,
 		@ApiParam(value = "info tag name", example = "NEAR_FOREST", type = "string")
@@ -52,8 +56,9 @@ public class AccommodationController {
 		@ApiParam(value = "페이지 사이즈", example = "10", type = "integer")
 		@RequestParam(required = false, defaultValue = "10") int pageSize
 	) {
-		final AccommodationsResponse response = accommodationService.getAccommodations(
-			region, infoTagName, topReviewTagName, pageNumber, pageSize);
+		String baseUrl = UrlUtils.getBaseUrl(request);
+		final AccommodationsResponse response = accommodationService.getAccommodations(baseUrl, region, infoTagName,
+			topReviewTagName, pageNumber, pageSize);
 
 		return ResponseEntity.ok(response);
 	}
@@ -62,9 +67,11 @@ public class AccommodationController {
 	@ApiOperation("Accommodation 단건 조회")
 	@ApiImplicitParam(name = "accommodationId", value = "Accommodation Id", required = true, dataType = "long", example = "1")
 	@GetMapping("/api/v1/accommodations/{accommodationId}")
-	public ResponseEntity<AccommodationResponse> getAccommodation(
+	public ResponseEntity<AccommodationResponse> getAccommodation(HttpServletRequest request,
 		@PathVariable("accommodationId") long accommodationId, @UserValidation Users user) {
-		final AccommodationResponse response = accommodationService.getAccommodation(accommodationId, user.getId());
+		String baseUrl = UrlUtils.getBaseUrl(request);
+		final AccommodationResponse response = accommodationService.getAccommodation(baseUrl, accommodationId,
+			user.getId());
 
 		return ResponseEntity.ok(response);
 	}
@@ -96,10 +103,12 @@ public class AccommodationController {
 	@ApiImplicitParam(name = "accommodationName", value = "Accommodation Name", required = true, dataType = "String", example = "워커힐")
 	@GetMapping("/api/v1/accommodations/names")
 	public ResponseEntity<List<AccommodationDto>> getAccommodationWithName(
+		HttpServletRequest request,
 		@ApiParam(value = "accommodationName", example = "워커힐", type = "string")
 		@RequestParam(required = false) String accommodationName
 	) {
-		List<AccommodationDto> response = accommodationService.getAccommodationsWithName(accommodationName);
+		String baseUrl = UrlUtils.getBaseUrl(request);
+		List<AccommodationDto> response = accommodationService.getAccommodationsWithName(baseUrl, accommodationName);
 
 		return ResponseEntity.ok(response);
 	}

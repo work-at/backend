@@ -84,7 +84,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		Users user = saveUsers(1).get(0);
 
 		// when
-		AccommodationDetailDto given = accommodationService.getAccommodation(accommodation.getId(),
+		AccommodationDetailDto given = accommodationService.getAccommodation("", accommodation.getId(),
 			user.getId()).getAccommodationDetail();
 
 		HashSet<TagDto> givenInfoTags = given.getInfoTags();
@@ -93,7 +93,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		assertAll(
 			() -> assertEquals(given.getId(), accommodation.getId()),
 			() -> assertEquals(given.getName(), accommodation.getName()),
-			() -> assertEquals(given.getImgUrl(), accommodation.getImgUrl()),
+			() -> assertEquals(given.getImgUrl(), accommodation.getImgUrl() + ".png"),
 			() -> assertEquals(given.getPrice(), accommodation.getPrice()),
 			() -> assertEquals(given.getPhone(), accommodation.getPhone()),
 			() -> assertEquals(given.getRoadAddressName(), accommodation.getRoadAddressName()),
@@ -128,8 +128,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 			Arrays.asList(accommodationReview1, accommodationReview2, accommodationReview3));
 
 		// when
-		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation(accommodation.getId(),
-				user1.getId())
+		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation("", accommodation.getId(), user1.getId())
 			.getAccommodationReview()
 			.getReviews();
 
@@ -176,7 +175,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		Long accommodationId = accommodation.getId();
 		Long userId = users.get(0).getId();
 
-		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation(accommodationId, userId)
+		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation("", accommodationId, userId)
 			.getAccommodationReview()
 			.getReviews();
 
@@ -198,9 +197,8 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		List<Accommodation> accommodations = saveAccommodations(3);
 
 		// when
-		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations(RegionType.SEOUL, null, null,
-			0,
-			10).getAccommodations();
+		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations("", RegionType.SEOUL, null,
+			null, 0, 10).getAccommodations();
 
 		// then
 		assertEquals(accommodations.size(), accommodationDtos.size());
@@ -243,9 +241,8 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 				accommodationReviewRepository.saveAll(allTagReviews);
 			});
 
-		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations(RegionType.SEOUL, null, null,
-			0,
-			10).getAccommodations();
+		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations("", RegionType.SEOUL, null,
+			null, 0, 10).getAccommodations();
 
 		// then
 		accommodationDtos.stream()

@@ -9,6 +9,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,6 +27,7 @@ import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
 import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.NotFoundException;
+import com.workat.common.util.UrlUtils;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.entity.AccommodationInfo;
@@ -52,6 +55,7 @@ public class AccommodationService {
 
 	@Transactional(readOnly = true)
 	public AccommodationsResponse getAccommodations(
+		String baseUrl,
 		RegionType region,
 		AccommodationInfoTag infoTag,
 		AccommodationReviewTag reviewTag,
@@ -67,7 +71,8 @@ public class AccommodationService {
 			infoTag,
 			reviewTag);
 
-		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(accommodationPages.getContent());
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl,
+			accommodationPages.getContent());
 
 		return AccommodationsResponse.of(
 			accommodationDtos,
@@ -78,7 +83,7 @@ public class AccommodationService {
 	}
 
 	@Transactional(readOnly = true)
-	public AccommodationResponse getAccommodation(long accommodationId, long userId) {
+	public AccommodationResponse getAccommodation(String baseUrl, long accommodationId, long userId) {
 
 		final Accommodation accommodation = accommodationRepository.findById(accommodationId)
 			.orElseThrow(() -> {
@@ -88,7 +93,7 @@ public class AccommodationService {
 		final List<AccommodationInfo> accommodationInfos = accommodationInfoRepository.findAllByAccommodation(
 			accommodation);
 
-		final AccommodationDetailDto accommodationDetailDto = convertAccommodationDetailDto(accommodation,
+		final AccommodationDetailDto accommodationDetailDto = convertAccommodationDetailDto(baseUrl, accommodation,
 			accommodationInfos);
 
 		final List<AccommodationReview> accommodationReviews = accommodationReviewRepository.findAllByAccommodation_Id(
@@ -171,18 +176,18 @@ public class AccommodationService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<AccommodationDto> getAccommodationsWithName(String name) {
+	public List<AccommodationDto> getAccommodationsWithName(String baseUrl, String name) {
 
 		// TODO: getAccommodations 와 통합해보기
 		final List<Accommodation> accommodations = accommodationRepository.findAllByNameContaining(name);
 
-		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(accommodations);
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl, accommodations);
 
 		return accommodationDtos;
 	}
 
 	@Transactional(readOnly = true)
-	public List<AccommodationDto> convertAccommodationDto(List<Accommodation> accommodations) {
+	public List<AccommodationDto> convertAccommodationDto(String baseUrl, List<Accommodation> accommodations) {
 
 		return accommodations.stream()
 			.map(accommodation -> {
@@ -205,18 +210,18 @@ public class AccommodationService {
 					accommodation.getId(),
 					accommodation.getName(),
 					accommodation.getPrice(),
-					accommodation.getThumbnailImgUrl(),
+					baseUrl + accommodation.getThumbnailImgUrl() + ".png",
 					tagsDtoSet);
 			}).collect(toList());
 	}
 
-	private AccommodationDetailDto convertAccommodationDetailDto(Accommodation accommodation,
-		List<AccommodationInfo> accommodationInfos) {
+	private AccommodationDetailDto convertAccommodationDetailDto(String baseUrl,
+		Accommodation accommodation, List<AccommodationInfo> accommodationInfos) {
 
 		return AccommodationDetailDto.builder()
 			.id(accommodation.getId())
 			.name(accommodation.getName())
-			.imgUrl(accommodation.getImgUrl())
+			.imgUrl(baseUrl + accommodation.getImgUrl() + ".png")
 			.price(accommodation.getPrice())
 			.phone(accommodation.getPhone())
 			.roadAddressName(accommodation.getRoadAddressName())
