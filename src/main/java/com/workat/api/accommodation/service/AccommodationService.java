@@ -134,7 +134,7 @@ public class AccommodationService {
 	}
 
 	@Transactional(readOnly = true)
-	public AccommodationCurationsResponse getAccommodationCurations() {
+	public AccommodationCurationsResponse getAccommodationCurations(String baseUrl) {
 
 		List<Accommodation> accommodations = accommodationRepository.findAllByRandom(5);
 
@@ -144,7 +144,7 @@ public class AccommodationService {
 					accommodation.getId(),
 					accommodation.getName(),
 					accommodation.getRegionType(),
-					accommodation.getImgUrl()
+					baseUrl + "/uploaded" + accommodation.getImgUrl() + ".png"
 				))
 				.collect(toList())
 		);
@@ -210,7 +210,7 @@ public class AccommodationService {
 					accommodation.getId(),
 					accommodation.getName(),
 					accommodation.getPrice(),
-					baseUrl + accommodation.getThumbnailImgUrl() + ".png",
+					baseUrl + "/uploaded" + accommodation.getThumbnailImgUrl() + ".png",
 					tagsDtoSet);
 			}).collect(toList());
 	}
@@ -221,7 +221,7 @@ public class AccommodationService {
 		return AccommodationDetailDto.builder()
 			.id(accommodation.getId())
 			.name(accommodation.getName())
-			.imgUrl(baseUrl + accommodation.getImgUrl() + ".png")
+			.imgUrl(baseUrl + "/uploaded" + accommodation.getImgUrl() + ".png")
 			.price(accommodation.getPrice())
 			.phone(accommodation.getPhone())
 			.roadAddressName(accommodation.getRoadAddressName())

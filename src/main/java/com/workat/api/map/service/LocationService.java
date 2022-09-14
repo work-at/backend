@@ -105,7 +105,7 @@ public class LocationService {
 					.roadAddressName(location.getRoadAddressName())
 					.reviewCount(reviewCount)
 					.topReviews(topReviews)
-					.thumbnailImageUrl(baseUrl + location.getThumbnailImageUrl())
+					.thumbnailImageUrl(baseUrl + "/uploaded" + location.getThumbnailImageUrl())
 					.build();
 			})
 			.collect(Collectors.toList());
@@ -134,7 +134,7 @@ public class LocationService {
 			.roadAddressName(location.getRoadAddressName())
 			.phone(location.getPhone())
 			.placeUrl(location.getPlaceUrl())
-			.fullImageUrl(baseUrl + location.getFullImageUrl())
+			.fullImageUrl(baseUrl + "/uploaded" + location.getFullImageUrl())
 			.build();
 
 		final ReviewWithUserDto locationLocationReviewDto = reviewService.getLocationReviewsWithUser(

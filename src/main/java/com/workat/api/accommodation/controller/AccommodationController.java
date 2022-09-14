@@ -92,8 +92,9 @@ public class AccommodationController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@ApiOperation("Accommodation 큐레이션")
 	@GetMapping("/api/v1/accommodations/curations")
-	public ResponseEntity<AccommodationCurationsResponse> getAccommodationCurations() {
-		final AccommodationCurationsResponse response = accommodationService.getAccommodationCurations();
+	public ResponseEntity<AccommodationCurationsResponse> getAccommodationCurations(HttpServletRequest request) {
+		String baseUrl = UrlUtils.getBaseUrl(request);
+		final AccommodationCurationsResponse response = accommodationService.getAccommodationCurations(baseUrl);
 
 		return ResponseEntity.ok(response);
 	}

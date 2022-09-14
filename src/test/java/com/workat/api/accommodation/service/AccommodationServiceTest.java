@@ -93,7 +93,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		assertAll(
 			() -> assertEquals(given.getId(), accommodation.getId()),
 			() -> assertEquals(given.getName(), accommodation.getName()),
-			() -> assertEquals(given.getImgUrl(), accommodation.getImgUrl() + ".png"),
+			() -> assertEquals(given.getImgUrl(), "/uploaded" + accommodation.getImgUrl() + ".png"),
 			() -> assertEquals(given.getPrice(), accommodation.getPrice()),
 			() -> assertEquals(given.getPhone(), accommodation.getPhone()),
 			() -> assertEquals(given.getRoadAddressName(), accommodation.getRoadAddressName()),

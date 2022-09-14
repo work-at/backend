@@ -98,13 +98,15 @@ public class ChatService {
 				boolean isBlocked = !userBlockingRepository.findByReportingUserIdAndBlockedUserId(anotherUserId, userId)
 					.isEmpty();
 
+				String userProfileUrl = anotherUserProfile.getImageUrl() != null ? baseUrl + anotherUserProfile.getImageUrl() : null;
+
 				ChatRoomListUserDto userDto = ChatRoomListUserDto.builder()
 					.isOwner(chatRoom.isOwner(anotherUserId))
 					.userId(anotherUserId)
 					.userNickname(anotherUserProfile.getNickname())
 					.position(anotherUserProfile.getPosition().getType())
 					.workingYear(anotherUserProfile.getWorkingYear().getType())
-					.userProfileUrl(baseUrl + anotherUserProfile.getImageUrl())
+					.userProfileUrl(userProfileUrl)
 					.build();
 
 				boolean isAllRead = chatMessageRepository.isAllMessageRead(
