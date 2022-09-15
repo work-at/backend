@@ -16,5 +16,5 @@ public interface CustomChatMessageRepository {
 
 	List<ChatMessage> findRecentMessage(ChatRoom chatRoom, long userId, long messageId, long pageSize);
 
-	boolean isAllMessageRead(long lastMessageId, long ownerUserId, long applicantUserId);
+	boolean isAllMessageRead(long chatRoomId, long lastMessageId);
 }

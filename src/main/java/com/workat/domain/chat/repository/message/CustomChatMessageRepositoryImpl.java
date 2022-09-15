@@ -84,9 +84,9 @@ public class CustomChatMessageRepositoryImpl implements CustomChatMessageReposit
 	}
 
 	@Override
-	public boolean isAllMessageRead(long lastMessageId, long ownerUserId, long applicantUserId) {
+	public boolean isAllMessageRead(long chatRoomId, long lastMessageId) {
 		return jpaQueryFactory.selectFrom(chatMessage)
-			.where(chatMessage.id.gt(lastMessageId).and(chatMessage.writerId.eq(ownerUserId).or(chatMessage.writerId.eq(applicantUserId))))
+			.where(chatMessage.id.gt(lastMessageId).and(chatMessage.room.id.eq(chatRoomId)))
 			.stream().findAny().isEmpty();
 	}
 

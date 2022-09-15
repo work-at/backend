@@ -69,7 +69,7 @@ class ChatServiceTest {
 	}
 
 	private List<Users> saveUsers(int size) {
-		List<Users> users = IntStream.range(0, size).mapToObj(idx -> {
+		List<Users> users = IntStream.range(1, size+1).mapToObj(idx -> {
 			Users user = Users.of(OauthType.KAKAO, (long)idx);
 
 			UserProfile userProfile = UserProfile.builder()
@@ -631,6 +631,80 @@ class ChatServiceTest {
 		assertEquals(resultMessageResponse.getMessages().size(), 101);
 		assertEquals(resultMessageResponse.getMessages().get(0).getId(), givenMessages.get(20).getId());
 		assertEquals(resultMessageResponse.getMessages().get(100).getId(), givenMessages.get(120).getId());
+	}
+
+	@Test
+	void getChatRoomMessage_case8_success() {
+		//given
+		List<Users> users = saveUsers(4);
+
+		Users user1 = users.get(0);
+		Users user2 = users.get(1);
+		Users user3 = users.get(2);
+		Users user4 = users.get(3);
+
+		ChatRoom givenChatroom1 = ChatRoom.of();
+		givenChatroom1.assignUsers(user1, user2);
+
+		ChatRoom givenChatroom2 = ChatRoom.of();
+		givenChatroom2.assignUsers(user1, user3);
+
+		ChatRoom givenChatroom3 = ChatRoom.of();
+		givenChatroom3.assignUsers(user1, user4);
+
+		ArrayList<ChatMessage> givenMessages = new ArrayList<>();
+		for (int i = 1; i <= 150; i++) {
+			ChatMessage givenMessage = ChatMessage.of(user1.getId(), "test" + i);
+			givenMessage.assignRoom(givenChatroom1);
+			givenMessages.add(givenMessage);
+		}
+		chatMessageRepository.saveAll(givenMessages);
+
+		givenChatroom1.setUsersLastCheckingMessageId(user1.getId(), givenMessages.get(70).getId());
+		givenChatroom1.setUsersLastCheckingMessageId(user2.getId(), givenMessages.get(givenMessages.size() - 1).getId());
+		chatRoomRepository.saveAll(List.of(givenChatroom1,givenChatroom2,givenChatroom3));
+
+		ChatRoomResponse response1 = chatService.getChatRooms("", user1.getId());
+		ChatRoomResponse response2 = chatService.getChatRooms("", user2.getId());
+		ChatRoomResponse response3 = chatService.getChatRooms("", user3.getId());
+		ChatRoomResponse response4 = chatService.getChatRooms("", user4.getId());
+
+		ChatRoomDto resultDto1 = response1.getRooms().get(2);
+		assertFalse(resultDto1.isAllRead());
+		assertEquals("test150", resultDto1.getLastMessage());
+
+		ChatRoomDto resultDto2 = response1.getRooms().get(1);
+		assertTrue(resultDto2.isAllRead());
+
+		ChatRoomDto resultDto3 = response1.getRooms().get(0);
+		assertTrue(resultDto3.isAllRead());
+
+		ChatRoomDto resultDto4 = response2.getRooms().get(0);
+		assertTrue(resultDto4.isAllRead());
+		assertEquals("test150", resultDto4.getLastMessage());
+
+		chatService.postRoomLastUserCheckingMessage(user1.getId(), givenChatroom1.getId(), givenMessages.get(149).getId());
+		ChatRoomResponse response5 = chatService.getChatRooms("", user1.getId());
+		ChatRoomDto resultDto5 = response5.getRooms().get(2);
+		assertTrue(resultDto5.isAllRead());
+		assertEquals("test150", resultDto5.getLastMessage());
+
+		chatService.createChatMessage(givenChatroom1.getId(), user1.getId(), "test");
+		chatService.createChatMessage(givenChatroom2.getId(), user1.getId(), "test");
+		chatService.createChatMessage(givenChatroom3.getId(), user1.getId(), "test");
+
+		ChatRoomResponse response6 = chatService.getChatRooms("", user1.getId());
+		ChatRoomDto resultDto6 = response6.getRooms().get(2);
+		assertTrue(resultDto6.isAllRead());
+		assertEquals("test", resultDto6.getLastMessage());
+
+		ChatRoomDto resultDto7 = response6.getRooms().get(1);
+		assertTrue(resultDto7.isAllRead());
+		assertEquals("test", resultDto7.getLastMessage());
+
+		ChatRoomDto resultDto8 = response6.getRooms().get(0);
+		assertTrue(resultDto8.isAllRead());
+		assertEquals("test", resultDto8.getLastMessage());
 	}
 
 	@Test
