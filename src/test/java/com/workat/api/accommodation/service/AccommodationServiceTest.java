@@ -117,9 +117,9 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		Users user3 = users.get(2);
 
 		// FOCUS 2, POWER 1 저장
-		final AccommodationReview accommodationReview1 = AccommodationReview.of(AccommodationReviewTag.FOCUS,
+		final AccommodationReview accommodationReview1 = AccommodationReview.of(AccommodationReviewTag.LOCATION,
 			accommodation, user1);
-		final AccommodationReview accommodationReview2 = AccommodationReview.of(AccommodationReviewTag.FOCUS,
+		final AccommodationReview accommodationReview2 = AccommodationReview.of(AccommodationReviewTag.LOCATION,
 			accommodation, user2);
 		final AccommodationReview accommodationReview3 = AccommodationReview.of(AccommodationReviewTag.POWER,
 			accommodation, user3);
@@ -139,7 +139,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 
 		// then
 		assertAll(
-			() -> assertEquals(countMap.get(AccommodationReviewTag.FOCUS.getName()), 2),
+			() -> assertEquals(countMap.get(AccommodationReviewTag.LOCATION.getName()), 2),
 			() -> assertEquals(countMap.get(AccommodationReviewTag.POWER.getName()), 1)
 		);
 	}
@@ -153,12 +153,12 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 
 		List<AccommodationReview> reviewPart1 = users.subList(0, 10) // 1st 가장 큼
 			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.FOCUS, accommodation, user))
+			.map(user -> AccommodationReview.of(AccommodationReviewTag.LOCATION, accommodation, user))
 			.collect(Collectors.toList());
 
 		List<AccommodationReview> reviewPart2 = users.subList(10, 18) // 2nd
 			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.SERVE_MEAL, accommodation, user))
+			.map(user -> AccommodationReview.of(AccommodationReviewTag.MEAL, accommodation, user))
 			.collect(Collectors.toList());
 
 		List<AccommodationReview> reviewPart3 = users.subList(18, 20) // 3rd
@@ -214,12 +214,12 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		// when
 		List<AccommodationReview> reviewPart1 = users.subList(0, 5) // 1st 가장 큼
 			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.FOCUS, accommodation, user))
+			.map(user -> AccommodationReview.of(AccommodationReviewTag.LOCATION, accommodation, user))
 			.collect(Collectors.toList());
 
 		List<AccommodationReview> reviewPart2 = users.subList(5, 9) // 2nd
 			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.SERVE_MEAL, accommodation, user))
+			.map(user -> AccommodationReview.of(AccommodationReviewTag.MEAL, accommodation, user))
 			.collect(Collectors.toList());
 
 		List<AccommodationReview> reviewPart3 = users.subList(9, 12) // 3rd
@@ -252,8 +252,8 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 					.collect(toList());
 
 				assertAll(
-					() -> assertTrue(tags.contains(AccommodationReviewTag.FOCUS)),
-					() -> assertTrue(tags.contains(AccommodationReviewTag.SERVE_MEAL)),
+					() -> assertTrue(tags.contains(AccommodationReviewTag.LOCATION)),
+					() -> assertTrue(tags.contains(AccommodationReviewTag.MEAL)),
 					() -> assertTrue(tags.contains(AccommodationReviewTag.POWER))
 				);
 			});

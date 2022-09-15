@@ -1,5 +1,6 @@
 package com.workat.domain.tag.dto;
 
+import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.tag.BaseTag;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -24,5 +25,9 @@ public class TagDto {
 
 	public static TagDto of(BaseTag baseReviewData) {
 		return new TagDto(baseReviewData.getName(), baseReviewData.getContent());
+	}
+
+	public static TagDto summaryOf(AccommodationReviewTag accommodationReviewTag) {
+		return new TagDto(accommodationReviewTag.getName(), accommodationReviewTag.getSummary());
 	}
 }

@@ -197,7 +197,7 @@ public class AccommodationService {
 					.map(tag -> {
 						Long count = accommodationReviewRepository.countByTag(tag);
 
-						return TagCountDto.of(TagDto.of(tag), count);
+						return TagCountDto.of(TagDto.summaryOf(tag), count);
 					})
 					.sorted(Comparator
 						.comparingLong(TagCountDto::getCount)
