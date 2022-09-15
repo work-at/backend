@@ -29,7 +29,7 @@ public class Accommodation extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private RegionType regionType;
 
-	@Column
+	@Column(name = "accommodation_name")
 	private String name;
 
 	@Column
