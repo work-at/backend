@@ -7,19 +7,26 @@ import com.workat.common.exception.NotFoundException;
 
 public enum AccommodationReviewTag implements BaseTag {
 
-	WIFI("와이파이가 빵빵해요"),
-	POWER("콘센트 자리 많아요"),
-	SEAT("좌석이 업무하기 좋아요"),
-	QUIET("조용한 공간이 있어요"),
-	FOCUS("집중이 잘 돼요"),
-	SERVE_MEAL("식사메뉴가 있어요");
+	PARKING("주차하기 편해요", "주차하기편해요"),
+	VIEW("뷰가 좋아요", "뷰가좋아요"),
+	PRICE("가성비가 좋아요", "가성비가좋아요"),
+	BED("침대가 편해요", "침대가편해요"),
+	CLEAN("방이 청결해요", "방이청결해요"),
+	WIFI("와이파이가 빵빵해요", "와이파이빵빵해요"),
+	SEAT("책상이 편해요", "책상이편해요"),
+	MEAL("조식 먹을 수 있어요", "조식가능해요"),
+	LOCATION("교통이 좋아요", "교통이좋아요"),
+	POWER("콘센트 자리 많아요", "콘센트많아요");
 
 	public static final Set<AccommodationReviewTag> ALL = EnumSet.allOf(AccommodationReviewTag.class);
 
 	private final String content;
 
-	AccommodationReviewTag(String content) {
+	private final String summary;
+
+	AccommodationReviewTag(String content, String summary) {
 		this.content = content;
+		this.summary = summary;
 	}
 
 	public static AccommodationReviewTag of(String typeName) {
@@ -39,5 +46,9 @@ public enum AccommodationReviewTag implements BaseTag {
 	@Override
 	public String getContent() {
 		return content;
+	}
+
+	public String getSummary() {
+		return summary;
 	}
 }
