@@ -39,7 +39,7 @@ server:
 
 external:
   kakaoOauth:
-    clientId: "8439428e0cb1d110de00736ed04efae2"
+    clientId: "7052acd04b3385c80fac9bb40d8b5a32"
     redirect-url: "http://localhost:5050/login"
   tour-api:
     big-data:
