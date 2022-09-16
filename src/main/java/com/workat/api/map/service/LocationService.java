@@ -193,7 +193,8 @@ public class LocationService {
 
 	private void createAreaFromCsv() {
 		areaRepository.deleteAll();
-		readSeoulSubwayCsv();
+		// readSeoulSubwayCsv();
+		readEtcCsv();
 	}
 
 	private void readSeoulSubwayCsv() {
@@ -213,6 +214,29 @@ public class LocationService {
 				String latitude = line.get(3);
 				String longitude = line.get(4);
 				return Area.of(stationName, stationAddress, Double.parseDouble(longitude),
+					Double.parseDouble(latitude));
+			})
+			.collect(Collectors.toList());
+
+		areaRepository.saveAll(result);
+	}
+
+	private void readEtcCsv() {
+
+		String seoulSubwayCsvPath = "/csv/etc_5.csv";
+		URL url = getClass().getResource(seoulSubwayCsvPath);
+
+		if (url == null || url.getPath() == null) {
+			throw new NotFoundException(seoulSubwayCsvPath + " not exist");
+		}
+		File file = new File(url.getPath());
+
+		List<Area> result = FileReadUtils.readCSV(file).stream()
+			.map(line -> {
+				String name = line.get(0);
+				String latitude = line.get(1);
+				String longitude = line.get(2);
+				return Area.of(name, "", Double.parseDouble(longitude),
 					Double.parseDouble(latitude));
 			})
 			.collect(Collectors.toList());
