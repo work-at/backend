@@ -268,7 +268,15 @@ public class UserService {
 		userRepository.save(user);
 	}
 
+	@Transactional
 	public EmailLimitResponseDto getVerificationEmailRemain(Users user) {
+		if (user.getEmailRequestRemain() == 0) {
+			if (!userEmailLimitRepository.existsById(user.getId())) {
+				user.resetEmailRequestCount();
+			}
+		}
+		userRepository.save(user);
+
 		return EmailLimitResponseDto.of(user.getEmailRequestRemain());
 	}
 
