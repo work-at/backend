@@ -26,12 +26,12 @@ public class LocationBriefDto extends LocationDto {
 
 	private int reviewCount;
 
-	private List<ReviewTypeDto> topReviews;
+	private List<TagDto> topReviews;
 
 	@Builder
 	public LocationBriefDto(long id, String placeId, double longitude, double latitude, LocationCategory category,
 		String placeName, String roadAddressName, String thumbnailImageUrl, int reviewCount,
-		List<ReviewTypeDto> topReviews) {
+		List<TagDto> topReviews) {
 		super(id, placeId, longitude, latitude);
 
 		this.category = category;

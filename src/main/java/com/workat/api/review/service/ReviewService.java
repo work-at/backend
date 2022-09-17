@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,8 @@ import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.tag.ReviewTag;
 import com.workat.domain.tag.CafeReviewType;
 import com.workat.domain.tag.FoodReviewType;
+import com.workat.domain.tag.dto.TagCountDto;
+import com.workat.domain.tag.dto.TagSummaryDto;
 import com.workat.domain.user.entity.Users;
 
 import lombok.RequiredArgsConstructor;
@@ -43,14 +46,19 @@ public class ReviewService {
 
 	private final LocationRepository locationRepository;
 
-	public List<ReviewDto> getLocationReviews(long locationId, LocationCategory category) {
+	public List<TagCountDto> getLocationReviews(long locationId, LocationCategory category) {
 
 		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
 		final HashMap<ReviewTag, Long> reviewCountMap = convertReviewCountMap(reviews);
-		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
-
-		return sortedReviewDtos;
+		return reviewCountMap.entrySet().stream()
+			.map(tag -> {
+				return TagCountDto.of(TagSummaryDto.of(tag.getKey()), tag.getValue());
+			})
+			.sorted(Comparator
+				.comparingLong(TagCountDto::getCount)
+				.reversed())
+			.collect(toList());
 	}
 
 	public ReviewWithUserDto getLocationReviewsWithUser(long locationId, LocationCategory category, long userId) {

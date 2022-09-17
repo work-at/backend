@@ -38,6 +38,8 @@ import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.map.vo.MapPoint;
 import com.workat.domain.map.vo.MapRangeInfo;
 
+import com.workat.domain.tag.dto.TagCountDto;
+import com.workat.domain.tag.dto.TagDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,12 +89,12 @@ public class LocationService {
 		List<LocationBriefDto> locationBriefs = locations.stream()
 			.map(location -> {
 				long locationId = location.getId();
-				List<ReviewDto> locationReviews = reviewService.getLocationReviews(locationId, category);
+				List<TagCountDto> locationReviews = reviewService.getLocationReviews(locationId, category);
 
 				int reviewCount = locationReviews.size();
-				List<ReviewTypeDto> topReviews = locationReviews.stream()
+				List<TagDto> topReviews = locationReviews.stream()
 					.limit(TOP_REVIEW_LENGTH)
-					.map(ReviewDto::getReviewType)
+					.map(TagCountDto::getTag)
 					.collect(Collectors.toList());
 
 				return LocationBriefDto.builder()
