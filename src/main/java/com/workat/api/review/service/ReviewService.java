@@ -65,7 +65,7 @@ public class ReviewService {
 
 		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
-		final long userCount = countReviewedUser(reviews);
+		final long userCount = countDistinctUserByLocationId(locationId, category);
 		final HashMap<ReviewTag, Long> reviewCountMap = convertReviewCountMap(reviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
@@ -166,5 +166,14 @@ public class ReviewService {
 			.collect(toList());
 
 		restaurantReviewRepository.saveAll(RestaurantReviews);
+	}
+
+	@Transactional(readOnly = true)
+	public int countDistinctUserByLocationId(long locationId, LocationCategory category){
+		if (category == LocationCategory.CAFE) {
+			return cafeReviewRepository.countDistinctUserByLocationId(locationId);
+		}
+
+		return restaurantReviewRepository.countDistinctUserByLocationId(locationId);
 	}
 }

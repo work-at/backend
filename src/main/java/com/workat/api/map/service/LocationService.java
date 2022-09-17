@@ -91,7 +91,7 @@ public class LocationService {
 				long locationId = location.getId();
 				List<TagCountDto> locationReviews = reviewService.getLocationReviews(locationId, category);
 
-				int reviewCount = locationReviews.size();
+				int reviewCount = reviewService.countDistinctUserByLocationId(locationId, category);
 				List<TagDto> topReviews = locationReviews.stream()
 					.limit(TOP_REVIEW_LENGTH)
 					.map(TagCountDto::getTag)
