@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@RedisHash(value = "monthly", timeToLive = 1440)
+@RedisHash(value = "limit", timeToLive = 1440)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEmailLimit {
 
