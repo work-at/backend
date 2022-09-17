@@ -73,7 +73,7 @@ public class AccommodationService {
 			reviewTag);
 
 		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl,
-			accommodationPages.getContent());
+			accommodationPages.getContent(), infoTag);
 
 		return AccommodationsResponse.of(
 			accommodationDtos,
@@ -182,30 +182,46 @@ public class AccommodationService {
 		// TODO: getAccommodations 와 통합해보기
 		final List<Accommodation> accommodations = accommodationRepository.findAllByNameContaining(name);
 
-		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl, accommodations);
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl, accommodations, null);
 
 		return accommodationDtos;
 	}
 
 	@Transactional(readOnly = true)
-	public List<AccommodationDto> convertAccommodationDto(String baseUrl, List<Accommodation> accommodations) {
+	public List<AccommodationDto> convertAccommodationDto(String baseUrl, List<Accommodation> accommodations, AccommodationInfoTag infoTag) {
 
 		return accommodations.stream()
 			.map(accommodation -> {
-
+				List<TagDto> tagsDtoSet;
 				// TODO: 효율적인 방법으로 고치기
-				LinkedHashSet<TagDto> tagsDtoSet = AccommodationReviewTag.ALL.stream()
-					.map(tag -> {
-						Long count = accommodationReviewRepository.countByTag(tag);
+				if(infoTag == null){
+					tagsDtoSet = AccommodationReviewTag.ALL.stream()
+						.map(tag -> {
+							Long count = accommodationReviewRepository.countByTag(tag);
 
-						return TagCountDto.of(TagSummaryDto.of(tag), count);
-					})
-					.sorted(Comparator
-						.comparingLong(TagCountDto::getCount)
-						.reversed())
-					.limit(3)
-					.map(TagCountDto::getTag)
-					.collect(toCollection(LinkedHashSet::new));
+							return TagCountDto.of(TagSummaryDto.of(tag), count);
+						})
+						.sorted(Comparator
+							.comparingLong(TagCountDto::getCount)
+							.reversed())
+						.limit(3)
+						.map(TagCountDto::getTag)
+						.collect(toList());
+				} else{
+					tagsDtoSet = AccommodationReviewTag.ALL.stream()
+						.map(tag -> {
+							Long count = accommodationReviewRepository.countByTag(tag);
+
+							return TagCountDto.of(TagSummaryDto.of(tag), count);
+						})
+						.sorted(Comparator
+							.comparingLong(TagCountDto::getCount)
+							.reversed())
+						.limit(2)
+						.map(TagCountDto::getTag)
+						.collect(toList());
+					tagsDtoSet.add(0,TagInfoDto.of(infoTag));
+				}
 
 				return AccommodationDto.of(
 					accommodation.getId(),
