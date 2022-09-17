@@ -22,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.workat.api.accommodation.dto.AccommodationDetailDto;
 import com.workat.api.accommodation.dto.AccommodationDto;
+import com.workat.api.review.dto.ReviewDto;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.entity.AccommodationInfo;
@@ -129,15 +130,15 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 			Arrays.asList(accommodationReview1, accommodationReview2, accommodationReview3));
 
 		// when
-		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation("", accommodation.getId(), user1.getId())
+		List<ReviewDto> tagCountDtos = accommodationService.getAccommodation("", accommodation.getId(), user1.getId())
 			.getAccommodationReview()
 			.getReviews();
 
 		Map<String, Long> countMap = tagCountDtos.stream()
 			.collect(
 				Collectors.toMap(
-				dto -> dto.getTag().getName(),
-				TagCountDto::getCount)
+				dto -> dto.getReviewType().getName(),
+				ReviewDto::getCount)
 			);
 
 		// then
@@ -178,7 +179,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		Long accommodationId = accommodation.getId();
 		Long userId = users.get(0).getId();
 
-		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation("", accommodationId, userId)
+		List<ReviewDto> tagCountDtos = accommodationService.getAccommodation("", accommodationId, userId)
 			.getAccommodationReview()
 			.getReviews();
 
@@ -186,8 +187,8 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 		assertEquals(tagCountDtos.size(), 3); // FOCUS, SERVE_MEAL, POWER
 
 		for (int i = 0; i < tagCountDtos.size() - 1; i++) {
-			TagCountDto curDto = tagCountDtos.get(i);
-			TagCountDto nextDto = tagCountDtos.get(i + 1);
+			ReviewDto curDto = tagCountDtos.get(i);
+			ReviewDto nextDto = tagCountDtos.get(i + 1);
 
 			assertTrue(curDto.getCount() >= nextDto.getCount()); // 역순 정렬
 		}
