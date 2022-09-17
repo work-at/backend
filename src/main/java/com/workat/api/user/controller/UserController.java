@@ -1,9 +1,11 @@
 package com.workat.api.user.controller;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -75,8 +77,12 @@ public class UserController {
 
 	@PostMapping("/api/v1/user/verify")
 	public ResponseEntity<?> sendCompanyVerifyEmail(@UserValidation Users user, @Valid @RequestBody EmailCertifyRequest emailCertifyRequest, HttpServletRequest request) throws UnsupportedEncodingException, MessagingException {
-		userService.sendCompanyVerifyEmail(user, emailCertifyRequest, getSiteURL(request));
+		userService.sendCompanyVerifyEmail(user, emailCertifyRequest, getSiteURL(request), getUserAgent(request));
 		return ResponseEntity.ok().build();
+	}
+
+	private static String getUserAgent(HttpServletRequest request) {
+		return request.getHeader("User-Agent");
 	}
 
 	private String getSiteURL(HttpServletRequest request) {
@@ -97,10 +103,14 @@ public class UserController {
 	}
 
 	@GetMapping("/api/v1/user/email-verified")
-	public String verifyUser(@RequestParam("code") String code, @RequestParam String address) {
+	public String verifyUser(@RequestParam("code") String code, @RequestParam String address, @RequestParam String agent, HttpServletResponse httpServletResponse) throws IOException {
 		// TODO: 메일 인증 후 redirect 페이지 여부에 따라 변경 가능
-		if (userService.verify(code, address)) {
-			return "verify_success";
+		if (userService.verify(code, address, agent)) {
+			if (agent.indexOf("ANDROID_APP") > -1) {
+				httpServletResponse.sendRedirect("https://play.google.com/store/apps/details?id=com.workat_");
+			}
+
+			httpServletResponse.sendRedirect("https://workat.o-r.kr/accommodation");
 		}
 		return "verify_fail";
 	}

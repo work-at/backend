@@ -204,7 +204,7 @@ public class UserService {
 	}
 
 	@Transactional
-	public void sendCompanyVerifyEmail(Users user, EmailCertifyRequest request, String siteURL) throws
+	public void sendCompanyVerifyEmail(Users user, EmailCertifyRequest request, String siteURL, String userAgent) throws
 		UnsupportedEncodingException,
 		MessagingException {
 		if (user.getEmailRequestRemain() == 0) {
@@ -229,11 +229,11 @@ public class UserService {
 		user.setVerificationCode();
 		userRepository.save(user);
 
-		sendVerificationEmail(user, userProfile.getNickname(), request.getEmail(), siteURL);
+		sendVerificationEmail(user, userProfile.getNickname(), request.getEmail(), siteURL, userAgent);
 	}
 
 	@Transactional
-	public boolean verify(String verificationCode, String address) {
+	public boolean verify(String verificationCode, String address, String agent) {
 		Users user = userRepository.findUsersByVerificationCode(verificationCode)
 			.orElseThrow(() -> new NotFoundException("verification code not found"));
 		UserProfile userProfile = userProfileRepository.findById(user.getId())
@@ -272,7 +272,7 @@ public class UserService {
 		return EmailLimitResponseDto.of(user.getEmailRequestRemain());
 	}
 
-	private void sendVerificationEmail(Users user, String nickname, String email, String siteURL) throws
+	private void sendVerificationEmail(Users user, String nickname, String email, String siteURL, String userAgent) throws
 		MessagingException,
 		UnsupportedEncodingException {
 		String senderName = "Work at_";
@@ -295,7 +295,7 @@ public class UserService {
 
 		content = content.replace("[[name]]", nickname);
 		String verifyURL =
-			siteURL + "/api/v1/user/email-verified?code=" + user.getVerificationCode() + "&address=" + email;
+			siteURL + "/api/v1/user/email-verified?code=" + user.getVerificationCode() + "&address=" + email + "&agent=" + userAgent;
 
 		content = content.replace("[[URL]]", verifyURL);
 
