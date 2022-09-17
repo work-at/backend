@@ -6,9 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.workat.api.review.dto.response.ReviewTypeListResponse;
+import com.workat.api.accommodation.dto.response.TagsResponse;
 import com.workat.api.review.service.CollectReviewTypeService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +22,8 @@ public class CollectReviewTypeController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@ApiOperation(value = "카페 리뷰 조회", notes = "카페 리뷰 목록을 조회합니다")
 	@GetMapping("/api/v1/cafe/review-type")
-	public ResponseEntity<ReviewTypeListResponse> getCafeTypesReviewTypes() {
-		ReviewTypeListResponse response = collectReviewEnumService.collectCafeReviewTypes();
+	public ResponseEntity<TagsResponse> getCafeTypesReviewTypes() {
+		TagsResponse response = collectReviewEnumService.collectCafeReviewTypes();
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
@@ -32,8 +31,8 @@ public class CollectReviewTypeController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@ApiOperation(value = "음식점 리뷰 조회", notes = "음식점 리뷰 목록을 조회합니다")
 	@GetMapping("/api/v1/food/review-type")
-	public ResponseEntity<ReviewTypeListResponse> getFoodReviewTypes() {
-		ReviewTypeListResponse response = collectReviewEnumService.collectFoodReviewTypes();
+	public ResponseEntity<TagsResponse> getFoodReviewTypes() {
+		TagsResponse response = collectReviewEnumService.collectFoodReviewTypes();
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}

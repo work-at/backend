@@ -1,6 +1,6 @@
 package com.workat.api.review.dto;
 
-import com.workat.domain.tag.BaseTag;
+import com.workat.domain.tag.ReviewTag;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
@@ -22,7 +22,11 @@ public class ReviewDto {
 		this.count = count;
 	}
 
-	public static ReviewDto of(BaseTag reviewType, long count) {
+	public static ReviewDto of(ReviewTag reviewType, long count) {
 		return new ReviewDto(ReviewTypeDto.of(reviewType), count);
+	}
+
+	public static ReviewDto of(ReviewTypeDto reviewTypeDto, long count) {
+		return new ReviewDto(reviewTypeDto, count);
 	}
 }

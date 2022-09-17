@@ -3,7 +3,6 @@ package com.workat.api.accommodation.dto;
 import java.util.HashSet;
 
 import com.workat.domain.tag.dto.TagDto;
-
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Builder;

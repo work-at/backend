@@ -20,7 +20,15 @@ public class TagCountDto {
 		this.count = count;
 	}
 
-	public static TagCountDto of(TagDto tag, long count) {
+	public static TagCountDto of(TagSummaryDto tag, long count) {
+		return new TagCountDto(tag, count);
+	}
+
+	public static TagCountDto of(TagContentDto tag, long count) {
+		return new TagCountDto(tag, count);
+	}
+
+	public static TagCountDto of(TagInfoDto tag, long count) {
 		return new TagCountDto(tag, count);
 	}
 }

@@ -9,6 +9,8 @@ import com.workat.api.accommodation.dto.response.TagsResponse;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagDto;
+import com.workat.domain.tag.dto.TagInfoDto;
+import com.workat.domain.tag.dto.TagContentDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,16 +21,16 @@ public class CollectAccommodationTagService {
 	public TagsResponse collectReviewTags() {
 		List<TagDto> list = AccommodationReviewTag.ALL
 			.stream()
-			.map(TagDto::of)
+			.map(TagContentDto::of)
 			.collect(Collectors.toList());
 
 		return TagsResponse.of(list);
 	}
 
 	public TagsResponse collectInfoTags() {
-		List<TagDto> list = AccommodationInfoTag.ALL
+		List<TagInfoDto> list = AccommodationInfoTag.ALL
 			.stream()
-			.map(TagDto::of)
+			.map(TagInfoDto::of)
 			.collect(Collectors.toList());
 
 		return TagsResponse.of(list);

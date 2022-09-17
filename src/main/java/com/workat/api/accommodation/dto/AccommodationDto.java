@@ -2,8 +2,9 @@ package com.workat.api.accommodation.dto;
 
 import java.util.HashSet;
 
-import com.workat.domain.tag.dto.TagDto;
+import com.workat.domain.tag.dto.TagContentDto;
 
+import com.workat.domain.tag.dto.TagDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
