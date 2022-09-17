@@ -1,8 +1,7 @@
 package com.workat.api.accommodation.dto;
 
 import java.util.HashSet;
-
-import com.workat.domain.tag.dto.TagContentDto;
+import java.util.List;
 
 import com.workat.domain.tag.dto.TagDto;
 import lombok.AccessLevel;
@@ -20,9 +19,9 @@ public class AccommodationDto {
 
 	private String imgUrl;
 
-	private HashSet<TagDto> topReviewTags;
+	private List<TagDto> topReviewTags;
 
-	private AccommodationDto(long id, String name, long price, String imgUrl, HashSet<TagDto> topReviewTags) {
+	private AccommodationDto(long id, String name, long price, String imgUrl, List<TagDto> topReviewTags) {
 		this.id = id;
 		this.name = name;
 		this.price = price;
@@ -30,7 +29,7 @@ public class AccommodationDto {
 		this.topReviewTags = topReviewTags;
 	}
 
-	public static AccommodationDto of(long id, String name, long price, String imgUrl, HashSet<TagDto> topReviewTags) {
+	public static AccommodationDto of(long id, String name, long price, String imgUrl, List<TagDto> topReviewTags) {
 		return new AccommodationDto(id, name, price, imgUrl, topReviewTags);
 	}
 }
