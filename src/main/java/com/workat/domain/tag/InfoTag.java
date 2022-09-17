@@ -1,6 +1,6 @@
 package com.workat.domain.tag;
 
-public interface BaseTag {
+public interface InfoTag {
 
 	String getName();
 

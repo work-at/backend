@@ -2,9 +2,11 @@ package com.workat.api.map.dto;
 
 import java.util.List;
 
+import com.workat.api.review.dto.ReviewDto;
 import com.workat.api.review.dto.ReviewTypeDto;
 import com.workat.domain.map.entity.LocationCategory;
 
+import com.workat.domain.tag.dto.TagDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

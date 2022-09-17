@@ -24,7 +24,7 @@ import com.workat.domain.locationReview.repository.RestaurantReviewRepository;
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationCategory;
 import com.workat.domain.map.repository.location.LocationRepository;
-import com.workat.domain.tag.BaseTag;
+import com.workat.domain.tag.ReviewTag;
 import com.workat.domain.tag.CafeReviewType;
 import com.workat.domain.tag.FoodReviewType;
 import com.workat.domain.user.entity.Users;
@@ -47,7 +47,7 @@ public class ReviewService {
 
 		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
-		final HashMap<BaseTag, Long> reviewCountMap = convertReviewCountMap(reviews);
+		final HashMap<ReviewTag, Long> reviewCountMap = convertReviewCountMap(reviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
 		return sortedReviewDtos;
@@ -58,7 +58,7 @@ public class ReviewService {
 		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
 
 		final long userCount = countReviewedUser(reviews);
-		final HashMap<BaseTag, Long> reviewCountMap = convertReviewCountMap(reviews);
+		final HashMap<ReviewTag, Long> reviewCountMap = convertReviewCountMap(reviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
 		final boolean userReviewed = checkUserReviewed(reviews, userId);
@@ -87,15 +87,15 @@ public class ReviewService {
 			.size();
 	}
 
-	private <T extends BaseReview> HashMap<BaseTag, Long> convertReviewCountMap(List<T> reviews) {
+	private <T extends BaseReview> HashMap<ReviewTag, Long> convertReviewCountMap(List<T> reviews) {
 
-		final HashMap<BaseTag, Long> reviewCountMap = reviews.stream()
+		final HashMap<ReviewTag, Long> reviewCountMap = reviews.stream()
 			.collect(groupingBy(BaseReview::getReviewType, HashMap::new, counting()));
 
 		return reviewCountMap;
 	}
 
-	private <T extends BaseTag> List<ReviewDto> getSortedReviewDtos(Map<T, Long> map) {
+	private <T extends ReviewTag> List<ReviewDto> getSortedReviewDtos(Map<T, Long> map) {
 
 		return map.entrySet()
 			.stream()

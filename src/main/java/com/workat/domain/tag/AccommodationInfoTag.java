@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.workat.common.exception.NotFoundException;
 
-public enum AccommodationInfoTag implements BaseTag {
+public enum AccommodationInfoTag implements InfoTag {
 
 	WORKSPACE("숙소 내 업무 공간"),
 	NEAR_FOREST("숲 인근"),

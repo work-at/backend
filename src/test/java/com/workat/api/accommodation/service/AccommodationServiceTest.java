@@ -34,6 +34,7 @@ import com.workat.domain.config.DataJpaTestConfig;
 import com.workat.domain.config.MysqlContainerBaseTest;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.tag.dto.TagInfoDto;
 import com.workat.domain.tag.dto.TagCountDto;
 import com.workat.domain.tag.dto.TagDto;
 import com.workat.domain.user.entity.UserProfile;
@@ -79,7 +80,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 			accommodation);
 		HashSet<TagDto> accommodationInfoDtos = accommodationInfos.stream()
 			.map(AccommodationInfo::getTag)
-			.map(TagDto::of)
+			.map(TagInfoDto::of)
 			.collect(toCollection(HashSet::new));
 		Users user = saveUsers(1).get(0);
 
@@ -133,9 +134,11 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 			.getReviews();
 
 		Map<String, Long> countMap = tagCountDtos.stream()
-			.collect(Collectors.toMap(
+			.collect(
+				Collectors.toMap(
 				dto -> dto.getTag().getName(),
-				TagCountDto::getCount));
+				TagCountDto::getCount)
+			);
 
 		// then
 		assertAll(
@@ -158,7 +161,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 
 		List<AccommodationReview> reviewPart2 = users.subList(10, 18) // 2nd
 			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.MEAL, accommodation, user))
+			.map(user -> AccommodationReview.of(AccommodationReviewTag.BREAKFAST, accommodation, user))
 			.collect(Collectors.toList());
 
 		List<AccommodationReview> reviewPart3 = users.subList(18, 20) // 3rd
@@ -219,7 +222,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 
 		List<AccommodationReview> reviewPart2 = users.subList(5, 9) // 2nd
 			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.MEAL, accommodation, user))
+			.map(user -> AccommodationReview.of(AccommodationReviewTag.BREAKFAST, accommodation, user))
 			.collect(Collectors.toList());
 
 		List<AccommodationReview> reviewPart3 = users.subList(9, 12) // 3rd
@@ -253,7 +256,7 @@ public class AccommodationServiceTest extends MysqlContainerBaseTest {
 
 				assertAll(
 					() -> assertTrue(tags.contains(AccommodationReviewTag.LOCATION)),
-					() -> assertTrue(tags.contains(AccommodationReviewTag.MEAL)),
+					() -> assertTrue(tags.contains(AccommodationReviewTag.BREAKFAST)),
 					() -> assertTrue(tags.contains(AccommodationReviewTag.POWER))
 				);
 			});
