@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +24,6 @@ import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
 import com.workat.api.accommodation.dto.response.AccommodationCurationsResponse;
 import com.workat.api.accommodation.dto.response.AccommodationResponse;
 import com.workat.api.accommodation.dto.response.AccommodationsResponse;
-import com.workat.api.review.dto.ReviewDto;
 import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.NotFoundException;
 import com.workat.domain.accommodation.RegionType;
@@ -35,10 +35,9 @@ import com.workat.domain.accommodation.repository.AccommodationRepository;
 import com.workat.domain.accommodation.repository.AccommodationReviewRepository;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
-import com.workat.domain.tag.dto.TagInfoDto;
 import com.workat.domain.tag.dto.TagCountDto;
-import com.workat.domain.tag.dto.TagContentDto;
 import com.workat.domain.tag.dto.TagDto;
+import com.workat.domain.tag.dto.TagInfoDto;
 import com.workat.domain.tag.dto.TagSummaryDto;
 import com.workat.domain.user.entity.Users;
 
@@ -188,40 +187,26 @@ public class AccommodationService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<AccommodationDto> convertAccommodationDto(String baseUrl, List<Accommodation> accommodations, AccommodationInfoTag infoTag) {
+	public List<AccommodationDto> convertAccommodationDto(String baseUrl, List<Accommodation> accommodations,
+		AccommodationInfoTag infoTag) {
 
 		return accommodations.stream()
 			.map(accommodation -> {
-				List<TagDto> tagsDtoSet;
-				// TODO: 효율적인 방법으로 고치기
-				if(infoTag == null){
-					tagsDtoSet = AccommodationReviewTag.ALL.stream()
-						.map(tag -> {
-							Long count = accommodationReviewRepository.countByTag(tag);
+				List<AccommodationReview> reviews = accommodationReviewRepository.findAllByAccommodation_Id(
+					accommodation.getId());
 
-							return TagCountDto.of(TagSummaryDto.of(tag), count);
-						})
-						.sorted(Comparator
-							.comparingLong(TagCountDto::getCount)
-							.reversed())
-						.limit(3)
-						.map(TagCountDto::getTag)
-						.collect(toList());
-				} else{
-					tagsDtoSet = AccommodationReviewTag.ALL.stream()
-						.map(tag -> {
-							Long count = accommodationReviewRepository.countByTag(tag);
+				HashMap<AccommodationReviewTag, Long> reviewCountMap = convertReviewCountMap(
+					reviews);
 
-							return TagCountDto.of(TagSummaryDto.of(tag), count);
-						})
-						.sorted(Comparator
-							.comparingLong(TagCountDto::getCount)
-							.reversed())
-						.limit(2)
-						.map(TagCountDto::getTag)
-						.collect(toList());
-					tagsDtoSet.add(0,TagInfoDto.of(infoTag));
-				}
+				Stream<TagDto> tagDtoStream = convertTagCountDtos(reviewCountMap).stream()
+					.filter(countMap -> countMap.getCount() > 0)
+					.limit(3)
+					.map(TagCountDto::getTag);
+
+				LinkedHashSet tagsDtoSet = (infoTag == null ?
+					tagDtoStream : Stream.concat(Stream.of(TagInfoDto.of(infoTag)), tagDtoStream))
+					.limit(3)
+					.collect(toCollection(LinkedHashSet::new));
 
 				return AccommodationDto.of(
 					accommodation.getId(),
@@ -256,7 +241,7 @@ public class AccommodationService {
 		final HashMap<AccommodationReviewTag, Long> reviewTagMap = convertReviewCountMap(
 			reviews);
 
-		final List<ReviewDto> tagCountDtos = convertTagCountDtos(reviewTagMap);
+		final List<TagCountDto> tagCountDtos = convertTagCountDtos(reviewTagMap);
 
 		final HashSet<Long> userIdSet = reviews.stream()
 			.map(review ->
@@ -285,15 +270,12 @@ public class AccommodationService {
 		return reviewCountMap;
 	}
 
-	private List<ReviewDto> convertTagCountDtos(HashMap<AccommodationReviewTag, Long> map) {
+	private List<TagCountDto> convertTagCountDtos(HashMap<AccommodationReviewTag, Long> map) {
 
 		return map.entrySet().stream()
-			.map(entry ->
-				ReviewDto.of(
-					TagContentDto.of(entry.getKey()).convertToReviewTypeDto(),
-					entry.getValue()))
+			.map(entry -> TagCountDto.of(TagSummaryDto.of(entry.getKey()), entry.getValue()))
 			.sorted(Comparator
-				.comparingLong(ReviewDto::getCount)
+				.comparingLong(TagCountDto::getCount)
 				.reversed() // count 역순으로 정렬
 			)
 			.collect(Collectors.toList());
