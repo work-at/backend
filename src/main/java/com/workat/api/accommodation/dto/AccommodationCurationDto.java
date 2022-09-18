@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AccommodationCuration {
+public class AccommodationCurationDto {
 
 	private long id;
 
@@ -18,14 +18,14 @@ public class AccommodationCuration {
 
 	private String imgUrl;
 
-	private AccommodationCuration(long id, String name, RegionType region, String imgUrl) {
+	private AccommodationCurationDto(long id, String name, RegionType region, String imgUrl) {
 		this.id = id;
 		this.name = name;
 		this.region = region;
 		this.imgUrl = imgUrl;
 	}
 
-	public static AccommodationCuration of(long id, String name, RegionType region, String imgUrl) {
-		return new AccommodationCuration(id, name, region, imgUrl);
+	public static AccommodationCurationDto of(long id, String name, RegionType region, String imgUrl) {
+		return new AccommodationCurationDto(id, name, region, imgUrl);
 	}
 }

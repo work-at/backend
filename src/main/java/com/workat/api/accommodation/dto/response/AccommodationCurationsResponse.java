@@ -2,7 +2,7 @@ package com.workat.api.accommodation.dto.response;
 
 import java.util.List;
 
-import com.workat.api.accommodation.dto.AccommodationCuration;
+import com.workat.api.accommodation.dto.AccommodationCurationDto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
@@ -14,13 +14,13 @@ import lombok.NoArgsConstructor;
 public class AccommodationCurationsResponse {
 
 	@ApiModelProperty(name = "accommodations")
-	private List<AccommodationCuration> accommodations;
+	private List<AccommodationCurationDto> accommodations;
 
-	private AccommodationCurationsResponse(List<AccommodationCuration> accommodations) {
+	private AccommodationCurationsResponse(List<AccommodationCurationDto> accommodations) {
 		this.accommodations = accommodations;
 	}
 
-	public static AccommodationCurationsResponse of(List<AccommodationCuration> accommodations) {
+	public static AccommodationCurationsResponse of(List<AccommodationCurationDto> accommodations) {
 		return new AccommodationCurationsResponse(accommodations);
 	}
 }
