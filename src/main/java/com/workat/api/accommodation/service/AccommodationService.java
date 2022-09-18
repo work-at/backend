@@ -16,7 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.workat.api.accommodation.dto.AccommodationCuration;
+import com.workat.api.accommodation.dto.AccommodationCurationDto;
 import com.workat.api.accommodation.dto.AccommodationDetailDto;
 import com.workat.api.accommodation.dto.AccommodationDto;
 import com.workat.api.accommodation.dto.AccommodationReviewDto;
@@ -140,11 +140,11 @@ public class AccommodationService {
 
 		return AccommodationCurationsResponse.of(
 			accommodations.stream()
-				.map(accommodation -> AccommodationCuration.of(
+				.map(accommodation -> AccommodationCurationDto.of(
 					accommodation.getId(),
 					accommodation.getName(),
 					accommodation.getRegionType(),
-					baseUrl + "/uploaded" + accommodation.getImgUrl() + ".png"
+					baseUrl + "/uploaded" + accommodation.getThumbnailImgUrl() + ".png"
 				))
 				.collect(toList())
 		);
