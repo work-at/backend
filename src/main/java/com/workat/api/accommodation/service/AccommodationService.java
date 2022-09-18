@@ -144,7 +144,7 @@ public class AccommodationService {
 					accommodation.getId(),
 					accommodation.getName(),
 					accommodation.getRegionType(),
-					baseUrl + "/uploaded" + accommodation.getImgUrl() + ".png"
+					baseUrl + "/uploaded" + accommodation.getThumbnailImgUrl() + ".png"
 				))
 				.collect(toList())
 		);
