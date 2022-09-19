@@ -23,11 +23,10 @@ public class TourApiService {
 		MonthlyRegionVisitor monthlyRegionVisitor = monthlyRegionVisitorRepository.findById(regionCode.getCode()).orElseThrow(() -> new NotFoundException(regionCode.name() + " not found"));
 		YearlyRegionVisitor yearlyRegionVisitor = yearlyRegionVisitorRepository.findById(regionCode.getCode()).orElseThrow(() -> new NotFoundException(regionCode.name() + " not found"));
 
-		VisitorDegree type = null;
-		if (yearlyRegionVisitor.getCount() < monthlyRegionVisitor.getCount() * 0.7) {
+		if (yearlyRegionVisitor.getCount() * 0.7 < monthlyRegionVisitor.getCount()) {
 			return RegionTrafficResponse.of(regionCode, VisitorDegree.POPULAR);
 		}
-		if (yearlyRegionVisitor.getCount() > monthlyRegionVisitor.getCount() * 0.4) {
+		if (yearlyRegionVisitor.getCount() * 0.4 > monthlyRegionVisitor.getCount()) {
 			return RegionTrafficResponse.of(regionCode, VisitorDegree.FREE);
 		}
 		return RegionTrafficResponse.of(regionCode, VisitorDegree.IN_BETWEEN);
