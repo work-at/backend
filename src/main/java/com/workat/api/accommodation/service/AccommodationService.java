@@ -213,7 +213,7 @@ public class AccommodationService {
 					accommodation.getName(),
 					accommodation.getPrice(),
 					baseUrl + "/uploaded" + accommodation.getThumbnailImgUrl() + ".png",
-					tagsDtoSet);
+					tagsDtoSet, accommodation.getRegionType());
 			}).collect(toList());
 	}
 
