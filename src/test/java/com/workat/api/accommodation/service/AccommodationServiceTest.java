@@ -15,14 +15,13 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -40,7 +39,6 @@ import com.workat.domain.accommodation.repository.AccommodationReviewRepository;
 import com.workat.domain.accommodation.repository.AccommodationSearchAndFilterRepository;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.MultipleDatasourceBaseTest;
-import com.workat.domain.config.MysqlContainerBaseTest;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagCountDto;
@@ -56,7 +54,7 @@ import com.workat.domain.user.repository.UserProfileRepository;
 @ActiveProfiles("test")
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-@Ignore
+@Disabled
 public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 
 	@PersistenceContext
