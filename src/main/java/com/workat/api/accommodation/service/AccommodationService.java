@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import com.workat.domain.accommodation.entity.AccommodationReview;
 import com.workat.domain.accommodation.repository.AccommodationInfoRepository;
 import com.workat.domain.accommodation.repository.AccommodationRepository;
 import com.workat.domain.accommodation.repository.AccommodationReviewRepository;
+import com.workat.domain.accommodation.repository.AccommodationSearchAndFilterRepository;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagCountDto;
@@ -52,6 +54,7 @@ public class AccommodationService {
 	private final AccommodationReviewRepository accommodationReviewRepository;
 
 	private final AccommodationInfoRepository accommodationInfoRepository;
+	private final AccommodationSearchAndFilterRepository accommodationSearchAndFilterRepository;
 
 	@Transactional(readOnly = true)
 	public AccommodationsResponse getAccommodations(
@@ -62,17 +65,15 @@ public class AccommodationService {
 		int pageNumber,
 		int pageSize
 	) {
-
-		final PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "id");
-
-		final Page<Accommodation> accommodationPages = getAccommodationPagesWithFilter(
-			pageRequest,
+		final Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "id");
+		final Page<Accommodation> accommodationPages = accommodationSearchAndFilterRepository.getAccommodationPagesWithFilter(
 			region,
 			infoTag,
-			reviewTag);
+			reviewTag,
+			pageable);
 
 		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl,
-			accommodationPages.getContent(), infoTag);
+			accommodationPages.getContent(), infoTag, reviewTag);
 
 		return AccommodationsResponse.of(
 			accommodationDtos,
@@ -181,14 +182,14 @@ public class AccommodationService {
 		// TODO: getAccommodations 와 통합해보기
 		final List<Accommodation> accommodations = accommodationRepository.findAllByNameContaining(name);
 
-		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl, accommodations, null);
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl, accommodations, null, null);
 
 		return accommodationDtos;
 	}
 
 	@Transactional(readOnly = true)
 	public List<AccommodationDto> convertAccommodationDto(String baseUrl, List<Accommodation> accommodations,
-		AccommodationInfoTag infoTag) {
+		AccommodationInfoTag infoTag, AccommodationReviewTag reviewTag) {
 
 		return accommodations.stream()
 			.map(accommodation -> {
@@ -203,8 +204,17 @@ public class AccommodationService {
 					.limit(3)
 					.map(TagCountDto::getTag);
 
-				LinkedHashSet tagsDtoSet = (infoTag == null ?
-					tagDtoStream : Stream.concat(Stream.of(TagInfoDto.of(infoTag)), tagDtoStream))
+				TagDto firstTag = null;
+				if(infoTag != null){
+					firstTag = TagInfoDto.of(infoTag);
+				}
+				if(reviewTag != null){
+					firstTag = TagSummaryDto.of(reviewTag);
+				}
+
+				LinkedHashSet tagsDtoSet = (firstTag == null ?
+					tagDtoStream : Stream.concat(Stream.of(firstTag), tagDtoStream))
+					.distinct()
 					.limit(3)
 					.collect(toCollection(LinkedHashSet::new));
 
