@@ -25,4 +25,23 @@ public class TagSummaryDto extends TagDto{
 		return new TagSummaryDto(baseReviewData.getName(), baseReviewData.getSummary());
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+
+		if (!(obj instanceof TagDto)) {
+			return false;
+		}
+
+		TagDto c = (TagDto)obj;
+
+		return name.equals(c.getName());
+	}
+
+	@Override
+	public int hashCode(){
+		return name.hashCode();
+	}
 }
