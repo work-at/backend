@@ -42,6 +42,7 @@ public class AccommodationSearchAndFilterRepository {
 				isFilteredInfo(infoTag),
 				isFilteredReview(reviewTag)
 			)
+			.distinct()
 			.orderBy(accommodation.id.asc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
