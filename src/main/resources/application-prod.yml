@@ -7,7 +7,7 @@ spring:
       ddl-auto: update
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://34.64.168.189:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://34.64.157.72:3306/work_at?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
     username: root
     password: workatworkat
     hikari:
@@ -15,7 +15,7 @@ spring:
       maximum-pool-size: 50
       pool-name: pool-work-at
   redis:
-    host: 34.64.168.189
+    host: 34.64.157.72
     port: 6379
     password: workat@1234
   mail:
