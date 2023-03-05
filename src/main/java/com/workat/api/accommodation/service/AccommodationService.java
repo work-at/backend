@@ -1,7 +1,9 @@
 package com.workat.api.accommodation.service;
 
+import static com.workat.common.util.UrlUtils.getBaseUrl;
 import static java.util.stream.Collectors.*;
 
+import com.workat.common.util.UrlUtils;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,7 +60,6 @@ public class AccommodationService {
 
 	@Transactional(readOnly = true)
 	public AccommodationsResponse getAccommodations(
-		String baseUrl,
 		RegionType region,
 		AccommodationInfoTag infoTag,
 		AccommodationReviewTag reviewTag,
@@ -72,8 +73,10 @@ public class AccommodationService {
 			reviewTag,
 			pageable);
 
-		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl,
-			accommodationPages.getContent(), infoTag, reviewTag);
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(
+			accommodationPages.getContent(),
+			infoTag,
+			reviewTag);
 
 		return AccommodationsResponse.of(
 			accommodationDtos,
@@ -84,18 +87,15 @@ public class AccommodationService {
 	}
 
 	@Transactional(readOnly = true)
-	public AccommodationResponse getAccommodation(String baseUrl, long accommodationId, long userId) {
-
+	public AccommodationResponse getAccommodation(long accommodationId, long userId) {
 		final Accommodation accommodation = accommodationRepository.findById(accommodationId)
 			.orElseThrow(() -> {
 				throw new NotFoundException("accommodation is not found");
 			});
 
-		final List<AccommodationInfo> accommodationInfos = accommodationInfoRepository.findAllByAccommodation(
-			accommodation);
+		final List<AccommodationInfo> accommodationInfos = accommodationInfoRepository.findAllByAccommodation(accommodation);
 
-		final AccommodationDetailDto accommodationDetailDto = convertAccommodationDetailDto(baseUrl, accommodation,
-			accommodationInfos);
+		final AccommodationDetailDto accommodationDetailDto = convertAccommodationDetailDto(accommodation, accommodationInfos);
 
 		final List<AccommodationReview> accommodationReviews = accommodationReviewRepository.findAllByAccommodation_Id(
 			accommodationId);
@@ -112,7 +112,6 @@ public class AccommodationService {
 
 	@Transactional
 	public void addAccommodationReview(long accommodationId, AccommodationReviewRequest reviewRequest, Users user) {
-
 		final Accommodation accommodation = accommodationRepository.findById(accommodationId)
 			.orElseThrow(() -> new NotFoundException("No accommodation found for the id"));
 
@@ -135,7 +134,8 @@ public class AccommodationService {
 	}
 
 	@Transactional(readOnly = true)
-	public AccommodationCurationsResponse getAccommodationCurations(String baseUrl) {
+	public AccommodationCurationsResponse getAccommodationCurations() {
+		String baseUrl = getBaseUrl();
 
 		List<Accommodation> accommodations = accommodationRepository.findAllByRandom(5);
 
@@ -177,19 +177,19 @@ public class AccommodationService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<AccommodationDto> getAccommodationsWithName(String baseUrl, String name) {
+	public List<AccommodationDto> getAccommodationsWithName(String name) {
 
 		// TODO: getAccommodations 와 통합해보기
 		final List<Accommodation> accommodations = accommodationRepository.findAllByNameContaining(name);
 
-		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl, accommodations, null, null);
+		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(accommodations, null, null);
 
 		return accommodationDtos;
 	}
 
 	@Transactional(readOnly = true)
-	public List<AccommodationDto> convertAccommodationDto(String baseUrl, List<Accommodation> accommodations,
-		AccommodationInfoTag infoTag, AccommodationReviewTag reviewTag) {
+	public List<AccommodationDto> convertAccommodationDto(List<Accommodation> accommodations, AccommodationInfoTag infoTag, AccommodationReviewTag reviewTag) {
+		String baseUrl = getBaseUrl();
 
 		return accommodations.stream()
 			.map(accommodation -> {
@@ -205,10 +205,10 @@ public class AccommodationService {
 					.map(TagCountDto::getTag);
 
 				TagDto firstTag = null;
-				if(infoTag != null){
+				if (infoTag != null) {
 					firstTag = TagInfoDto.of(infoTag);
 				}
-				if(reviewTag != null){
+				if (reviewTag != null) {
 					firstTag = TagSummaryDto.of(reviewTag);
 				}
 
@@ -227,8 +227,8 @@ public class AccommodationService {
 			}).collect(toList());
 	}
 
-	private AccommodationDetailDto convertAccommodationDetailDto(String baseUrl,
-		Accommodation accommodation, List<AccommodationInfo> accommodationInfos) {
+	private AccommodationDetailDto convertAccommodationDetailDto(Accommodation accommodation, List<AccommodationInfo> accommodationInfos) {
+		String baseUrl = getBaseUrl();
 
 		return AccommodationDetailDto.builder()
 			.id(accommodation.getId())

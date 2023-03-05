@@ -56,8 +56,7 @@ public class AccommodationController {
 		@ApiParam(value = "페이지 사이즈", example = "10", type = "integer")
 		@RequestParam(required = false, defaultValue = "10") int pageSize
 	) {
-		String baseUrl = UrlUtils.getBaseUrl(request);
-		final AccommodationsResponse response = accommodationService.getAccommodations(baseUrl, region, infoTagName,
+		final AccommodationsResponse response = accommodationService.getAccommodations(region, infoTagName,
 			topReviewTagName, pageNumber, pageSize);
 
 		return ResponseEntity.ok(response);
@@ -67,11 +66,8 @@ public class AccommodationController {
 	@ApiOperation("Accommodation 단건 조회")
 	@ApiImplicitParam(name = "accommodationId", value = "Accommodation Id", required = true, dataType = "long", example = "1")
 	@GetMapping("/api/v1/accommodations/{accommodationId}")
-	public ResponseEntity<AccommodationResponse> getAccommodation(HttpServletRequest request,
-		@PathVariable("accommodationId") long accommodationId, @UserValidation Users user) {
-		String baseUrl = UrlUtils.getBaseUrl(request);
-		final AccommodationResponse response = accommodationService.getAccommodation(baseUrl, accommodationId,
-			user.getId());
+	public ResponseEntity<AccommodationResponse> getAccommodation(@PathVariable("accommodationId") long accommodationId, @UserValidation Users user) {
+		final AccommodationResponse response = accommodationService.getAccommodation(accommodationId, user.getId());
 
 		return ResponseEntity.ok(response);
 	}
@@ -92,9 +88,8 @@ public class AccommodationController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@ApiOperation("Accommodation 큐레이션")
 	@GetMapping("/api/v1/accommodations/curations")
-	public ResponseEntity<AccommodationCurationsResponse> getAccommodationCurations(HttpServletRequest request) {
-		String baseUrl = UrlUtils.getBaseUrl(request);
-		final AccommodationCurationsResponse response = accommodationService.getAccommodationCurations(baseUrl);
+	public ResponseEntity<AccommodationCurationsResponse> getAccommodationCurations() {
+		final AccommodationCurationsResponse response = accommodationService.getAccommodationCurations();
 
 		return ResponseEntity.ok(response);
 	}
@@ -104,12 +99,10 @@ public class AccommodationController {
 	@ApiImplicitParam(name = "accommodationName", value = "Accommodation Name", required = true, dataType = "String", example = "워커힐")
 	@GetMapping("/api/v1/accommodations/names")
 	public ResponseEntity<List<AccommodationDto>> getAccommodationWithName(
-		HttpServletRequest request,
 		@ApiParam(value = "accommodationName", example = "워커힐", type = "string")
 		@RequestParam(required = false) String accommodationName
 	) {
-		String baseUrl = UrlUtils.getBaseUrl(request);
-		List<AccommodationDto> response = accommodationService.getAccommodationsWithName(baseUrl, accommodationName);
+		List<AccommodationDto> response = accommodationService.getAccommodationsWithName(accommodationName);
 
 		return ResponseEntity.ok(response);
 	}
