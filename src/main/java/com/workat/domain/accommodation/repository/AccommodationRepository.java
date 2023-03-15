@@ -12,9 +12,7 @@ import org.springframework.data.repository.query.Param;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
 
-public interface AccommodationRepository extends JpaRepository<Accommodation, Long> {
-
-	Optional<Accommodation> findById(Long accommodationId);
+public interface AccommodationRepository extends JpaRepository<Accommodation, Long>, AccommodationCustomRepository {
 
 	Optional<Accommodation> findByName(String name);
 

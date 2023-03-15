@@ -1,6 +1,8 @@
 package com.workat.domain.tag;
 
-public interface ReviewTag {
+import com.workat.common.convert.ConvertContent;
+
+public interface ReviewTag extends ConvertContent {
 
 	String getName();
 

@@ -1,5 +1,6 @@
 package com.workat.api.accommodation.dto.response;
 
+import com.workat.domain.accommodation.entity.Accommodation;
 import java.util.List;
 
 import com.workat.api.accommodation.dto.AccommodationDto;
@@ -8,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -33,8 +35,7 @@ public class AccommodationsResponse {
 		this.totalCount = totalCount;
 	}
 
-	public static AccommodationsResponse of(List<AccommodationDto> accommodations, int pageNumber, int pageSize,
-		long totalCount) {
-		return new AccommodationsResponse(accommodations, pageNumber, pageSize, totalCount);
+	public static AccommodationsResponse of(List<AccommodationDto> accommodations, Page<Accommodation> pages) {
+		return new AccommodationsResponse(accommodations, pages.getNumber(), pages.getSize(), pages.getTotalElements());
 	}
 }

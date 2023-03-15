@@ -19,11 +19,16 @@ public class UrlUtils {
 	}
 
 	public static String getBaseUrl() {
-		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-		return ServletUriComponentsBuilder
-			.fromRequestUri(req)
-			.replacePath(null)
-			.build()
-			.toUriString();
+		String profile = System.getProperty("spring.profiles.active");
+		if (profile == null || profile.equalsIgnoreCase("test")) {
+			return "";
+		} else {
+			HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+			return ServletUriComponentsBuilder
+				.fromRequestUri(req)
+				.replacePath(null)
+				.build()
+				.toUriString();
+		}
 	}
 }

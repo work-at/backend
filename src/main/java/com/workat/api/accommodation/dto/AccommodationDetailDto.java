@@ -1,9 +1,14 @@
 package com.workat.api.accommodation.dto;
 
-import java.util.HashSet;
+import static com.workat.common.util.UrlUtils.getBaseUrl;
+
+import com.workat.domain.accommodation.entity.Accommodation;
+import com.workat.domain.tag.dto.TagInfoDto;
 
 import com.workat.domain.tag.dto.TagDto;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,11 +43,11 @@ public class AccommodationDetailDto {
 	private String relatedUrl;
 
 	@ApiModelProperty(name = "infoTags", notes = "Accommodation info tags", example = "[ { \"name\": \"NEAR_CITY\", \"content\": \"도시 인근\" }, { \"name\": \"WORKSPACE\", \"content\": \"숙소 내 업무 공간\" }, { \"name\": \"SHARED_WORKSPACE\", \"content\": \"공용업무공간\" } ]")
-	private HashSet<TagDto> infoTags;
+	private List<TagDto> infoTags;
 
 	public AccommodationDetailDto(long id, String name, String imgUrl, long price, String phone,
 		String roadAddressName, String placeUrl, String relatedUrl,
-		HashSet<TagDto> infoTags) {
+		List<TagDto> infoTags) {
 		this.id = id;
 		this.name = name;
 		this.imgUrl = imgUrl;
@@ -52,5 +57,23 @@ public class AccommodationDetailDto {
 		this.placeUrl = placeUrl;
 		this.relatedUrl = relatedUrl;
 		this.infoTags = infoTags;
+	}
+
+	public static AccommodationDetailDto from(Accommodation accommodation) {
+		String baseUrl = getBaseUrl();
+
+		return AccommodationDetailDto.builder()
+			.id(accommodation.getId())
+			.name(accommodation.getName())
+			.imgUrl(baseUrl + "/uploaded" + accommodation.getImgUrl() + ".png")
+			.price(accommodation.getPrice())
+			.phone(accommodation.getPhone())
+			.roadAddressName(accommodation.getRoadAddressName())
+			.placeUrl(accommodation.getPlaceUrl())
+			.relatedUrl(accommodation.getRelatedUrl())
+			.infoTags(accommodation.getAccommodationInfo().getTags().stream()
+				.map(TagInfoDto::of)
+				.collect(Collectors.toList()))
+			.build();
 	}
 }

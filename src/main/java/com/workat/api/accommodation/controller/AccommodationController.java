@@ -77,10 +77,10 @@ public class AccommodationController {
 	@ApiImplicitParam(name = "accommodationId", value = "Accommodation Id", required = true, dataType = "long", example = "1")
 	@PostMapping("/api/v1/accommodations/{accommodationId}/reviews")
 	public ResponseEntity addAccommodationReview(
+		@UserValidation Users user,
 		@PathVariable("accommodationId") long accommodationId,
-		@RequestBody AccommodationReviewRequest reviewRequest,
-		@UserValidation Users user) {
-		accommodationService.addAccommodationReview(accommodationId, reviewRequest, user);
+		@RequestBody AccommodationReviewRequest reviewRequest) {
+		accommodationService.addAccommodationReview(user, accommodationId, reviewRequest);
 
 		return ResponseEntity.ok().build();
 	}

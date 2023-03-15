@@ -1,22 +1,18 @@
 package com.workat.domain.config;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.workat.api.map.service.LocationImageGenerator;
 import javax.persistence.EntityManager;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.persistence.PersistenceContext;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.workat.api.map.service.LocationImageGenerator;
-import com.workat.domain.chat.repository.room.ChatRoomCustomRepository;
-import com.workat.domain.chat.repository.room.ChatRoomCustomRepositoryImpl;
 
 @EnableJpaAuditing
 @TestConfiguration
 public class DataJpaTestConfig {
 
-	@Autowired
+	@PersistenceContext
 	private EntityManager entityManager;
 
 	@Bean

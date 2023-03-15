@@ -1,17 +1,19 @@
 package com.workat.domain.accommodation.entity;
 
+import com.workat.api.accommodation.dto.CsvAccommodationDto;
+import com.workat.domain.BaseEntity;
+import com.workat.domain.accommodation.RegionType;
+import com.workat.domain.accommodation.embed.AccommodationInfo;
+import com.workat.domain.accommodation.entity.review.AccommodationReview;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import com.workat.api.accommodation.dto.CsvAccommodationDto;
-import com.workat.domain.BaseEntity;
-import com.workat.domain.accommodation.RegionType;
-
+import javax.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,6 +55,12 @@ public class Accommodation extends BaseEntity {
 	@Column
 	private String relatedUrl;
 
+	@Embedded
+	private AccommodationInfo accommodationInfo;
+
+	@OneToOne(mappedBy = "accommodation")
+	private AccommodationReview accommodationReview;
+
 	@Builder
 	public Accommodation(RegionType regionType,
 		String name,
@@ -62,7 +70,8 @@ public class Accommodation extends BaseEntity {
 		String phone,
 		String roadAddressName,
 		String placeUrl,
-		String relatedUrl
+		String relatedUrl,
+		AccommodationInfo accommodationInfo
 	) {
 		this.regionType = regionType;
 		this.name = name;
@@ -73,10 +82,11 @@ public class Accommodation extends BaseEntity {
 		this.roadAddressName = roadAddressName;
 		this.placeUrl = placeUrl;
 		this.relatedUrl = relatedUrl;
+		this.accommodationInfo = accommodationInfo;
 	}
 
-	public static Accommodation of() {
-		return new Accommodation();
+	public void setReview(AccommodationReview review) {
+		this.accommodationReview = review;
 	}
 
 	public void update(CsvAccommodationDto dto) {
@@ -89,5 +99,9 @@ public class Accommodation extends BaseEntity {
 		this.price = Long.parseLong(dto.getPrice().replaceAll("[^0-9]", ""));
 		this.relatedUrl = dto.getRelatedUrl();
 		this.placeUrl = dto.getPlaceUrl();
+	}
+
+	public void update(AccommodationReview review) {
+		this.accommodationReview = review;
 	}
 }
