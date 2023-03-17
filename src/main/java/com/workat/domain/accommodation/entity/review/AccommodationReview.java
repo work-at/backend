@@ -75,6 +75,21 @@ public class AccommodationReview extends BaseEntity {
 		});
 	}
 
+	public void removeReviews(List<AccommodationReviewTag> tags) {
+		tags.forEach(tag -> {
+			AccommodationReviewAbbreviation abbreviation = countingInfoList.stream()
+				.filter(countingInfo -> countingInfo.getCategory().equals(tag))
+				.findFirst()
+				.orElse(null);
+
+			if (abbreviation == null) {
+				log.info("no Matching Abbreviation");
+			} else {
+				abbreviation.decreaseCnt();
+			}
+		});
+	}
+
 	public static AccommodationReview of(Accommodation accommodation) {
 		return new AccommodationReview(null, accommodation, 0, new ArrayList<>());
 	}

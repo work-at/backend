@@ -5,6 +5,7 @@ import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.enums.AccommodationReviewHistoryStatus;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.user.entity.Users;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
@@ -46,6 +47,12 @@ public class AccommodationReviewAbbreviationHistory extends BaseEntity {
 	private AccommodationReviewHistoryStatus status;
 
 	private String tags;
+
+	public List<AccommodationReviewTag> getTags() {
+		return Arrays.stream(tags.split(DELIMITER))
+			.map(AccommodationReviewTag::valueOf)
+			.collect(Collectors.toList());
+	}
 
 	public static AccommodationReviewAbbreviationHistory of(Users user, Accommodation accommodation, AccommodationReviewHistoryStatus status, List<AccommodationReviewTag> tagList) {
 		List<String> tagStringList = tagList.stream()

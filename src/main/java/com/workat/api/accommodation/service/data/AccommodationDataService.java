@@ -98,4 +98,8 @@ public class AccommodationDataService {
 				throw new NotFoundException("not found AccommodationReviewHistory, user(id : " + user.getId() + " , accommodation(id: " + accommodation.getId() + ")");
 			});
 	}
+
+	public void deleteAccommodationReviewAbbreviationHistory(AccommodationReviewAbbreviationHistory abbreviationHistory) {
+		this.accommodationReviewAbbreviationHistoryRepository.delete(abbreviationHistory);
+	}
 }

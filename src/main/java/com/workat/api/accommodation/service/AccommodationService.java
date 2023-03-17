@@ -24,6 +24,7 @@ import com.workat.domain.accommodation.repository.AccommodationSearchAndFilterRe
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.user.entity.Users;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -143,6 +144,29 @@ public class AccommodationService {
 
 		accommodationDataService.saveAccommodationReviewHistory(tagList.stream()
 			.map(tag -> AccommodationReviewHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE, tag))
+			.collect(Collectors.toList()));
+	}
+
+	@Transactional
+	public void removeAccommodationReview(Users user, long accommodationId) {
+		Users findUser = userDataService.getUserById(user.getId());
+		Accommodation findAccommodation = accommodationDataService.getAccommodation(accommodationId);
+
+		if (!accommodationDataService.isExistAccommodationReviewAbbreviationHistoryMatchingLatestStatus(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE)) {
+			// if your last history is not exist or not write
+			throw new RuntimeException("");
+		}
+
+		AccommodationReview findAccommodationReview = findAccommodation.getAccommodationReview();
+		findAccommodationReview.decreaseUserCnt();
+
+		AccommodationReviewAbbreviationHistory abbreviationHistory = accommodationDataService.getLatestAccommodationReviewAbbreviationHistory(findUser, findAccommodation);
+		List<AccommodationReviewTag> tagList = new ArrayList<>(abbreviationHistory.getTags());
+		findAccommodationReview.removeReviews(tagList);
+
+		accommodationDataService.deleteAccommodationReviewAbbreviationHistory(abbreviationHistory);
+		accommodationDataService.saveAccommodationReviewHistory(tagList.stream()
+			.map(tag -> AccommodationReviewHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.DELETE, tag))
 			.collect(Collectors.toList()));
 	}
 
