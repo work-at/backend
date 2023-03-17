@@ -16,6 +16,7 @@ import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.entity.review.AccommodationReview;
 import com.workat.domain.accommodation.entity.review.AccommodationReviewHistory;
+import com.workat.domain.accommodation.entity.review.abbreviation.AccommodationReviewAbbreviationHistory;
 import com.workat.domain.accommodation.enums.AccommodationReviewHistoryStatus;
 import com.workat.domain.accommodation.repository.AccommodationSearchAndFilterRepository;
 import com.workat.domain.tag.AccommodationInfoTag;
@@ -76,7 +77,7 @@ public class AccommodationService {
 
 		final AccommodationDetailDto accommodationDetailDto = AccommodationDetailDto.from(findAccommodation);
 
-		boolean isUserWrite = accommodationDataService.isExistAccommodationReviewHistoryByStatus(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE);
+		boolean isUserWrite = accommodationDataService.isExistAccommodationReviewAbbreviationHistoryMatchingLatestStatus(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE);
 
 		final AccommodationReviewDto accommodationReviewDto = AccommodationReviewDto.from(findAccommodation, isUserWrite);
 
@@ -88,6 +89,8 @@ public class AccommodationService {
 
 	@Transactional
 	public void addAccommodationReview(Users user, long accommodationId, AccommodationReviewRequest reviewRequest) {
+		final List<AccommodationReviewTag> tagList = reviewRequest.getTags();
+
 		final Users findUser = userDataService.getUserById(user.getId());
 
 		final Accommodation findAccommodation = accommodationDataService.getAccommodation(accommodationId);
@@ -99,7 +102,7 @@ public class AccommodationService {
 			findAccommodation.setReview(accommodationReview);
 		}
 
-		if (accommodationDataService.isExistAccommodationReviewHistoryByStatus(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE)) {
+		if (accommodationDataService.isExistAccommodationReviewAbbreviationHistoryMatchingLatestStatus(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE)) {
 			// Check if User Reviewed This Accommodation
 			throw new RuntimeException("");
 		}
@@ -107,12 +110,16 @@ public class AccommodationService {
 		// Calculate Cnt
 		final AccommodationReview findAccommodationReview = findAccommodation.getAccommodationReview();
 		findAccommodationReview.increaseUserCnt();
-		findAccommodationReview.addReviews(reviewRequest.getTags());
-		accommodationDataService.saveAllAccommodationReviewCounting(findAccommodationReview.getCountingInfoList());
+		findAccommodationReview.addReviews(tagList);
+		accommodationDataService.saveAllAccommodationReviewAbbreviation(findAccommodationReview.getCountingInfoList());
 
-		// Create History
-		AccommodationReviewHistory reviewHistory = AccommodationReviewHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE);
-		accommodationDataService.saveAccommdoationReviewHistory(reviewHistory);
+		// Create & Save Histories
+		AccommodationReviewAbbreviationHistory reviewAbbreviationHistory = AccommodationReviewAbbreviationHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE, tagList);
+		accommodationDataService.saveAccommdoationReviewHistory(reviewAbbreviationHistory);
+
+		accommodationDataService.saveAccommodationReviewHistory(tagList.stream()
+			.map(tag -> AccommodationReviewHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE, tag))
+			.collect(Collectors.toList()));
 	}
 
 	@Transactional(readOnly = true)
@@ -153,7 +160,7 @@ public class AccommodationService {
 
 	@Transactional(readOnly = true)
 	public List<AccommodationDto> getAccommodationsWithName(String name) {
-		return accommodationDataService.findAllByNameContaining(name).stream()
+		return accommodationDataService.getAllByNameContaining(name).stream()
 			.map(AccommodationDto::from)
 			.collect(Collectors.toList());
 	}

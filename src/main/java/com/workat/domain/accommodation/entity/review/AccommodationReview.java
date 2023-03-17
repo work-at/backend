@@ -2,10 +2,10 @@ package com.workat.domain.accommodation.entity.review;
 
 import com.workat.domain.BaseEntity;
 import com.workat.domain.accommodation.entity.Accommodation;
+import com.workat.domain.accommodation.entity.review.abbreviation.AccommodationReviewAbbreviation;
 import com.workat.domain.tag.AccommodationReviewTag;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -15,7 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
-import javax.persistence.PrimaryKeyJoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +40,7 @@ public class AccommodationReview extends BaseEntity {
 	@OrderBy(value = "cnt desc")
 	@JoinColumn(name = "accommodation_review_id")
 	@OneToMany(fetch = FetchType.LAZY)
-	private List<AccommodationReviewCounting> countingInfoList = new ArrayList<>();
+	private List<AccommodationReviewAbbreviation> countingInfoList = new ArrayList<>();
 
 	public void increaseUserCnt() {
 		this.reviewedUserCnt++;
@@ -55,20 +54,20 @@ public class AccommodationReview extends BaseEntity {
 		}
 	}
 
-	public List<AccommodationReviewCounting> getTopRank(int number) {
+	public List<AccommodationReviewAbbreviation> getTopRank(int number) {
 		int maxLength = Math.min(countingInfoList.size(), number);
 		return this.countingInfoList.subList(0, maxLength);
 	}
 
 	public void addReviews(List<AccommodationReviewTag> tags) {
 		tags.forEach(tag -> {
-			AccommodationReviewCounting info = countingInfoList.stream()
+			AccommodationReviewAbbreviation info = countingInfoList.stream()
 				.filter(countingInfo -> countingInfo.getCategory().equals(tag))
 				.findFirst()
 				.orElse(null);
 
 			if (info == null) {
-				info = AccommodationReviewCounting.of(tag);
+				info = AccommodationReviewAbbreviation.of(tag);
 				countingInfoList.add(info);
 			}
 

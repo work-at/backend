@@ -1,13 +1,10 @@
 package com.workat.api.accommodation.dto;
 
-import static java.util.stream.Collectors.groupingBy;
-
 import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.entity.review.AccommodationReview;
 import com.workat.domain.tag.dto.TagCountDto;
 import com.workat.domain.tag.dto.TagSummaryDto;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;

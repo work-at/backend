@@ -1,10 +1,12 @@
-package com.workat.domain.accommodation.entity.review;
+package com.workat.domain.accommodation.entity.review.abbreviation;
 
 import com.workat.domain.BaseEntity;
 import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.enums.AccommodationReviewHistoryStatus;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.user.entity.Users;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -19,18 +21,13 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 
-/*
- * Basic History
- * Select를 하기에는 비효율적이나 Base가 되는 Hisotry를 쌓는다.
- * 이유는 추후 어떤식으로 서비스가 확장될지 모르기때문에 History를 남긴다.
- * 단순히 데이터 전달을 위한 것은 AccommodationAbbreviation.class을 비롯한 클래스로 관리한다.
- * 따라서 단순 Insert하고 쌓기만한다.
- */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class AccommodationReviewHistory extends BaseEntity {
+public class AccommodationReviewAbbreviationHistory extends BaseEntity {
+
+	private static final String DELIMITER = "||";
 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
@@ -44,12 +41,17 @@ public class AccommodationReviewHistory extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Accommodation accommodation;
 
+	// 이것은 조회를 위한 것으로 WRITE만 상태를 기록하고 DELETE인 경우는 row를 삭제한다.
+	@Enumerated(EnumType.STRING)
 	private AccommodationReviewHistoryStatus status;
 
-	@Enumerated(value = EnumType.STRING)
-	private AccommodationReviewTag tag;
+	private String tags;
 
-	public static AccommodationReviewHistory of(Users user, Accommodation accommodation, AccommodationReviewHistoryStatus status, AccommodationReviewTag tag) {
-		return new AccommodationReviewHistory(null, user, accommodation, status, tag);
+	public static AccommodationReviewAbbreviationHistory of(Users user, Accommodation accommodation, AccommodationReviewHistoryStatus status, List<AccommodationReviewTag> tagList) {
+		List<String> tagStringList = tagList.stream()
+			.map(AccommodationReviewTag::getName)
+			.collect(Collectors.toList());
+		String tagStr = String.join(DELIMITER, tagStringList);
+		return new AccommodationReviewAbbreviationHistory(null, user, accommodation, status, tagStr);
 	}
 }

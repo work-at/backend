@@ -1,10 +1,10 @@
-package com.workat.domain.accommodation.repository.review.history;
+package com.workat.domain.accommodation.repository.review.history.abbreviation;
 
 import static com.workat.domain.accommodation.entity.QAccommodationReviewHistory.accommodationReviewHistory;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.workat.domain.accommodation.entity.Accommodation;
-import com.workat.domain.accommodation.entity.review.AccommodationReviewHistory;
+import com.workat.domain.accommodation.entity.review.abbreviation.AccommodationReviewAbbreviationHistory;
 import com.workat.domain.accommodation.enums.AccommodationReviewHistoryStatus;
 import com.workat.domain.user.entity.Users;
 import java.util.Optional;
@@ -13,14 +13,14 @@ import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
-public class AccommodationReviewHistoryCustomRepositoryImpl implements AccommodationReviewHistoryCustomRepository {
+public class CustomAccommodationReviewAbbreviationHistoryRepositoryImpl implements CustomAccommodationReviewAbbreviationHistoryRepository {
 
 
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public boolean existAccommodationReviewHistoryMatchingStatus(Users user, Accommodation accommodation, AccommodationReviewHistoryStatus status) {
-		AccommodationReviewHistory history = jpaQueryFactory
+	public boolean isExistAccommodationReviewAbbreviationHistoryMatchingLatestStatus(Users user, Accommodation accommodation, AccommodationReviewHistoryStatus status) {
+		AccommodationReviewAbbreviationHistory history = jpaQueryFactory
 			.selectFrom(accommodationReviewHistory)
 			.where(accommodationReviewHistory.user.id.eq(user.getId())
 				.and(accommodationReviewHistory.accommodation.id.eq(accommodation.getId())))
@@ -35,12 +35,12 @@ public class AccommodationReviewHistoryCustomRepositoryImpl implements Accommoda
 	}
 
 	@Override
-	public Optional<AccommodationReviewHistory> latestAccommodationReviewHistory(Users user, Accommodation accommodation) {
+	public Optional<AccommodationReviewAbbreviationHistory> findLatestAccommodationReviewAbbreviationHistory(Users user, Accommodation accommodation) {
 		return Optional.empty();
 	}
 
 	@Override
-	public Optional<AccommodationReviewHistory> latestAccommodationReviewHistoryMatchingStatus(Users user, Accommodation accommodation, AccommodationReviewHistoryStatus status) {
+	public Optional<AccommodationReviewAbbreviationHistory> findLatestAccommodationReviewAbbreviationHistoryMatchingStatus(Users user, Accommodation accommodation, AccommodationReviewHistoryStatus status) {
 		return Optional.empty();
 	}
 

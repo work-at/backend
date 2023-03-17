@@ -1,4 +1,4 @@
-package com.workat.domain.accommodation.entity.review;
+package com.workat.domain.accommodation.entity.review.abbreviation;
 
 import com.workat.domain.BaseEntity;
 import com.workat.domain.tag.AccommodationReviewTag;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class AccommodationReviewCounting extends BaseEntity {
+public class AccommodationReviewAbbreviation extends BaseEntity {
 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
@@ -36,8 +36,8 @@ public class AccommodationReviewCounting extends BaseEntity {
 		this.cnt--;
 	}
 
-	public static AccommodationReviewCounting of(AccommodationReviewTag tag) {
-		return new AccommodationReviewCounting(null, tag, 0);
+	public static AccommodationReviewAbbreviation of(AccommodationReviewTag tag) {
+		return new AccommodationReviewAbbreviation(null, tag, 0);
 	}
 
 	@Override
@@ -47,8 +47,8 @@ public class AccommodationReviewCounting extends BaseEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof AccommodationReviewCounting) {
-			return this.category.equals(((AccommodationReviewCounting) obj).category);
+		if (obj instanceof AccommodationReviewAbbreviation) {
+			return this.category.equals(((AccommodationReviewAbbreviation) obj).category);
 		} else {
 			return false;
 		}

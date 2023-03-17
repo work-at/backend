@@ -17,8 +17,9 @@ import com.workat.domain.accommodation.entity.review.AccommodationReview;
 import com.workat.domain.accommodation.repository.AccommodationRepository;
 import com.workat.domain.accommodation.repository.AccommodationSearchAndFilterRepository;
 import com.workat.domain.accommodation.repository.review.AccommodationReviewRepository;
-import com.workat.domain.accommodation.repository.review.counting.AccommodationReviewCountingRepository;
 import com.workat.domain.accommodation.repository.review.history.AccommodationReviewHistoryRepository;
+import com.workat.domain.accommodation.repository.review.history.abbreviation.AccommodationReviewAbbreviationRepository;
+import com.workat.domain.accommodation.repository.review.history.abbreviation.AccommodationReviewAbbreviationHistoryRepository;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.DataJpaTestConfig;
 import com.workat.domain.tag.AccommodationInfoTag;
@@ -76,10 +77,13 @@ public class AccommodationServiceTest {
 	private AccommodationReviewRepository accommodationReviewRepository;
 
 	@Autowired
-	private AccommodationReviewCountingRepository accommodationReviewCountingRepository;
+	private AccommodationReviewHistoryRepository accommodationReviewHistoryRepository;
 
 	@Autowired
-	private AccommodationReviewHistoryRepository accommodationReviewHistoryRepository;
+	private AccommodationReviewAbbreviationRepository accommodationReviewAbbreviationRepository;
+
+	@Autowired
+	private AccommodationReviewAbbreviationHistoryRepository accommodationReviewAbbreviationHistoryRepository;
 
 	//TODO Merge
 	private AccommodationSearchAndFilterRepository accommodationSearchAndFilterRepository;
@@ -87,7 +91,8 @@ public class AccommodationServiceTest {
 	@BeforeEach
 	void setUp() {
 		this.userDataService = new UserDataService(usersRepository, userProfileRepository);
-		this.accommodationDataService = new AccommodationDataService(accommodationRepository, accommodationReviewRepository, accommodationReviewCountingRepository, accommodationReviewHistoryRepository);
+		this.accommodationDataService = new AccommodationDataService(accommodationRepository, accommodationReviewRepository, accommodationReviewHistoryRepository, accommodationReviewAbbreviationRepository,
+			accommodationReviewAbbreviationHistoryRepository);
 		this.accommodationSearchAndFilterRepository = new AccommodationSearchAndFilterRepository(jpaQueryFactory);
 		this.accommodationService = new AccommodationService(userDataService, accommodationDataService, accommodationSearchAndFilterRepository);
 	}
@@ -95,7 +100,7 @@ public class AccommodationServiceTest {
 	@AfterEach
 	void tearDown() {
 		this.accommodationRepository.deleteAll();
-		this.accommodationReviewHistoryRepository.deleteAll();
+		this.accommodationReviewAbbreviationHistoryRepository.deleteAll();
 	}
 
 	@DisplayName("getAccommodation 메소드는 accommodationId 에 매핑된 accommodation entity 에 해당하는 데이터를 반환해야 한다")
