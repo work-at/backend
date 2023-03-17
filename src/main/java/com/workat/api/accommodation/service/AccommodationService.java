@@ -6,6 +6,7 @@ import com.workat.api.accommodation.dto.AccommodationCurationDto;
 import com.workat.api.accommodation.dto.AccommodationDetailDto;
 import com.workat.api.accommodation.dto.AccommodationDto;
 import com.workat.api.accommodation.dto.AccommodationReviewDto;
+import com.workat.api.accommodation.dto.request.AccommodationCreationRequest;
 import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
 import com.workat.api.accommodation.dto.response.AccommodationCurationsResponse;
 import com.workat.api.accommodation.dto.response.AccommodationResponse;
@@ -13,6 +14,7 @@ import com.workat.api.accommodation.dto.response.AccommodationsResponse;
 import com.workat.api.accommodation.service.data.AccommodationDataService;
 import com.workat.api.user.service.data.UserDataService;
 import com.workat.domain.accommodation.RegionType;
+import com.workat.domain.accommodation.embed.AccommodationInfo;
 import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.entity.review.AccommodationReview;
 import com.workat.domain.accommodation.entity.review.AccommodationReviewHistory;
@@ -46,6 +48,28 @@ public class AccommodationService {
 	private final AccommodationDataService accommodationDataService;
 
 	private final AccommodationSearchAndFilterRepository accommodationSearchAndFilterRepository;
+
+	@Transactional
+	public Accommodation createAccommodation(AccommodationCreationRequest request) {
+		Accommodation accommodation = Accommodation.builder()
+			.regionType(request.getRegionType())
+			.name(request.getName())
+			.imgUrl(request.getImgUrl())
+			.thumbnailImgUrl(request.getThumbnailUrl())
+			.price(request.getPrice())
+			.phone(request.getPhone())
+			.roadAddressName(request.getRoadAddressName())
+			.placeUrl(request.getPlaceUrl())
+			.relatedUrl(request.getRelateUrl())
+			.accommodationInfo(AccommodationInfo.of(request.getInfoTagList()))
+			.build();
+		this.accommodationDataService.saveAccommodation(accommodation);
+
+		AccommodationReview accommodationReview = AccommodationReview.of(accommodation);
+		this.accommodationDataService.saveAccommodationReview(accommodationReview);
+
+		return accommodation;
+	}
 
 	@Transactional(readOnly = true)
 	public AccommodationsResponse getAccommodations(

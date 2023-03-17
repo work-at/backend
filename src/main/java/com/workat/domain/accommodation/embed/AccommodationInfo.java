@@ -26,14 +26,6 @@ public class AccommodationInfo {
 	@Enumerated(EnumType.STRING)
 	private List<AccommodationInfoTag> tags;
 
-	public void add(AccommodationInfoTag tag) {
-		tags.add(tag);
-	}
-
-	public void remove(AccommodationInfoTag tag) {
-		tags.remove(tag);
-	}
-
 	public static AccommodationInfo of(List<AccommodationInfoTag> infoTags) {
 		return new AccommodationInfo(infoTags);
 	}
