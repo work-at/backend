@@ -36,9 +36,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /*
- TODO
- 1. Accommodation 생성 로직에서 Review가 없는 경우에 대한 Init 데이터 초기화해서 처리하는 로직 필요
- 2. Filter 로직 개선 필요
+ * TODO
+ * 1. Refactor Filter
+ * 2. Add Create, Remove Test Case & Code
+ * 3. Add Detail Test Case & Code
+ * 4. At Least Class Line Coverage Over 80%
  */
 @RequiredArgsConstructor
 @Service
