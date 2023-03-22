@@ -1,6 +1,7 @@
 package com.workat.domain.accommodation.repository.review.history.abbreviation;
 
-import static com.workat.domain.accommodation.entity.QAccommodationReviewHistory.accommodationReviewHistory;
+
+import static com.workat.domain.accommodation.entity.review.abbreviation.QAccommodationReviewAbbreviationHistory.accommodationReviewAbbreviationHistory;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.workat.domain.accommodation.entity.Accommodation;
@@ -21,10 +22,10 @@ public class CustomAccommodationReviewAbbreviationHistoryRepositoryImpl implemen
 	@Override
 	public boolean isExistAccommodationReviewAbbreviationHistoryMatchingLatestStatus(Users user, Accommodation accommodation, AccommodationReviewHistoryStatus status) {
 		AccommodationReviewAbbreviationHistory history = jpaQueryFactory
-			.selectFrom(accommodationReviewHistory)
-			.where(accommodationReviewHistory.user.id.eq(user.getId())
-				.and(accommodationReviewHistory.accommodation.id.eq(accommodation.getId())))
-			.orderBy(accommodationReviewHistory.createdDate.desc())
+			.selectFrom(accommodationReviewAbbreviationHistory)
+			.where(accommodationReviewAbbreviationHistory.user.id.eq(user.getId())
+				.and(accommodationReviewAbbreviationHistory.accommodation.id.eq(accommodation.getId())))
+			.orderBy(accommodationReviewAbbreviationHistory.createdDate.desc())
 			.stream().findFirst().orElse(null);
 
 		if (history == null) {
