@@ -84,7 +84,7 @@ public class AccommodationDataService {
 	/*
 	 * AccommodationReviewAbbreviationHistory
 	 */
-	public AccommodationReviewAbbreviationHistory saveAccommdoationReviewHistory(AccommodationReviewAbbreviationHistory accommodationReviewAbbreviationHistory) {
+	public AccommodationReviewAbbreviationHistory saveAccommodationReviewAbbreviationHistory(AccommodationReviewAbbreviationHistory accommodationReviewAbbreviationHistory) {
 		return this.accommodationReviewAbbreviationHistoryRepository.save(accommodationReviewAbbreviationHistory);
 	}
 

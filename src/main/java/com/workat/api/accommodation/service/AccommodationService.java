@@ -69,6 +69,7 @@ public class AccommodationService {
 		this.accommodationDataService.saveAccommodation(accommodation);
 
 		AccommodationReview accommodationReview = AccommodationReview.of(accommodation);
+		accommodation.setReview(accommodationReview);
 		this.accommodationDataService.saveAccommodationReview(accommodationReview);
 
 		return accommodation;
@@ -142,7 +143,7 @@ public class AccommodationService {
 
 		// Create & Save Histories
 		AccommodationReviewAbbreviationHistory reviewAbbreviationHistory = AccommodationReviewAbbreviationHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE, tagList);
-		accommodationDataService.saveAccommdoationReviewHistory(reviewAbbreviationHistory);
+		accommodationDataService.saveAccommodationReviewAbbreviationHistory(reviewAbbreviationHistory);
 
 		accommodationDataService.saveAccommodationReviewHistory(tagList.stream()
 			.map(tag -> AccommodationReviewHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE, tag))
