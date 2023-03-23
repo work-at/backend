@@ -1,8 +1,6 @@
 package com.workat.domain.accommodation.repository;
 
 import static com.workat.domain.accommodation.entity.QAccommodation.*;
-import static com.workat.domain.accommodation.entity.QAccommodationInfo.*;
-import static com.workat.domain.accommodation.entity.QAccommodationReview.*;
 
 import java.util.List;
 
@@ -35,13 +33,13 @@ public class AccommodationSearchAndFilterRepository {
 		List<Accommodation> content = jpaQueryFactory
 			.select(accommodation)
 			.from(accommodation)
-			.leftJoin(accommodationReview).on(accommodation.id.eq(accommodationReview.accommodation.id))
-			.leftJoin(accommodationInfo).on(accommodation.id.eq(accommodationInfo.accommodation.id))
-			.where(
-				isRegion(region),
-				isFilteredInfo(infoTag),
-				isFilteredReview(reviewTag)
-			)
+//			.leftJoin(accommodationReview).on(accommodation.id.eq(accommodationReview.accommodation.id))
+//			.leftJoin(accommodationInfo).on(accommodation.id.eq(accommodationInfo.accommodation.id))
+//			.where(
+//				isRegion(region),
+//				isFilteredInfo(infoTag),
+//				isFilteredReview(reviewTag)
+//			)
 			.distinct()
 			.orderBy(accommodation.id.asc())
 			.offset(pageable.getOffset())
@@ -59,13 +57,13 @@ public class AccommodationSearchAndFilterRepository {
 		Long count = jpaQueryFactory
 			.select(accommodation.count())
 			.from(accommodation)
-			.leftJoin(accommodationReview).on(accommodation.id.eq(accommodationReview.accommodation.id))
-			.leftJoin(accommodationInfo).on(accommodation.id.eq(accommodationInfo.accommodation.id))
-			.where(
-				isRegion(region),
-				isFilteredInfo(infoTag),
-				isFilteredReview(reviewTag)
-			)
+//			.leftJoin(accommodationReview).on(accommodation.id.eq(accommodationReview.accommodation.id))
+//			.leftJoin(accommodationInfo).on(accommodation.id.eq(accommodationInfo.accommodation.id))
+//			.where(
+//				isRegion(region),
+//				isFilteredInfo(infoTag),
+//				isFilteredReview(reviewTag)
+//			)
 			.fetchOne();
 		if (count == null) {
 			return 0L;
@@ -80,17 +78,17 @@ public class AccommodationSearchAndFilterRepository {
 		return accommodation.regionType.eq(region);
 	}
 
-	private BooleanExpression isFilteredInfo(AccommodationInfoTag infoTag) {
-		if (infoTag == null) {
-			return null;
-		}
-		return accommodationInfo.tag.eq(infoTag);
-	}
-
-	private BooleanExpression isFilteredReview(AccommodationReviewTag reviewTag) {
-		if (reviewTag == null) {
-			return null;
-		}
-		return accommodationReview.tag.eq(reviewTag);
-	}
+//	private BooleanExpression isFilteredInfo(AccommodationInfoTag infoTag) {
+//		if (infoTag == null) {
+//			return null;
+//		}
+//		return accommodationInfo.tag.eq(infoTag);
+//	}
+//
+//	private BooleanExpression isFilteredReview(AccommodationReviewTag reviewTag) {
+//		if (reviewTag == null) {
+//			return null;
+//		}
+//		return accommodationReview.tag.eq(reviewTag);
+//	}
 }

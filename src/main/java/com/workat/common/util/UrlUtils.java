@@ -2,6 +2,8 @@ package com.workat.common.util;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 public class UrlUtils {
@@ -14,5 +16,19 @@ public class UrlUtils {
 			.toUriString();
 
 		return baseUrl;
+	}
+
+	public static String getBaseUrl() {
+		String profile = System.getProperty("spring.profiles.active");
+		if (profile == null || profile.equalsIgnoreCase("test")) {
+			return "";
+		} else {
+			HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+			return ServletUriComponentsBuilder
+				.fromRequestUri(req)
+				.replacePath(null)
+				.build()
+				.toUriString();
+		}
 	}
 }

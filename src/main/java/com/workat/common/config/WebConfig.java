@@ -1,5 +1,6 @@
 package com.workat.common.config;
 
+import com.workat.common.convert.EnumConvertFactory;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,10 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
 		WebMvcConfigurer.super.addFormatters(registry);
+		//Converter
 		registry.addConverter(new ChatMessageSortTypeConverter());
+		//ConvertFactory
+		registry.addConverterFactory(new EnumConvertFactory());
 	}
 
 	@Override

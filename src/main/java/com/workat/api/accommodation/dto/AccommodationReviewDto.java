@@ -1,10 +1,12 @@
 package com.workat.api.accommodation.dto;
 
-import java.util.List;
-
+import com.workat.domain.accommodation.entity.Accommodation;
+import com.workat.domain.accommodation.entity.review.AccommodationReview;
 import com.workat.domain.tag.dto.TagCountDto;
-
+import com.workat.domain.tag.dto.TagSummaryDto;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,5 +32,24 @@ public class AccommodationReviewDto {
 
 	public static AccommodationReviewDto of(List<TagCountDto> reviews, boolean userReviewed, int userCount) {
 		return new AccommodationReviewDto(reviews, userReviewed, userCount);
+	}
+
+	public static AccommodationReviewDto from(Accommodation accommodation, boolean isUserWrite) {
+		AccommodationReview accommodationReview = accommodation.getAccommodationReview();
+
+		final List<TagCountDto> countDtoList = accommodationReview == null ? List.of() : accommodationReview.getCountingInfoList().stream()
+			.map(tag -> {
+				TagSummaryDto summaryDto = TagSummaryDto.of(tag.getCategory());
+				return TagCountDto.of(summaryDto, tag.getCnt());
+			})
+			.collect(Collectors.toList());
+
+		final int userCount = accommodationReview == null ? 0 : accommodationReview.getReviewedUserCnt();
+
+		return AccommodationReviewDto.of(
+			countDtoList,
+			isUserWrite,
+			userCount
+		);
 	}
 }

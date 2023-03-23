@@ -1,8 +1,9 @@
 package com.workat.api.accommodation.dto.request;
 
-import java.util.HashSet;
-
+import com.workat.domain.tag.AccommodationReviewTag;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.HashSet;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,13 +12,13 @@ import lombok.NoArgsConstructor;
 public class AccommodationReviewRequest {
 
 	@ApiModelProperty(name = "tagNames", notes = "추가할 리뷰 태그", example = "[WIFI, POWER]")
-	private HashSet<String> tagNames;
+	private List<AccommodationReviewTag> tags;
 
-	private AccommodationReviewRequest(HashSet<String> tagNames) {
-		this.tagNames = tagNames;
+	private AccommodationReviewRequest(List<AccommodationReviewTag> tags) {
+		this.tags = tags;
 	}
 
-	public static AccommodationReviewRequest of(HashSet<String> tagNames) {
-		return new AccommodationReviewRequest(tagNames);
+	public static AccommodationReviewRequest of(List<AccommodationReviewTag> tags) {
+		return new AccommodationReviewRequest(tags);
 	}
 }

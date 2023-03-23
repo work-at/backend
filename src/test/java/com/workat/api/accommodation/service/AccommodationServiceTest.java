@@ -1,117 +1,117 @@
 package com.workat.api.accommodation.service;
 
-import static java.util.stream.Collectors.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.workat.api.accommodation.dto.AccommodationDetailDto;
 import com.workat.api.accommodation.dto.AccommodationDto;
+import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
+import com.workat.api.accommodation.service.data.AccommodationDataService;
+import com.workat.api.user.service.data.UserDataService;
 import com.workat.domain.accommodation.RegionType;
+import com.workat.domain.accommodation.embed.AccommodationInfo;
 import com.workat.domain.accommodation.entity.Accommodation;
-import com.workat.domain.accommodation.entity.AccommodationInfo;
-import com.workat.domain.accommodation.entity.AccommodationReview;
-import com.workat.domain.accommodation.repository.AccommodationInfoRepository;
+import com.workat.domain.accommodation.entity.review.AccommodationReview;
 import com.workat.domain.accommodation.repository.AccommodationRepository;
-import com.workat.domain.accommodation.repository.AccommodationReviewRepository;
 import com.workat.domain.accommodation.repository.AccommodationSearchAndFilterRepository;
+import com.workat.domain.accommodation.repository.review.AccommodationReviewRepository;
+import com.workat.domain.accommodation.repository.review.history.AccommodationReviewHistoryRepository;
+import com.workat.domain.accommodation.repository.review.history.abbreviation.AccommodationReviewAbbreviationRepository;
+import com.workat.domain.accommodation.repository.review.history.abbreviation.AccommodationReviewAbbreviationHistoryRepository;
 import com.workat.domain.auth.OauthType;
-import com.workat.domain.config.MultipleDatasourceBaseTest;
+import com.workat.domain.config.DataJpaTestConfig;
 import com.workat.domain.tag.AccommodationInfoTag;
 import com.workat.domain.tag.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagCountDto;
-import com.workat.domain.tag.dto.TagDto;
-import com.workat.domain.tag.dto.TagInfoDto;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
 import com.workat.domain.user.repository.UserProfileRepository;
+import com.workat.domain.user.repository.UsersRepository;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 @DisplayName("AccommodationService 테스트")
 @ActiveProfiles("test")
-@SpringBootTest
-@ExtendWith(SpringExtension.class)
-@Disabled
-public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
+@Import({DataJpaTestConfig.class, MockitoExtension.class})
+@DataJpaTest
+public class AccommodationServiceTest {
 
-	@PersistenceContext
+	@Autowired
 	private EntityManager em;
-	private JPAQueryFactory queryFactory;
-	private AccommodationSearchAndFilterRepository accommodationSearchAndFilterRepository;
+
+	@Autowired
+	private JPAQueryFactory jpaQueryFactory;
 
 	private AccommodationService accommodationService;
+
+	private UserDataService userDataService;
+
+	@Autowired
+	private UsersRepository usersRepository;
+
+	@Autowired
+	private UserProfileRepository userProfileRepository;
+
+	private AccommodationDataService accommodationDataService;
 
 	@Autowired
 	private AccommodationRepository accommodationRepository;
 
 	@Autowired
-	private AccommodationInfoRepository accommodationInfoRepository;
-
-	@Autowired
 	private AccommodationReviewRepository accommodationReviewRepository;
 
 	@Autowired
-	private UserProfileRepository userProfileRepository;
+	private AccommodationReviewHistoryRepository accommodationReviewHistoryRepository;
+
+	@Autowired
+	private AccommodationReviewAbbreviationRepository accommodationReviewAbbreviationRepository;
+
+	@Autowired
+	private AccommodationReviewAbbreviationHistoryRepository accommodationReviewAbbreviationHistoryRepository;
+
+	//TODO Merge
+	private AccommodationSearchAndFilterRepository accommodationSearchAndFilterRepository;
 
 	@BeforeEach
 	void setUp() {
-		this.queryFactory = new JPAQueryFactory(em);
-		this.accommodationSearchAndFilterRepository = new AccommodationSearchAndFilterRepository(queryFactory);
-		this.accommodationService = new AccommodationService(accommodationRepository,
-			accommodationReviewRepository,
-			accommodationInfoRepository,
-			accommodationSearchAndFilterRepository);
-
+		this.userDataService = new UserDataService(usersRepository, userProfileRepository);
+		this.accommodationDataService = new AccommodationDataService(accommodationRepository, accommodationReviewRepository, accommodationReviewHistoryRepository, accommodationReviewAbbreviationRepository,
+			accommodationReviewAbbreviationHistoryRepository);
+		this.accommodationSearchAndFilterRepository = new AccommodationSearchAndFilterRepository(jpaQueryFactory);
+		this.accommodationService = new AccommodationService(userDataService, accommodationDataService, accommodationSearchAndFilterRepository);
 	}
 
 	@AfterEach
-	void tearDown(){
+	void tearDown() {
 		this.accommodationRepository.deleteAll();
-		this.accommodationInfoRepository.deleteAll();
-		this.accommodationReviewRepository.deleteAll();
+		this.accommodationReviewAbbreviationHistoryRepository.deleteAll();
 	}
 
 	@DisplayName("getAccommodation 메소드는 accommodationId 에 매핑된 accommodation entity 에 해당하는 데이터를 반환해야 한다")
 	@Test
 	void getAccommodationTest() {
 		// given
-		Accommodation accommodation = saveAccommodations(1).get(0);
-		List<AccommodationInfo> accommodationInfos = accommodationInfoRepository.findAllByAccommodation(
-			accommodation);
-		HashSet<TagDto> accommodationInfoDtos = accommodationInfos.stream()
-			.map(AccommodationInfo::getTag)
-			.map(TagInfoDto::of)
-			.collect(toCollection(HashSet::new));
 		Users user = saveUsers(1).get(0);
+		Accommodation accommodation = saveAccommodations(1).get(0);
 
 		// when
-		AccommodationDetailDto given = accommodationService.getAccommodation("", accommodation.getId(),
-			user.getId()).getAccommodationDetail();
-
-		HashSet<TagDto> givenInfoTags = given.getInfoTags();
+		AccommodationDetailDto given = accommodationService.getAccommodation(accommodation.getId(), user.getId()).getAccommodationDetail();
 
 		// then
 		assertAll(
@@ -123,9 +123,7 @@ public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 			() -> assertEquals(given.getRoadAddressName(), accommodation.getRoadAddressName()),
 			() -> assertEquals(given.getPlaceUrl(), accommodation.getPlaceUrl()),
 			() -> assertEquals(given.getRelatedUrl(), accommodation.getRelatedUrl()),
-			() -> assertEquals(
-				accommodationInfoDtos.size(),
-				givenInfoTags.size())
+			() -> assertEquals(3, accommodation.getAccommodationInfo().getTags().size())
 		);
 	}
 
@@ -139,29 +137,21 @@ public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 		Users user1 = users.get(0);
 		Users user2 = users.get(1);
 		Users user3 = users.get(2);
+		em.flush();
 
 		// FOCUS 2, POWER 1 저장
-		final AccommodationReview accommodationReview1 = AccommodationReview.of(AccommodationReviewTag.LOCATION,
-			accommodation, user1);
-		final AccommodationReview accommodationReview2 = AccommodationReview.of(AccommodationReviewTag.LOCATION,
-			accommodation, user2);
-		final AccommodationReview accommodationReview3 = AccommodationReview.of(AccommodationReviewTag.POWER,
-			accommodation, user3);
-
-		accommodationReviewRepository.saveAll(
-			Arrays.asList(accommodationReview1, accommodationReview2, accommodationReview3));
+		accommodationService.addAccommodationReview(user1, accommodation.getId(), AccommodationReviewRequest.of(List.of(AccommodationReviewTag.LOCATION)));
+		accommodationService.addAccommodationReview(user2, accommodation.getId(), AccommodationReviewRequest.of(List.of(AccommodationReviewTag.LOCATION)));
+		accommodationService.addAccommodationReview(user3, accommodation.getId(), AccommodationReviewRequest.of(List.of(AccommodationReviewTag.POWER)));
 
 		// when
-		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation("", accommodation.getId(), user1.getId())
+		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation(accommodation.getId(), user1.getId())
 			.getAccommodationReview()
 			.getReviews();
 
 		Map<String, Long> countMap = tagCountDtos.stream()
-			.collect(
-				Collectors.toMap(
-					dto -> dto.getTag().getName(),
-					TagCountDto::getCount)
-			);
+			.collect(Collectors.toMap(dto ->
+				dto.getTag().getName(), TagCountDto::getCount));
 
 		// then
 		assertAll(
@@ -175,33 +165,23 @@ public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 	void getAccommodation_review_sort() {
 		// given
 		Accommodation accommodation = saveAccommodations(1).get(0);
+		AccommodationReview accommodationReview = AccommodationReview.of(accommodation);
+		accommodation.setReview(accommodationReview);
+		accommodationReviewRepository.save(accommodationReview);
 		List<Users> users = saveUsers(20);
 
-		List<AccommodationReview> reviewPart1 = users.subList(0, 10) // 1st 가장 큼
-			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.LOCATION, accommodation, user))
-			.collect(Collectors.toList());
-
-		List<AccommodationReview> reviewPart2 = users.subList(10, 18) // 2nd
-			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.BREAKFAST, accommodation, user))
-			.collect(Collectors.toList());
-
-		List<AccommodationReview> reviewPart3 = users.subList(18, 20) // 3rd
-			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.POWER, accommodation, user))
-			.collect(Collectors.toList());
-
-		final ArrayList<AccommodationReview> reviews = new ArrayList<>();
-		Stream.of(reviewPart1, reviewPart2, reviewPart3).forEach(reviews::addAll);
-
-		accommodationReviewRepository.saveAll(reviews);
+		users.subList(0, 10) // 1st 가장 큼
+			.forEach(user -> accommodationService.addAccommodationReview(user, accommodation.getId(), AccommodationReviewRequest.of(List.of(AccommodationReviewTag.LOCATION))));
+		users.subList(10, 18) // 2st 가장 큼
+			.forEach(user -> accommodationService.addAccommodationReview(user, accommodation.getId(), AccommodationReviewRequest.of(List.of(AccommodationReviewTag.BREAKFAST))));
+		users.subList(18, 20) // 3st 가장 큼
+			.forEach(user -> accommodationService.addAccommodationReview(user, accommodation.getId(), AccommodationReviewRequest.of(List.of(AccommodationReviewTag.POWER))));
 
 		// when
 		Long accommodationId = accommodation.getId();
 		Long userId = users.get(0).getId();
 
-		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation("", accommodationId, userId)
+		List<TagCountDto> tagCountDtos = accommodationService.getAccommodation(accommodationId, userId)
 			.getAccommodationReview()
 			.getReviews();
 
@@ -221,9 +201,14 @@ public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 	void getAccommodations() {
 		// given
 		List<Accommodation> accommodations = saveAccommodations(3);
+		accommodations.forEach(accommodation -> {
+			AccommodationReview review = AccommodationReview.of(accommodation);
+			accommodation.setReview(review);
+			accommodationReviewRepository.save(review);
+		});
 
 		// when
-		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations("", RegionType.SEOUL, null,
+		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations(RegionType.SEOUL, null,
 			null, 0, 10).getAccommodations();
 
 		// then
@@ -235,39 +220,19 @@ public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 	void getAccommodations_top_reviews() {
 		// given
 		Accommodation accommodation = saveAccommodations(1).get(0);
-		List<Users> users = saveUsers(15);
+		AccommodationReview accommodationReview = AccommodationReview.of(accommodation);
+		accommodation.setReview(accommodationReview);
+		accommodationReviewRepository.save(accommodationReview);
+		List<Users> users = saveUsers(20);
 
-		// when
-		List<AccommodationReview> reviewPart1 = users.subList(0, 5) // 1st 가장 큼
-			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.LOCATION, accommodation, user))
-			.collect(Collectors.toList());
+		users.subList(0, 10) // 1st 가장 큼
+			.forEach(user -> accommodationService.addAccommodationReview(user, accommodation.getId(), AccommodationReviewRequest.of(List.of(AccommodationReviewTag.LOCATION))));
+		users.subList(10, 18) // 2st 가장 큼
+			.forEach(user -> accommodationService.addAccommodationReview(user, accommodation.getId(), AccommodationReviewRequest.of(List.of(AccommodationReviewTag.BREAKFAST))));
+		users.subList(18, 20) // 3st 가장 큼
+			.forEach(user -> accommodationService.addAccommodationReview(user, accommodation.getId(), AccommodationReviewRequest.of(List.of(AccommodationReviewTag.POWER))));
 
-		List<AccommodationReview> reviewPart2 = users.subList(5, 9) // 2nd
-			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.BREAKFAST, accommodation, user))
-			.collect(Collectors.toList());
-
-		List<AccommodationReview> reviewPart3 = users.subList(9, 12) // 3rd
-			.stream()
-			.map(user -> AccommodationReview.of(AccommodationReviewTag.POWER, accommodation, user))
-			.collect(Collectors.toList());
-
-		final ArrayList<AccommodationReview> reviews = new ArrayList<>();
-		Stream.of(reviewPart1, reviewPart2, reviewPart3).forEach(reviews::addAll);
-
-		accommodationReviewRepository.saveAll(reviews);
-
-		users.subList(12, 15).stream()
-			.forEach(user -> {
-				List<AccommodationReview> allTagReviews = AccommodationReviewTag.ALL.stream()
-					.map(tag -> AccommodationReview.of(tag, accommodation, user))
-					.collect(toList());
-
-				accommodationReviewRepository.saveAll(allTagReviews);
-			});
-
-		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations("", RegionType.SEOUL, null,
+		List<AccommodationDto> accommodationDtos = accommodationService.getAccommodations(RegionType.SEOUL, null,
 			null, 0, 10).getAccommodations();
 
 		// then
@@ -275,7 +240,7 @@ public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 			.forEach(dto -> {
 				List<AccommodationReviewTag> tags = dto.getTopReviewTags().stream()
 					.map(tagDto -> AccommodationReviewTag.of(tagDto.getName()))
-					.collect(toList());
+					.collect(Collectors.toList());
 
 				assertAll(
 					() -> assertTrue(tags.contains(AccommodationReviewTag.LOCATION)),
@@ -283,13 +248,12 @@ public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 					() -> assertTrue(tags.contains(AccommodationReviewTag.POWER))
 				);
 			});
-
 	}
 
 	private List<Users> saveUsers(int size) {
-		return IntStream.range(0, size)
+		List<Users> users = IntStream.range(0, size)
 			.mapToObj(idx -> {
-					Users user = Users.of(OauthType.KAKAO, (long)idx);
+					Users user = Users.of(OauthType.KAKAO, (long) idx);
 					UserProfile userProfile = UserProfile.builder()
 						.user(user)
 						.nickname(String.format("name%d", idx))
@@ -297,19 +261,23 @@ public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 						.workingYear(DurationType.JUNIOR)
 						.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 						.build();
-					userProfileRepository.save(userProfile);
+					userDataService.saveProfile(userProfile);
 					return user;
 				}
 			).collect(Collectors.toList());
+		return users;
 	}
 
-	private List<Accommodation> saveAccommodations(int size) { // TODO: InvalidDataAccessApiUsageException
-
+	private List<Accommodation> saveAccommodations(int size) {
 		List<Accommodation> accommodations = IntStream.range(0, size)
 			.mapToObj(idx -> {
 					String mockValue = String.valueOf(idx);
+					AccommodationInfo accommodationInfo = AccommodationInfo.of(List.of(
+						AccommodationInfoTag.NEAR_CITY,
+						AccommodationInfoTag.WORKSPACE,
+						AccommodationInfoTag.SHARED_WORKSPACE));
 
-					Accommodation accommodation = Accommodation.builder()
+					return Accommodation.builder()
 						.regionType(RegionType.SEOUL)
 						.name("name" + mockValue)
 						.imgUrl("imgUrl" + mockValue)
@@ -318,25 +286,10 @@ public class AccommodationServiceTest extends MultipleDatasourceBaseTest {
 						.roadAddressName("roadAddressName" + mockValue)
 						.placeUrl("placeUrl" + mockValue)
 						.relatedUrl("relatedUrl" + mockValue)
+						.accommodationInfo(accommodationInfo)
 						.build();
-
-					List<AccommodationInfo> accommodationInfos = Stream.of(AccommodationInfoTag.NEAR_CITY,
-							AccommodationInfoTag.WORKSPACE,
-							AccommodationInfoTag.SHARED_WORKSPACE
-						)
-						.map(tag ->
-							AccommodationInfo.of(AccommodationInfoTag.NEAR_CITY, accommodation)
-						).collect(Collectors.toList());
-
-					accommodationInfoRepository.saveAll(accommodationInfos);
-
-					return accommodation;
 				}
 			).collect(Collectors.toList());
-
-		List<Accommodation> answer = accommodationRepository.saveAll(accommodations);
-
-		return answer;
+		return accommodationRepository.saveAll(accommodations);
 	}
-
 }

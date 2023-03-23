@@ -1,15 +1,33 @@
 package com.workat.api.accommodation.service;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import com.workat.api.accommodation.dto.AccommodationCurationDto;
+import com.workat.api.accommodation.dto.AccommodationDetailDto;
+import com.workat.api.accommodation.dto.AccommodationDto;
+import com.workat.api.accommodation.dto.AccommodationReviewDto;
+import com.workat.api.accommodation.dto.request.AccommodationCreationRequest;
+import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
+import com.workat.api.accommodation.dto.response.AccommodationCurationsResponse;
+import com.workat.api.accommodation.dto.response.AccommodationResponse;
+import com.workat.api.accommodation.dto.response.AccommodationsResponse;
+import com.workat.api.accommodation.service.data.AccommodationDataService;
+import com.workat.api.user.service.data.UserDataService;
+import com.workat.domain.accommodation.RegionType;
+import com.workat.domain.accommodation.embed.AccommodationInfo;
+import com.workat.domain.accommodation.entity.Accommodation;
+import com.workat.domain.accommodation.entity.review.AccommodationReview;
+import com.workat.domain.accommodation.entity.review.AccommodationReviewHistory;
+import com.workat.domain.accommodation.entity.review.abbreviation.AccommodationReviewAbbreviationHistory;
+import com.workat.domain.accommodation.enums.AccommodationReviewHistoryStatus;
+import com.workat.domain.accommodation.repository.AccommodationSearchAndFilterRepository;
+import com.workat.domain.tag.AccommodationInfoTag;
+import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.user.entity.Users;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,48 +35,48 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.workat.api.accommodation.dto.AccommodationCurationDto;
-import com.workat.api.accommodation.dto.AccommodationDetailDto;
-import com.workat.api.accommodation.dto.AccommodationDto;
-import com.workat.api.accommodation.dto.AccommodationReviewDto;
-import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
-import com.workat.api.accommodation.dto.response.AccommodationCurationsResponse;
-import com.workat.api.accommodation.dto.response.AccommodationResponse;
-import com.workat.api.accommodation.dto.response.AccommodationsResponse;
-import com.workat.common.exception.ConflictException;
-import com.workat.common.exception.NotFoundException;
-import com.workat.domain.accommodation.RegionType;
-import com.workat.domain.accommodation.entity.Accommodation;
-import com.workat.domain.accommodation.entity.AccommodationInfo;
-import com.workat.domain.accommodation.entity.AccommodationReview;
-import com.workat.domain.accommodation.repository.AccommodationInfoRepository;
-import com.workat.domain.accommodation.repository.AccommodationRepository;
-import com.workat.domain.accommodation.repository.AccommodationReviewRepository;
-import com.workat.domain.accommodation.repository.AccommodationSearchAndFilterRepository;
-import com.workat.domain.tag.AccommodationInfoTag;
-import com.workat.domain.tag.AccommodationReviewTag;
-import com.workat.domain.tag.dto.TagCountDto;
-import com.workat.domain.tag.dto.TagDto;
-import com.workat.domain.tag.dto.TagInfoDto;
-import com.workat.domain.tag.dto.TagSummaryDto;
-import com.workat.domain.user.entity.Users;
-
-import lombok.RequiredArgsConstructor;
-
+/*
+ * TODO
+ * 1. Refactor Filter
+ * 2. Add Create, Remove Test Case & Code
+ * 3. Add Detail Test Case & Code
+ * 4. At Least Class Line Coverage Over 80%
+ */
 @RequiredArgsConstructor
 @Service
 public class AccommodationService {
 
-	private final AccommodationRepository accommodationRepository;
+	private final UserDataService userDataService;
 
-	private final AccommodationReviewRepository accommodationReviewRepository;
+	private final AccommodationDataService accommodationDataService;
 
-	private final AccommodationInfoRepository accommodationInfoRepository;
 	private final AccommodationSearchAndFilterRepository accommodationSearchAndFilterRepository;
+
+	@Transactional
+	public Accommodation createAccommodation(AccommodationCreationRequest request) {
+		Accommodation accommodation = Accommodation.builder()
+			.regionType(request.getRegionType())
+			.name(request.getName())
+			.imgUrl(request.getImgUrl())
+			.thumbnailImgUrl(request.getThumbnailUrl())
+			.price(request.getPrice())
+			.phone(request.getPhone())
+			.roadAddressName(request.getRoadAddressName())
+			.placeUrl(request.getPlaceUrl())
+			.relatedUrl(request.getRelateUrl())
+			.accommodationInfo(AccommodationInfo.of(request.getInfoTagList()))
+			.build();
+		this.accommodationDataService.saveAccommodation(accommodation);
+
+		AccommodationReview accommodationReview = AccommodationReview.of(accommodation);
+		accommodation.setReview(accommodationReview);
+		this.accommodationDataService.saveAccommodationReview(accommodationReview);
+
+		return accommodation;
+	}
 
 	@Transactional(readOnly = true)
 	public AccommodationsResponse getAccommodations(
-		String baseUrl,
 		RegionType region,
 		AccommodationInfoTag infoTag,
 		AccommodationReviewTag reviewTag,
@@ -72,37 +90,24 @@ public class AccommodationService {
 			reviewTag,
 			pageable);
 
-		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl,
-			accommodationPages.getContent(), infoTag, reviewTag);
+		final List<AccommodationDto> accommodationDtos = accommodationPages.getContent().stream()
+			.map(AccommodationDto::from)
+			.collect(Collectors.toList());
 
-		return AccommodationsResponse.of(
-			accommodationDtos,
-			accommodationPages.getNumber(),
-			accommodationPages.getSize(),
-			accommodationPages.getTotalElements()
-		);
+		return AccommodationsResponse.of(accommodationDtos, accommodationPages);
 	}
 
 	@Transactional(readOnly = true)
-	public AccommodationResponse getAccommodation(String baseUrl, long accommodationId, long userId) {
+	public AccommodationResponse getAccommodation(long accommodationId, long userId) {
+		final Users findUser = userDataService.getUserById(userId);
 
-		final Accommodation accommodation = accommodationRepository.findById(accommodationId)
-			.orElseThrow(() -> {
-				throw new NotFoundException("accommodation is not found");
-			});
+		final Accommodation findAccommodation = accommodationDataService.getAccommodation(accommodationId);
 
-		final List<AccommodationInfo> accommodationInfos = accommodationInfoRepository.findAllByAccommodation(
-			accommodation);
+		final AccommodationDetailDto accommodationDetailDto = AccommodationDetailDto.from(findAccommodation);
 
-		final AccommodationDetailDto accommodationDetailDto = convertAccommodationDetailDto(baseUrl, accommodation,
-			accommodationInfos);
+		boolean isUserWrite = accommodationDataService.isExistAccommodationReviewAbbreviationHistoryMatchingLatestStatus(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE);
 
-		final List<AccommodationReview> accommodationReviews = accommodationReviewRepository.findAllByAccommodation_Id(
-			accommodationId);
-
-		final AccommodationReviewDto accommodationReviewDto = convertAccommodationReviewDto(
-			accommodationReviews,
-			userId);
+		final AccommodationReviewDto accommodationReviewDto = AccommodationReviewDto.from(findAccommodation, isUserWrite);
 
 		return AccommodationResponse.of(
 			accommodationDetailDto,
@@ -111,184 +116,103 @@ public class AccommodationService {
 	}
 
 	@Transactional
-	public void addAccommodationReview(long accommodationId, AccommodationReviewRequest reviewRequest, Users user) {
+	public void addAccommodationReview(Users user, long accommodationId, AccommodationReviewRequest reviewRequest) {
+		final List<AccommodationReviewTag> tagList = reviewRequest.getTags();
 
-		final Accommodation accommodation = accommodationRepository.findById(accommodationId)
-			.orElseThrow(() -> new NotFoundException("No accommodation found for the id"));
+		final Users findUser = userDataService.getUserById(user.getId());
 
-		final List<AccommodationReview> optionalAccommodationReviews = accommodationReviewRepository.findAllByAccommodation_IdAndUser_Id(
-			accommodation.getId(),
-			user.getId());
+		final Accommodation findAccommodation = accommodationDataService.getAccommodation(accommodationId);
 
-		if (!optionalAccommodationReviews.isEmpty()) {
-			throw new ConflictException("There is already a review posted with this user id.");
+		if (findAccommodation.getAccommodationReview() == null) {
+			// Check First Accommodation Review;
+			AccommodationReview accommodationReview = AccommodationReview.of(findAccommodation);
+			accommodationDataService.saveAccommodationReview(accommodationReview);
+			findAccommodation.setReview(accommodationReview);
 		}
 
-		final HashSet<String> reviewTagNames = reviewRequest.getTagNames();
+		if (accommodationDataService.isExistAccommodationReviewAbbreviationHistoryMatchingLatestStatus(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE)) {
+			// Check if User Reviewed This Accommodation
+			throw new RuntimeException("");
+		}
 
-		final List<AccommodationReview> accommodationReviews = reviewTagNames.stream()
-			.map(AccommodationReviewTag::of)
-			.map(tag -> AccommodationReview.of(tag, accommodation, user))
+		// Calculate Cnt
+		final AccommodationReview findAccommodationReview = findAccommodation.getAccommodationReview();
+		findAccommodationReview.increaseUserCnt();
+		findAccommodationReview.addReviews(tagList);
+		accommodationDataService.saveAllAccommodationReviewAbbreviation(findAccommodationReview.getCountingInfoList());
+
+		// Create & Save Histories
+		AccommodationReviewAbbreviationHistory reviewAbbreviationHistory = AccommodationReviewAbbreviationHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE, tagList);
+		accommodationDataService.saveAccommodationReviewAbbreviationHistory(reviewAbbreviationHistory);
+
+		accommodationDataService.saveAccommodationReviewHistory(tagList.stream()
+			.map(tag -> AccommodationReviewHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE, tag))
+			.collect(Collectors.toList()));
+	}
+
+	@Transactional
+	public void removeAccommodationReview(Users user, long accommodationId) {
+		Users findUser = userDataService.getUserById(user.getId());
+		Accommodation findAccommodation = accommodationDataService.getAccommodation(accommodationId);
+
+		if (!accommodationDataService.isExistAccommodationReviewAbbreviationHistoryMatchingLatestStatus(findUser, findAccommodation, AccommodationReviewHistoryStatus.WRITE)) {
+			// if your last history is not exist or not write
+			throw new RuntimeException("");
+		}
+
+		AccommodationReview findAccommodationReview = findAccommodation.getAccommodationReview();
+		findAccommodationReview.decreaseUserCnt();
+
+		AccommodationReviewAbbreviationHistory abbreviationHistory = accommodationDataService.getLatestAccommodationReviewAbbreviationHistory(findUser, findAccommodation);
+		List<AccommodationReviewTag> tagList = new ArrayList<>(abbreviationHistory.getTags());
+		findAccommodationReview.removeReviews(tagList);
+
+		accommodationDataService.deleteAccommodationReviewAbbreviationHistory(abbreviationHistory);
+		accommodationDataService.saveAccommodationReviewHistory(tagList.stream()
+			.map(tag -> AccommodationReviewHistory.of(findUser, findAccommodation, AccommodationReviewHistoryStatus.DELETE, tag))
+			.collect(Collectors.toList()));
+	}
+
+	@Transactional(readOnly = true)
+	public AccommodationCurationsResponse getAccommodationCurations() {
+		List<Accommodation> accommodations = accommodationDataService.getRandomAccommodation(5);
+
+		List<AccommodationCurationDto> curationDtoList = accommodations.stream()
+			.map(AccommodationCurationDto::of)
 			.collect(toList());
 
-		accommodationReviewRepository.saveAll(accommodationReviews);
+		return AccommodationCurationsResponse.of(curationDtoList);
 	}
+
+//	@Transactional(readOnly = true)
+//	public Page<Accommodation> getAccommodationPagesWithFilter(
+//		PageRequest pageRequest,
+//		RegionType region,
+//		AccommodationInfoTag infoTag,
+//		AccommodationReviewTag reviewTag
+//	) {
+//		// TODO: 좀 더 깔끔한 방법 생각해보기
+//		if (region != null && infoTag != null) {
+//			return accommodationRepository.findAllByRegionAndInfoTag(region.getValue(),
+//				infoTag.getName(),
+//				pageRequest);
+//		}
+//
+//		if (region == null && infoTag != null) {
+//			return accommodationRepository.findAllByInfoTag(infoTag.getName(), pageRequest);
+//		}
+//
+//		if (infoTag == null && region != null) {
+//			return accommodationRepository.findAllByRegionType(region, pageRequest);
+//		}
+//
+//		return accommodationRepository.findAll(pageRequest);
+//	}
 
 	@Transactional(readOnly = true)
-	public AccommodationCurationsResponse getAccommodationCurations(String baseUrl) {
-
-		List<Accommodation> accommodations = accommodationRepository.findAllByRandom(5);
-
-		return AccommodationCurationsResponse.of(
-			accommodations.stream()
-				.map(accommodation -> AccommodationCurationDto.of(
-					accommodation.getId(),
-					accommodation.getName(),
-					accommodation.getRegionType(),
-					baseUrl + "/uploaded" + accommodation.getThumbnailImgUrl() + ".png"
-				))
-				.collect(toList())
-		);
-	}
-
-	@Transactional(readOnly = true)
-	public Page<Accommodation> getAccommodationPagesWithFilter(
-		PageRequest pageRequest,
-		RegionType region,
-		AccommodationInfoTag infoTag,
-		AccommodationReviewTag reviewTag
-	) {
-		// TODO: 좀 더 깔끔한 방법 생각해보기
-		if (region != null && infoTag != null) {
-			return accommodationRepository.findAllByRegionAndInfoTag(region.getValue(),
-				infoTag.getName(),
-				pageRequest);
-		}
-
-		if (region == null && infoTag != null) {
-			return accommodationRepository.findAllByInfoTag(infoTag.getName(), pageRequest);
-		}
-
-		if (infoTag == null && region != null) {
-			return accommodationRepository.findAllByRegionType(region, pageRequest);
-		}
-
-		return accommodationRepository.findAll(pageRequest);
-	}
-
-	@Transactional(readOnly = true)
-	public List<AccommodationDto> getAccommodationsWithName(String baseUrl, String name) {
-
-		// TODO: getAccommodations 와 통합해보기
-		final List<Accommodation> accommodations = accommodationRepository.findAllByNameContaining(name);
-
-		final List<AccommodationDto> accommodationDtos = convertAccommodationDto(baseUrl, accommodations, null, null);
-
-		return accommodationDtos;
-	}
-
-	@Transactional(readOnly = true)
-	public List<AccommodationDto> convertAccommodationDto(String baseUrl, List<Accommodation> accommodations,
-		AccommodationInfoTag infoTag, AccommodationReviewTag reviewTag) {
-
-		return accommodations.stream()
-			.map(accommodation -> {
-				List<AccommodationReview> reviews = accommodationReviewRepository.findAllByAccommodation_Id(
-					accommodation.getId());
-
-				HashMap<AccommodationReviewTag, Long> reviewCountMap = convertReviewCountMap(
-					reviews);
-
-				Stream<TagDto> tagDtoStream = convertTagCountDtos(reviewCountMap).stream()
-					.filter(countMap -> countMap.getCount() > 0)
-					.limit(3)
-					.map(TagCountDto::getTag);
-
-				TagDto firstTag = null;
-				if(infoTag != null){
-					firstTag = TagInfoDto.of(infoTag);
-				}
-				if(reviewTag != null){
-					firstTag = TagSummaryDto.of(reviewTag);
-				}
-
-				LinkedHashSet tagsDtoSet = (firstTag == null ?
-					tagDtoStream : Stream.concat(Stream.of(firstTag), tagDtoStream))
-					.distinct()
-					.limit(3)
-					.collect(toCollection(LinkedHashSet::new));
-
-				return AccommodationDto.of(
-					accommodation.getId(),
-					accommodation.getName(),
-					accommodation.getPrice(),
-					baseUrl + "/uploaded" + accommodation.getThumbnailImgUrl() + ".png",
-					tagsDtoSet, accommodation.getRegionType());
-			}).collect(toList());
-	}
-
-	private AccommodationDetailDto convertAccommodationDetailDto(String baseUrl,
-		Accommodation accommodation, List<AccommodationInfo> accommodationInfos) {
-
-		return AccommodationDetailDto.builder()
-			.id(accommodation.getId())
-			.name(accommodation.getName())
-			.imgUrl(baseUrl + "/uploaded" + accommodation.getImgUrl() + ".png")
-			.price(accommodation.getPrice())
-			.phone(accommodation.getPhone())
-			.roadAddressName(accommodation.getRoadAddressName())
-			.placeUrl(accommodation.getPlaceUrl())
-			.relatedUrl(accommodation.getRelatedUrl())
-			.infoTags(accommodationInfos.stream()
-				.map(AccommodationInfo::getTag)
-				.map(TagInfoDto::of)
-				.collect(toCollection(HashSet::new)))
-			.build();
-	}
-
-	private AccommodationReviewDto convertAccommodationReviewDto(List<AccommodationReview> reviews, long userId) {
-
-		final HashMap<AccommodationReviewTag, Long> reviewTagMap = convertReviewCountMap(
-			reviews);
-
-		final List<TagCountDto> tagCountDtos = convertTagCountDtos(reviewTagMap);
-
-		final HashSet<Long> userIdSet = reviews.stream()
-			.map(review ->
-				review.getUser().getId())
-			.collect(toCollection(HashSet::new));
-
-		final boolean userReviewed = userIdSet.contains(userId);
-
-		final int userCount = userIdSet.size();
-
-		return AccommodationReviewDto.of(
-			tagCountDtos,
-			userReviewed,
-			userCount
-		);
-	}
-
-	private HashMap<AccommodationReviewTag, Long> convertReviewCountMap(List<AccommodationReview> reviews) {
-
-		// 태그별 카운트
-		final HashMap<AccommodationReviewTag, Long> reviewCountMap = reviews.stream()
-			.collect(groupingBy(
-				AccommodationReview::getTag, HashMap::new, counting()
-			));
-
-		return reviewCountMap;
-	}
-
-	private List<TagCountDto> convertTagCountDtos(HashMap<AccommodationReviewTag, Long> map) {
-
-		return map.entrySet().stream()
-			.map(entry -> TagCountDto.of(TagSummaryDto.of(entry.getKey()), entry.getValue()))
-			.sorted(Comparator
-				.comparingLong(TagCountDto::getCount)
-				.reversed() // count 역순으로 정렬
-			)
+	public List<AccommodationDto> getAccommodationsWithName(String name) {
+		return accommodationDataService.getAllByNameContaining(name).stream()
+			.map(AccommodationDto::from)
 			.collect(Collectors.toList());
 	}
-
 }
