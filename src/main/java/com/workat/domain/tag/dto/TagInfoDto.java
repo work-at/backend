@@ -1,6 +1,6 @@
 package com.workat.domain.tag.dto;
 
-import com.workat.domain.tag.InfoTag;
+import com.workat.domain.tag.info.InfoTag;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;

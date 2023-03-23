@@ -1,6 +1,6 @@
 package com.workat.domain.accommodation.embed;
 
-import com.workat.domain.tag.AccommodationInfoTag;
+import com.workat.domain.tag.info.AccommodationInfoTag;
 import java.util.List;
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;

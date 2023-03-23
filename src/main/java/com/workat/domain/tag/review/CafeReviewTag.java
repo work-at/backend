@@ -1,11 +1,11 @@
-package com.workat.domain.tag;
+package com.workat.domain.tag.review;
 
 import java.util.EnumSet;
-import java.util.Set;
+import java.util.List;
 
 import com.workat.common.exception.NotFoundException;
 
-public enum CafeReviewType implements ReviewTag {
+public enum CafeReviewTag implements ReviewTag {
 
 	WIFI("와이파이가\n빵빵해요", "와이파이가 빵빵해요", "와이파이빵빵해요"),
 	MEAL("식사 메뉴가\n있어요", "식사 메뉴가 있어요", "식사가능해요"),
@@ -18,7 +18,7 @@ public enum CafeReviewType implements ReviewTag {
 	SPACE("넓고\n깨끗해요", "넓고 깨끗해요", "넓고깨끗해요"),
 	NOT_CROWDED("사람이 많이\n없어요", "사람이 많이 없어요", "한산해요");
 
-	public static final Set<CafeReviewType> ALL = EnumSet.allOf(CafeReviewType.class);
+	public static final List<CafeReviewTag> ALL = List.of(CafeReviewTag.values());
 
 	private final String content;
 
@@ -26,14 +26,14 @@ public enum CafeReviewType implements ReviewTag {
 
 	private final String summary;
 
-	CafeReviewType(String content, String content2, String summary) {
+	CafeReviewTag(String content, String content2, String summary) {
 		this.content = content;
 		this.content2 = content2;
 		this.summary = summary;
 	}
 
-	public static CafeReviewType of(String typeName) {
-		return EnumSet.allOf(CafeReviewType.class)
+	public static CafeReviewTag of(String typeName) {
+		return EnumSet.allOf(CafeReviewTag.class)
 			.stream()
 			.filter(typeEnum -> typeEnum.getName().equals(typeName))
 			.findFirst()

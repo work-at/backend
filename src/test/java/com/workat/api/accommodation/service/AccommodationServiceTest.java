@@ -22,8 +22,8 @@ import com.workat.domain.accommodation.repository.review.history.abbreviation.Ac
 import com.workat.domain.accommodation.repository.review.history.abbreviation.AccommodationReviewAbbreviationHistoryRepository;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.DataJpaTestConfig;
-import com.workat.domain.tag.AccommodationInfoTag;
-import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.tag.info.AccommodationInfoTag;
+import com.workat.domain.tag.review.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagCountDto;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;

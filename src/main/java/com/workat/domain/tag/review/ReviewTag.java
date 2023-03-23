@@ -1,4 +1,4 @@
-package com.workat.domain.tag;
+package com.workat.domain.tag.review;
 
 import com.workat.common.convert.ConvertContent;
 

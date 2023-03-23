@@ -1,4 +1,4 @@
-package com.workat.domain.tag;
+package com.workat.domain.tag.review;
 
 import java.util.EnumSet;
 import java.util.Set;

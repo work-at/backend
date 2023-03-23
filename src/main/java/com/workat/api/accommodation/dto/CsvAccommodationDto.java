@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.workat.domain.accommodation.RegionType;
-import com.workat.domain.tag.AccommodationInfoTag;
+import com.workat.domain.tag.info.AccommodationInfoTag;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

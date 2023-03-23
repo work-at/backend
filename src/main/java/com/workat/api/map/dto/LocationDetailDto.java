@@ -1,6 +1,6 @@
 package com.workat.api.map.dto;
 
-import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.map.entity.LocationType;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LocationDetailDto extends LocationDto {
 
-	private LocationCategory category;
+	private LocationType category;
 
 	private String placeName;
 
@@ -25,7 +25,7 @@ public class LocationDetailDto extends LocationDto {
 
 	@Builder
 	public LocationDetailDto(long id, String placeId, double longitude, double latitude,
-		LocationCategory category, String placeName, String roadAddressName, String fullImageUrl, String phone,
+		LocationType category, String placeName, String roadAddressName, String fullImageUrl, String phone,
 		String placeUrl) {
 		super(id, placeId, longitude, latitude);
 

@@ -1,69 +1,76 @@
 package com.workat.api.review.service;
 
-import static java.util.stream.Collectors.*;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 import com.workat.api.review.dto.ReviewDto;
 import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.NotFoundException;
-import com.workat.domain.locationReview.entity.BaseReview;
-import com.workat.domain.locationReview.entity.CafeReview;
-import com.workat.domain.locationReview.entity.RestaurantReview;
-import com.workat.domain.locationReview.repository.CafeReviewRepository;
-import com.workat.domain.locationReview.repository.RestaurantReviewRepository;
+import com.workat.domain.review.entity.BaseReview;
+import com.workat.domain.review.entity.CafeReview;
+import com.workat.domain.review.entity.RestaurantReview;
+import com.workat.domain.review.repository.BaseReviewRepository;
 import com.workat.domain.map.entity.Location;
-import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.map.entity.LocationType;
 import com.workat.domain.map.repository.location.LocationRepository;
-import com.workat.domain.tag.CafeReviewType;
-import com.workat.domain.tag.FoodReviewType;
-import com.workat.domain.tag.ReviewTag;
 import com.workat.domain.tag.dto.TagCountDto;
 import com.workat.domain.tag.dto.TagSummaryDto;
+import com.workat.domain.tag.review.CafeReviewTag;
+import com.workat.domain.tag.review.RestaurantReviewTag;
+import com.workat.domain.tag.review.ReviewTag;
 import com.workat.domain.user.entity.Users;
+import com.workat.domain.user.repository.UsersRepository;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class ReviewService {
 
-	private final CafeReviewRepository cafeReviewRepository;
+	private final UsersRepository usersRepository;
 
-	private final RestaurantReviewRepository restaurantReviewRepository;
+	private final BaseReviewRepository baseReviewRepository;
 
 	private final LocationRepository locationRepository;
 
-	public List<TagCountDto> getLocationReviews(long locationId, LocationCategory category) {
+	public List<TagCountDto> getLocationReviews(long locationId, LocationType type) {
+		Location findLocation = locationRepository.findById(locationId).orElseThrow(() -> {
+			throw new NotFoundException("location not exist (userId: " + locationId + ")");
+		});
 
-		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
+		final List<? extends BaseReview> reviews = baseReviewRepository.findAllByTypeAndLocation(type, findLocation);
 
 		final HashMap<ReviewTag, Long> reviewCountMap = convertReviewCountMap(reviews);
 		return reviewCountMap.entrySet().stream()
-			.map(tag -> {
-				return TagCountDto.of(TagSummaryDto.of(tag.getKey()), tag.getValue());
-			})
+			.map(tag -> TagCountDto.of(TagSummaryDto.of(tag.getKey()), tag.getValue()))
 			.sorted(Comparator
 				.comparingLong(TagCountDto::getCount)
 				.reversed())
 			.collect(toList());
 	}
 
-	public ReviewWithUserDto getLocationReviewsWithUser(long locationId, LocationCategory category, long userId) {
+	public ReviewWithUserDto getLocationReviewsWithUser(long userId, long locationId, LocationType type) {
+		Users findUser = usersRepository.findById(userId).orElseThrow(() -> {
+			throw new NotFoundException("user not exist (userId: " + userId + ")");
+		});
 
-		final List<? extends BaseReview> reviews = getReviewsByCategory(locationId, category);
+		Location findLocation = locationRepository.findById(locationId).orElseThrow(() -> {
+			throw new NotFoundException("location not exist (userId: " + locationId + ")");
+		});
 
-		final long userCount = countDistinctUserByLocationId(locationId, category);
+		final List<? extends BaseReview> reviews = baseReviewRepository.findAllByTypeAndLocation(type, findLocation);
+
+		final long userCount = countDistinctUserByLocationId(locationId, type);
 		final HashMap<ReviewTag, Long> reviewCountMap = convertReviewCountMap(reviews);
 		final List<ReviewDto> sortedReviewDtos = getSortedReviewDtos(reviewCountMap);
 
@@ -76,29 +83,10 @@ public class ReviewService {
 		);
 	}
 
-	@Transactional(readOnly = true)
-	public List<? extends BaseReview> getReviewsByCategory(long locationId, LocationCategory category) {
-
-		if (category == LocationCategory.CAFE) {
-			return cafeReviewRepository.findAllByLocation_Id(locationId);
-		}
-
-		return restaurantReviewRepository.findAllByLocation_Id(locationId);
-	}
-
-	private <T extends BaseReview> long countReviewedUser(List<T> reviews) {
-		return reviews.stream()
-			.map(review -> review.getUser().getId())
-			.collect(toSet())
-			.size();
-	}
-
 	private <T extends BaseReview> HashMap<ReviewTag, Long> convertReviewCountMap(List<T> reviews) {
 
-		final HashMap<ReviewTag, Long> reviewCountMap = reviews.stream()
-			.collect(groupingBy(BaseReview::getReviewType, HashMap::new, counting()));
-
-		return reviewCountMap;
+		return reviews.stream()
+			.collect(groupingBy(BaseReview::getReviewTag, HashMap::new, counting()));
 	}
 
 	private <T extends ReviewTag> List<ReviewDto> getSortedReviewDtos(Map<T, Long> map) {
@@ -118,60 +106,51 @@ public class ReviewService {
 			.anyMatch(review -> review.getUser().getId() == userId);
 	}
 
-	@Transactional
-	public void addCafeReview(long locationId, ReviewRequest reviewRequest, Users user) {
-
-		final Location location = locationRepository.findById(locationId)
-			.orElseThrow(() -> new NotFoundException("No location found for the id"));
-
-		final List<CafeReview> optionalCafeReviews = cafeReviewRepository.findAllByLocation_IdAndUser_Id(
-			locationId,
-			user.getId());
-
-		if (!optionalCafeReviews.isEmpty()) {
-			throw new ConflictException("There is already a review posted with this user id.");
-		}
-
-		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
-
-		final List<CafeReview> cafeReviews = reviewTypeNames.stream()
-			.map(CafeReviewType::of)
-			.map(reviewType -> CafeReview.of(reviewType, location, user))
-			.collect(toList());
-
-		cafeReviewRepository.saveAll(cafeReviews);
-	}
-
-	@Transactional
-	public void addRestaurantReview(long locationId, ReviewRequest reviewRequest, Users user) {
-
-		final Location location = locationRepository.findById(locationId)
-			.orElseThrow(() -> new NotFoundException("No location found for the id"));
-
-		final List<RestaurantReview> optionalRestaurantReviews = restaurantReviewRepository.findAllByLocation_IdAndUser_Id(
-			locationId,
-			user.getId());
-
-		if (!optionalRestaurantReviews.isEmpty()) {
-			throw new ConflictException("There is already a review posted with this user id.");
-		}
-
-		final HashSet<String> reviewTypeNames = reviewRequest.getReviewTypeNames();
-
-		final List<RestaurantReview> RestaurantReviews = reviewTypeNames.stream()
-			.map(FoodReviewType::of)
-			.map(reviewType -> RestaurantReview.of(reviewType, location, user))
-			.collect(toList());
-
-		restaurantReviewRepository.saveAll(RestaurantReviews);
-	}
-
+	/*
+	 * Get Location Reviewed User Count
+	 */
 	@Transactional(readOnly = true)
-	public int countDistinctUserByLocationId(long locationId, LocationCategory category){
-		if (category == LocationCategory.CAFE) {
-			return cafeReviewRepository.countDistinctUserByLocationId(locationId);
+	public int countDistinctUserByLocationId(long locationId, LocationType type) {
+		Location findLocation = locationRepository.findById(locationId).orElseThrow(() -> {
+			throw new NotFoundException("location not exist (userId: " + locationId + ")");
+		});
+
+		return baseReviewRepository.getLocationReviewedUserCount(findLocation, type);
+	}
+
+	/*
+	 * Add Location Review Function
+	 */
+	@Transactional
+	public void addLocationReview(long userId, long locationId, ReviewRequest request) {
+		Users findUser = usersRepository.findById(userId).orElseThrow(() -> {
+			throw new NotFoundException("user not exist (userId: " + userId + ")");
+		});
+
+		Location findLocation = locationRepository.findById(locationId).orElseThrow(() -> {
+			throw new NotFoundException("location not exist (userId: " + locationId + ")");
+		});
+
+		List<? extends BaseReview> findBaseReviews = baseReviewRepository.findAllByUserAndLocationAndType(findUser, findLocation, request.getCategory());
+
+		if (!findBaseReviews.isEmpty()) {
+			throw new ConflictException("There is already a review posted with this user id.");
 		}
 
-		return restaurantReviewRepository.countDistinctUserByLocationId(locationId);
+		if (request.getCategory() == LocationType.CAFE) {
+			final List<CafeReview> cafeReviews = request.getReviewTags().stream()
+				.map(reviewTag -> CafeReview.of(request.getCategory(), findUser, findLocation, (CafeReviewTag) reviewTag))
+				.collect(toList());
+
+			baseReviewRepository.saveAll(cafeReviews);
+		} else if (request.getCategory() == LocationType.RESTAURANT) {
+			final List<RestaurantReview> RestaurantReviews = request.getReviewTags().stream()
+				.map(reviewTag -> RestaurantReview.of(request.getCategory(), findUser, findLocation, (RestaurantReviewTag) reviewTag))
+				.collect(toList());
+
+			baseReviewRepository.saveAll(RestaurantReviews);
+		} else {
+			throw new RuntimeException("");
+		}
 	}
 }

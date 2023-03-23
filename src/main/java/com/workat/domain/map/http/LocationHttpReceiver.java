@@ -16,7 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.workat.common.exception.InternalServerException;
 import com.workat.common.exception.base.BusinessException;
-import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.map.entity.LocationType;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.http.dto.KakaoLocalResponse;
@@ -43,7 +43,7 @@ public class LocationHttpReceiver {
 
 	private final RestTemplate restTemplate;
 
-	public List<KakaoLocalDataDto> updateLocations(LocationCategory category, MapPoint point, int radius) {
+	public List<KakaoLocalDataDto> updateLocations(LocationType category, MapPoint point, int radius) {
 		ArrayList<KakaoLocalDataDto> result = new ArrayList<>();
 
 		try {
@@ -101,7 +101,7 @@ public class LocationHttpReceiver {
 			.toUriString();
 	}
 
-	private String convertToUri(String url, LocationCategory category, MapPoint point, int radius, int page) {
+	private String convertToUri(String url, LocationType category, MapPoint point, int radius, int page) {
 		String categoryCode = category.getValue();
 		double longitude = point.getLongitude();
 		double latitude = point.getLatitude();

@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.workat.api.accommodation.dto.response.TagsResponse;
-import com.workat.domain.tag.AccommodationInfoTag;
-import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.tag.info.AccommodationInfoTag;
+import com.workat.domain.tag.review.AccommodationReviewTag;
 import com.workat.domain.tag.dto.TagDto;
 import com.workat.domain.tag.dto.TagInfoDto;
 import com.workat.domain.tag.dto.TagContentDto;
