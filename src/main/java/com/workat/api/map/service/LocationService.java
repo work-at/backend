@@ -35,13 +35,11 @@ import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.map.vo.MapPoint;
 import com.workat.domain.map.vo.MapRangeInfo;
-
 import com.workat.domain.tag.dto.TagCountDto;
 import com.workat.domain.tag.dto.TagDto;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 @Service
 public class LocationService {
@@ -69,7 +67,6 @@ public class LocationService {
 
 		MapRangeInfo mapRangeInfo = DistanceUtils.getLocationPoint(longitude, latitude, radius);
 		List<Location> locations = locationRepository.findAllByRadius(category, mapRangeInfo);
-		log.info("findAllByRadius : " + locations.size());
 
 		if (locations.isEmpty()) {
 			return LocationResponse.of(Collections.emptyList());
