@@ -1,6 +1,6 @@
 package com.workat.api.review.dto;
 
-import com.workat.domain.tag.ReviewTag;
+import com.workat.domain.tag.review.ReviewTag;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;

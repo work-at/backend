@@ -20,8 +20,6 @@ import com.workat.api.map.dto.LocationDto;
 import com.workat.api.map.dto.LocationPinDto;
 import com.workat.api.map.dto.response.LocationDetailResponse;
 import com.workat.api.map.dto.response.LocationResponse;
-import com.workat.api.review.dto.ReviewDto;
-import com.workat.api.review.dto.ReviewTypeDto;
 import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.service.ReviewService;
 import com.workat.common.exception.BadRequestException;
@@ -31,7 +29,7 @@ import com.workat.common.util.FileReadUtils;
 import com.workat.domain.area.entity.Area;
 import com.workat.domain.area.repository.AreaRepository;
 import com.workat.domain.map.entity.Location;
-import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.map.entity.LocationType;
 import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.repository.location.LocationRepository;
@@ -63,7 +61,7 @@ public class LocationService {
 	// TODO: 2022/07/31 pin 과 brief 를 분리해보기
 	@Transactional(readOnly = true)
 	public LocationResponse<? extends LocationDto> getLocations(boolean isPin, String baseUrl,
-		LocationCategory category, double longitude, double latitude, int radius) {
+		LocationType category, double longitude, double latitude, int radius) {
 
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
@@ -102,7 +100,7 @@ public class LocationService {
 					.placeId(location.getPlaceId())
 					.latitude(location.getLatitude())
 					.longitude(location.getLongitude())
-					.category(location.getCategory())
+					.category(location.getType())
 					.placeName(location.getPlaceName())
 					.roadAddressName(location.getRoadAddressName())
 					.reviewCount(reviewCount)
@@ -115,7 +113,7 @@ public class LocationService {
 		return LocationResponse.of(locationBriefs);
 	}
 
-	public LocationDetailResponse getLocationById(String baseUrl, LocationCategory category, long locationId,
+	public LocationDetailResponse getLocationById(String baseUrl, LocationType category, long locationId,
 		long userId) {
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
@@ -131,7 +129,7 @@ public class LocationService {
 			.placeId(location.getPlaceId())
 			.longitude(location.getLongitude())
 			.latitude(location.getLatitude())
-			.category(location.getCategory())
+			.category(location.getType())
 			.placeName(location.getPlaceName())
 			.roadAddressName(location.getRoadAddressName())
 			.phone(location.getPhone())
@@ -140,9 +138,10 @@ public class LocationService {
 			.build();
 
 		final ReviewWithUserDto locationLocationReviewDto = reviewService.getLocationReviewsWithUser(
+			userId,
 			locationId,
-			category,
-			userId);
+			category
+		);
 
 		return LocationDetailResponse.of(
 			locationDetailDto,
@@ -156,7 +155,7 @@ public class LocationService {
 
 		long startLocationCount = locationRepository.findAll().size();
 
-		for (LocationCategory category : LocationCategory.values()) {
+		for (LocationType category : LocationType.values()) {
 			List<Area> areas = areaRepository.findAll();
 			for (Area area : areas) {
 				log.info(area.getName() + " " + category.getValue() + " batch start, total area size : " + areas.size()

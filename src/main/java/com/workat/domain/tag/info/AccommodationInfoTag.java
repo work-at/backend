@@ -1,4 +1,4 @@
-package com.workat.domain.tag;
+package com.workat.domain.tag.info;
 
 import java.util.EnumSet;
 import java.util.Set;

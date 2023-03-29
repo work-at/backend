@@ -31,7 +31,7 @@ public class Location extends BaseEntity {
 	private long id;
 
 	@Enumerated(EnumType.STRING)
-	private LocationCategory category;
+	private LocationType type;
 
 	@Column(unique = true)
 	private String placeId;
@@ -66,9 +66,9 @@ public class Location extends BaseEntity {
 	@Column
 	private double latitude;
 
-	public static Location of(LocationCategory category, KakaoLocalDataDto dto) {
+	public static Location of(LocationType type, KakaoLocalDataDto dto) {
 		return Location.builder()
-			.category(category)
+			.type(type)
 			.phone(dto.getPhone())
 			.placeId(dto.getId())
 			.placeName(dto.getPlaceName())

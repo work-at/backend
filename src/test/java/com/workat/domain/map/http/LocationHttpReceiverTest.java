@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.map.entity.LocationType;
 import com.workat.domain.map.http.dto.KakaoAddressResponse;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.http.dto.KakaoLocalMetaDto;
@@ -50,7 +50,7 @@ class LocationHttpReceiverTest {
 	@Test
 	void updateLocation() {
 		//given
-		LocationCategory givenLocationCategory = LocationCategory.CAFE;
+		LocationType givenLocationType = LocationType.CAFE;
 		MapPoint point = MapPoint.of(1.0, 1.0);
 		List<KakaoLocalDataDto> givenDocuments = IntStream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 			.boxed()
@@ -80,7 +80,7 @@ class LocationHttpReceiverTest {
 			.willReturn(ResponseEntity.ok(givenResponse));
 
 		//when
-		List<KakaoLocalDataDto> response = locationHttpReceiver.updateLocations(givenLocationCategory, point, 1);
+		List<KakaoLocalDataDto> response = locationHttpReceiver.updateLocations(givenLocationType, point, 1);
 
 		//then
 		assertEquals(givenResponse.getDocuments().size(), response.size());

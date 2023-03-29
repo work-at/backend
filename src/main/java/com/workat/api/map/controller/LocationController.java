@@ -15,7 +15,7 @@ import com.workat.api.map.dto.response.LocationResponse;
 import com.workat.api.map.service.LocationService;
 import com.workat.common.annotation.UserValidation;
 import com.workat.common.util.UrlUtils;
-import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.map.entity.LocationType;
 import com.workat.domain.user.entity.Users;
 
 import io.swagger.annotations.Api;
@@ -51,7 +51,7 @@ public class LocationController {
 		@NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
-		LocationResponse response = locationService.getLocations(false, baseUrl, LocationCategory.CAFE, longitude,
+		LocationResponse response = locationService.getLocations(false, baseUrl, LocationType.CAFE, longitude,
 			latitude,
 			radius);
 		return ResponseEntity.ok(response);
@@ -73,7 +73,7 @@ public class LocationController {
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationResponse response =
-			locationService.getLocations(true, baseUrl, LocationCategory.CAFE, longitude, latitude, radius);
+			locationService.getLocations(true, baseUrl, LocationType.CAFE, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
 	}
 
@@ -85,7 +85,7 @@ public class LocationController {
 		@UserValidation Users user) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationDetailResponse dto =
-			locationService.getLocationById(baseUrl, LocationCategory.CAFE, locationId, user.getId());
+			locationService.getLocationById(baseUrl, LocationType.CAFE, locationId, user.getId());
 		return ResponseEntity.ok(dto);
 	}
 
@@ -105,7 +105,7 @@ public class LocationController {
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationResponse response =
-			locationService.getLocations(false, baseUrl, LocationCategory.RESTAURANT, longitude, latitude, radius);
+			locationService.getLocations(false, baseUrl, LocationType.RESTAURANT, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
 	}
 
@@ -124,7 +124,7 @@ public class LocationController {
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationResponse response =
-			locationService.getLocations(true, baseUrl, LocationCategory.RESTAURANT, longitude, latitude, radius);
+			locationService.getLocations(true, baseUrl, LocationType.RESTAURANT, longitude, latitude, radius);
 		return ResponseEntity.ok(response);
 	}
 
@@ -136,7 +136,7 @@ public class LocationController {
 		@PathVariable("locationId") long locationId) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationDetailResponse dto =
-			locationService.getLocationById(baseUrl, LocationCategory.RESTAURANT, locationId, user.getId());
+			locationService.getLocationById(baseUrl, LocationType.RESTAURANT, locationId, user.getId());
 		return ResponseEntity.ok(dto);
 	}
 }

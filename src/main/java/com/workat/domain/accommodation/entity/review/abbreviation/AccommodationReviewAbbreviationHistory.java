@@ -3,7 +3,7 @@ package com.workat.domain.accommodation.entity.review.abbreviation;
 import com.workat.domain.BaseEntity;
 import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.enums.AccommodationReviewHistoryStatus;
-import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.tag.review.AccommodationReviewTag;
 import com.workat.domain.user.entity.Users;
 import java.util.Arrays;
 import java.util.List;

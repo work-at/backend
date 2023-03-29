@@ -1,8 +1,7 @@
 package com.workat.api.accommodation.dto.request;
 
-import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.tag.review.AccommodationReviewTag;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.HashSet;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -2,9 +2,7 @@ package com.workat.api.map.dto;
 
 import java.util.List;
 
-import com.workat.api.review.dto.ReviewDto;
-import com.workat.api.review.dto.ReviewTypeDto;
-import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.map.entity.LocationType;
 
 import com.workat.domain.tag.dto.TagDto;
 import lombok.AccessLevel;
@@ -16,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LocationBriefDto extends LocationDto {
 
-	private LocationCategory category;
+	private LocationType category;
 
 	private String placeName;
 
@@ -29,7 +27,7 @@ public class LocationBriefDto extends LocationDto {
 	private List<TagDto> topReviews;
 
 	@Builder
-	public LocationBriefDto(long id, String placeId, double longitude, double latitude, LocationCategory category,
+	public LocationBriefDto(long id, String placeId, double longitude, double latitude, LocationType category,
 		String placeName, String roadAddressName, String thumbnailImageUrl, int reviewCount,
 		List<TagDto> topReviews) {
 		super(id, placeId, longitude, latitude);

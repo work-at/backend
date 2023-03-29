@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
+import com.workat.domain.review.repository.BaseReviewRepository;
+import com.workat.domain.user.repository.UsersRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,10 +34,8 @@ import com.workat.domain.area.repository.AreaRepository;
 import com.workat.domain.auth.OauthType;
 import com.workat.domain.config.DataJpaTestConfig;
 import com.workat.domain.config.MysqlContainerBaseTest;
-import com.workat.domain.locationReview.repository.CafeReviewRepository;
-import com.workat.domain.locationReview.repository.RestaurantReviewRepository;
 import com.workat.domain.map.entity.Location;
-import com.workat.domain.map.entity.LocationCategory;
+import com.workat.domain.map.entity.LocationType;
 import com.workat.domain.map.http.LocationHttpReceiver;
 import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.http.dto.KakaoLocalMetaDto;
@@ -61,6 +61,13 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	@Mock
 	private RestTemplate restTemplate;
 
+
+	@Autowired
+	private UsersRepository usersRepository;
+
+	@Autowired
+	private BaseReviewRepository baseReviewRepository;
+
 	@Autowired
 	private LocationRepository locationRepository;
 
@@ -68,18 +75,12 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	private AreaRepository areaRepository;
 
 	@Autowired
-	private CafeReviewRepository cafeReviewRepository;
-
-	@Autowired
-	private RestaurantReviewRepository restaurantReviewRepository;
-
-	@Autowired
 	private LocationImageGenerator imageGenerator;
 
 	@BeforeEach
 	void setUp() {
 		this.locationHttpReceiver = new LocationHttpReceiver(restTemplate);
-		this.reviewService = new ReviewService(cafeReviewRepository, restaurantReviewRepository, locationRepository);
+		this.reviewService = new ReviewService(usersRepository, baseReviewRepository, locationRepository);
 		this.locationService = new LocationService(locationHttpReceiver, reviewService, locationRepository,
 			areaRepository, imageGenerator);
 	}
@@ -103,7 +104,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertEquals(Collections.emptyList(),
-			locationService.getLocations(false, "", LocationCategory.RESTAURANT, 1.0, 1.0, 1).getLocations());
+			locationService.getLocations(false, "", LocationType.RESTAURANT, 1.0, 1.0, 1).getLocations());
 	}
 
 	@Test
@@ -114,7 +115,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertEquals(Collections.emptyList(),
-			locationService.getLocations(false, "", LocationCategory.RESTAURANT, 1.0, 1.0, 1).getLocations());
+			locationService.getLocations(false, "", LocationType.RESTAURANT, 1.0, 1.0, 1).getLocations());
 	}
 
 	// TODO: 2022/07/13 거리 관련 로직 확정전이라 exception이 무조건 발생
@@ -188,7 +189,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 		//when
 
 		//then
-		assertThrows(NotFoundException.class, () -> locationService.getLocationById("", LocationCategory.CAFE, 1L, 1L));
+		assertThrows(NotFoundException.class, () -> locationService.getLocationById("", LocationType.CAFE, 1L, 1L));
 	}
 
 	@Test
@@ -206,7 +207,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.y(value)
 			.build();
 
-		Location given = Location.of(LocationCategory.CAFE, dto);
+		Location given = Location.of(LocationType.CAFE, dto);
 		Users user = Users.of(OauthType.KAKAO, 1L);
 		UserProfile userProfile = UserProfile.builder()
 			.user(user)
@@ -215,17 +216,18 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.workingYear(DurationType.JUNIOR)
 			.imageUrl("https://avatars.githubusercontent.com/u/46469385?v=4")
 			.build();
+		usersRepository.save(user);
 
 		long locationid = locationRepository.save(given).getId();
 
 		//when
-		LocationDetailDto result = locationService.getLocationById("", LocationCategory.CAFE, locationid, 1L)
+		LocationDetailDto result = locationService.getLocationById("", LocationType.CAFE, locationid, user.getId())
 			.getLocationDetail();
 
 		//then
 		LocationDetailDto givenDto = LocationDetailDto.builder()
 			.id(given.getId())
-			.category(given.getCategory())
+			.category(given.getType())
 			.phone(given.getPhone())
 			.placeId(given.getPlaceId())
 			.placeUrl(given.getPlaceUrl())

@@ -1,7 +1,7 @@
 package com.workat.domain.accommodation.entity.review.abbreviation;
 
 import com.workat.domain.BaseEntity;
-import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.tag.review.AccommodationReviewTag;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;

@@ -13,8 +13,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.workat.domain.accommodation.RegionType;
 import com.workat.domain.accommodation.entity.Accommodation;
-import com.workat.domain.tag.AccommodationInfoTag;
-import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.tag.info.AccommodationInfoTag;
+import com.workat.domain.tag.review.AccommodationReviewTag;
 import lombok.RequiredArgsConstructor;
 
 @Repository

@@ -29,11 +29,12 @@ public class ReviewController {
 	@ApiOperation(value = "add cafe review", notes = "카페 리뷰 추가")
 	@ApiImplicitParam(name = "locationId", value = "카페의 Id", required = true, dataType = "long", example = "1")
 	@PostMapping("/api/v1/map/cafes/{locationId}/reviews")
-	public ResponseEntity addCafeReview(@PathVariable long locationId,
-		@RequestBody ReviewRequest reviewRequest,
-		@UserValidation Users user
+	public ResponseEntity addCafeReview(@UserValidation Users user,
+		@PathVariable long locationId,
+		@RequestBody ReviewRequest request
 	) {
-		reviewService.addCafeReview(locationId, reviewRequest, user);
+		request.validate();
+		reviewService.addLocationReview(user.getId(), locationId, request);
 
 		return ResponseEntity.ok().build();
 	}
@@ -43,11 +44,24 @@ public class ReviewController {
 	@ApiImplicitParam(name = "locationId", value = "식당의 Id", required = true, dataType = "long", example = "2")
 	@PostMapping("/api/v1/map/restaurants/{locationId}/reviews")
 	public ResponseEntity addRestaurantReview(@PathVariable long locationId,
-		@RequestBody ReviewRequest reviewRequest,
+		@RequestBody ReviewRequest request,
 		@UserValidation Users user
 	) {
-		reviewService.addRestaurantReview(locationId, reviewRequest, user);
+		request.validate();
+		reviewService.addLocationReview(user.getId(), locationId, request);
 
+		return ResponseEntity.ok().build();
+	}
+
+	/*
+	 * TODO
+	 * 1. 불필요한 Api를 Enum으로 합친다.
+	 * 2. 현재는 Front 작업이 불가능하기때문에 둘다 살려두도록한다.
+	 */
+	@PostMapping("/api/v1/map/locations/{locationId}/reviews")
+	public ResponseEntity<Void> addLocationReview(@UserValidation Users user, @PathVariable long locationId, @RequestBody ReviewRequest request) {
+		request.validate();
+		reviewService.addLocationReview(user.getId(), locationId, request);
 		return ResponseEntity.ok().build();
 	}
 }

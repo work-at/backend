@@ -3,7 +3,7 @@ package com.workat.domain.accommodation.entity.review;
 import com.workat.domain.BaseEntity;
 import com.workat.domain.accommodation.entity.Accommodation;
 import com.workat.domain.accommodation.entity.review.abbreviation.AccommodationReviewAbbreviation;
-import com.workat.domain.tag.AccommodationReviewTag;
+import com.workat.domain.tag.review.AccommodationReviewTag;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;

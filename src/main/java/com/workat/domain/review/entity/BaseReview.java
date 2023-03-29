@@ -1,7 +1,14 @@
-package com.workat.domain.locationReview.entity;
+package com.workat.domain.review.entity;
 
+import com.workat.domain.BaseEntity;
+import com.workat.domain.map.entity.Location;
+import com.workat.domain.map.entity.LocationType;
+import com.workat.domain.tag.review.ReviewTag;
+import com.workat.domain.user.entity.Users;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,12 +17,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-
-import com.workat.domain.BaseEntity;
-import com.workat.domain.map.entity.Location;
-import com.workat.domain.tag.ReviewTag;
-import com.workat.domain.user.entity.Users;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,18 +32,24 @@ public abstract class BaseReview extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@JoinColumn(name = "location_id")
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Location location;
+	@Enumerated(value = EnumType.STRING)
+	private LocationType type;
+
 
 	@JoinColumn(name = "user_id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Users user;
 
-	protected BaseReview(Location location, Users user) {
-		this.location = location;
+
+	@JoinColumn(name = "location_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Location location;
+
+	protected BaseReview(LocationType type, Users user, Location location) {
+		this.type = type;
 		this.user = user;
+		this.location = location;
 	}
 
-	abstract public ReviewTag getReviewType();
+	public abstract ReviewTag getReviewTag();
 }

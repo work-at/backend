@@ -1,9 +1,23 @@
 package com.workat.api.accommodation.controller;
 
+import com.workat.api.accommodation.dto.AccommodationDto;
+import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
+import com.workat.api.accommodation.dto.response.AccommodationCurationsResponse;
+import com.workat.api.accommodation.dto.response.AccommodationResponse;
+import com.workat.api.accommodation.dto.response.AccommodationsResponse;
+import com.workat.api.accommodation.service.AccommodationService;
+import com.workat.common.annotation.UserValidation;
+import com.workat.domain.accommodation.RegionType;
+import com.workat.domain.tag.info.AccommodationInfoTag;
+import com.workat.domain.tag.review.AccommodationReviewTag;
+import com.workat.domain.user.entity.Users;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,25 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.workat.api.accommodation.dto.AccommodationDto;
-import com.workat.api.accommodation.dto.request.AccommodationReviewRequest;
-import com.workat.api.accommodation.dto.response.AccommodationCurationsResponse;
-import com.workat.api.accommodation.dto.response.AccommodationResponse;
-import com.workat.api.accommodation.dto.response.AccommodationsResponse;
-import com.workat.api.accommodation.service.AccommodationService;
-import com.workat.common.annotation.UserValidation;
-import com.workat.common.util.UrlUtils;
-import com.workat.domain.accommodation.RegionType;
-import com.workat.domain.tag.AccommodationInfoTag;
-import com.workat.domain.tag.AccommodationReviewTag;
-import com.workat.domain.user.entity.Users;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import lombok.RequiredArgsConstructor;
 
 @Api(tags = "Accommodation Api")
 @RequiredArgsConstructor
