@@ -50,7 +50,7 @@ public class AddressService {
 
 	private void saveLocation(Long userId, String longitude, String latitude, String address) {
 		WorkerLocation workerLocation = WorkerLocation.of(userId, longitude, latitude, address);
-		
+
 		workerLocationRedisRepository.save(workerLocation);
 	}
 }

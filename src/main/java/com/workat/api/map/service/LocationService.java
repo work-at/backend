@@ -56,10 +56,9 @@ public class LocationService {
 
 	private final LocationImageGenerator imageGenerator;
 
-	// TODO: 2022/07/31 pin 과 brief 를 분리해보기
 	@Transactional(readOnly = true)
-	public LocationResponse<? extends LocationDto> getLocations(boolean isPin, String baseUrl,
-		LocationType category, double longitude, double latitude, int radius) {
+	public LocationResponse<? extends LocationDto> getLocationsWithPin(LocationType category, double longitude,
+		double latitude, int radius) {
 
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
@@ -72,13 +71,28 @@ public class LocationService {
 			return LocationResponse.of(Collections.emptyList());
 		}
 
-		if (isPin) {
-			List<LocationPinDto> locationPinDtos = locations.stream()
-				.map(location -> LocationPinDto.of(location.getId(), location.getPlaceId(), location.getLongitude(),
-					location.getLatitude()))
-				.collect(Collectors.toList());
+		List<LocationPinDto> locationPinDtos = locations.stream()
+			.map(location -> LocationPinDto.of(location.getId(), location.getPlaceId(), location.getLongitude(),
+				location.getLatitude()))
+			.collect(Collectors.toList());
 
-			return LocationResponse.of(locationPinDtos);
+		return LocationResponse.of(locationPinDtos);
+	}
+
+	@Transactional(readOnly = true)
+	public LocationResponse<? extends LocationDto> getLocationBriefs(String baseUrl,
+		LocationType category, double longitude, double latitude, int radius) {
+
+		if (category == null) {
+			throw new BadRequestException("category must be food or cafe");
+		}
+
+		MapRangeInfo mapRangeInfo = DistanceUtils.getLocationPoint(longitude, latitude, radius);
+
+		List<Location> locations = locationRepository.findAllByRadius(category, mapRangeInfo);
+
+		if (locations.isEmpty()) {
+			return LocationResponse.of(Collections.emptyList());
 		}
 
 		List<LocationBriefDto> locationBriefs = locations.stream()
@@ -155,9 +169,6 @@ public class LocationService {
 		for (LocationType category : LocationType.values()) {
 			List<Area> areas = areaRepository.findAll();
 			for (Area area : areas) {
-				log.info(area.getName() + " " + category.getValue() + " batch start, total area size : " + areas.size()
-					+ " of this batch index : " + (areas.indexOf(area) + 1));
-
 				ArrayList<Location> result = new ArrayList<>();
 				for (int x = -3; x <= 3; x++) {
 					for (int y = -3; y <= 3; y++) {
