@@ -125,18 +125,8 @@ public class LocationService {
 			throw new NotFoundException("location is not found");
 		});
 
-		final LocationDetailDto locationDetailDto = LocationDetailDto.builder()
-			.id(location.getId())
-			.placeId(location.getPlaceId())
-			.longitude(location.getLongitude())
-			.latitude(location.getLatitude())
-			.category(location.getType())
-			.placeName(location.getPlaceName())
-			.roadAddressName(location.getRoadAddressName())
-			.phone(location.getPhone())
-			.placeUrl(location.getPlaceUrl())
-			.fullImageUrl(baseUrl + "/uploaded" + location.getFullImageUrl())
-			.build();
+		LocationDetailDto locationDetailDto = LocationDetailDto.from(location,
+			baseUrl + "/uploaded" + location.getFullImageUrl());
 
 		final ReviewWithUserDto locationLocationReviewDto = reviewService.getLocationReviewsWithUser(
 			userId,

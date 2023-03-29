@@ -224,16 +224,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.getLocationDetail();
 
 		//then
-		LocationDetailDto givenDto = LocationDetailDto.builder()
-			.id(given.getId())
-			.category(given.getType())
-			.phone(given.getPhone())
-			.placeId(given.getPlaceId())
-			.placeUrl(given.getPlaceUrl())
-			.placeName(given.getPlaceName())
-			.longitude(given.getLongitude())
-			.latitude(given.getLatitude())
-			.build();
+		LocationDetailDto givenDto = LocationDetailDto.from(given, "");
 
 		assertAll(
 			() -> assertEquals(givenDto.getId(), result.getId()),
