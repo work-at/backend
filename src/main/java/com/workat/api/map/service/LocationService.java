@@ -35,7 +35,6 @@ import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.map.vo.MapPoint;
 import com.workat.domain.map.vo.MapRangeInfo;
-import com.workat.domain.tag.dto.TagCountDto;
 import com.workat.domain.tag.dto.TagDto;
 
 import lombok.RequiredArgsConstructor;
@@ -98,14 +97,10 @@ public class LocationService {
 		List<LocationBriefDto> locationBriefs = locations.stream()
 			.map(location -> {
 				long locationId = location.getId();
-				List<TagCountDto> locationReviews = reviewService.getLocationReviews(locationId, category);
 
 				int reviewCount = reviewService.countDistinctUserByLocationId(locationId, category);
 
-				List<TagDto> topReviews = locationReviews.stream()
-					.limit(TOP_REVIEW_LENGTH)
-					.map(TagCountDto::getTag)
-					.collect(Collectors.toList());
+				TagDto[] topReviews = reviewService.getLocationTopReviews(locationId, category, TOP_REVIEW_LENGTH);
 
 				return LocationBriefDto.from(location, reviewCount, topReviews);
 			})

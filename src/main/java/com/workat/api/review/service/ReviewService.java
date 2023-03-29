@@ -1,38 +1,38 @@
 package com.workat.api.review.service;
 
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.workat.api.review.dto.ReviewDto;
 import com.workat.api.review.dto.ReviewWithUserDto;
 import com.workat.api.review.dto.request.ReviewRequest;
 import com.workat.common.exception.ConflictException;
 import com.workat.common.exception.NotFoundException;
+import com.workat.domain.map.entity.Location;
+import com.workat.domain.map.entity.LocationType;
+import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.review.entity.BaseReview;
 import com.workat.domain.review.entity.CafeReview;
 import com.workat.domain.review.entity.RestaurantReview;
 import com.workat.domain.review.repository.BaseReviewRepository;
-import com.workat.domain.map.entity.Location;
-import com.workat.domain.map.entity.LocationType;
-import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.tag.dto.TagCountDto;
+import com.workat.domain.tag.dto.TagDto;
 import com.workat.domain.tag.dto.TagSummaryDto;
 import com.workat.domain.tag.review.CafeReviewTag;
 import com.workat.domain.tag.review.RestaurantReviewTag;
 import com.workat.domain.tag.review.ReviewTag;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.repository.UsersRepository;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
+import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 @Service
 public class ReviewService {
@@ -57,6 +57,15 @@ public class ReviewService {
 				.comparingLong(TagCountDto::getCount)
 				.reversed())
 			.collect(toList());
+	}
+
+	public TagDto[] getLocationTopReviews(long locationId, LocationType type, int limit) {
+		List<TagCountDto> locationReviews = getLocationReviews(locationId, type);
+
+		return locationReviews.stream()
+			.limit(limit)
+			.map(TagCountDto::getTag)
+			.toArray(TagDto[]::new);
 	}
 
 	public ReviewWithUserDto getLocationReviewsWithUser(long userId, long locationId, LocationType type) {
@@ -131,7 +140,8 @@ public class ReviewService {
 			throw new NotFoundException("location not exist (userId: " + locationId + ")");
 		});
 
-		List<? extends BaseReview> findBaseReviews = baseReviewRepository.findAllByUserAndLocationAndType(findUser, findLocation, request.getCategory());
+		List<? extends BaseReview> findBaseReviews = baseReviewRepository.findAllByUserAndLocationAndType(findUser,
+			findLocation, request.getCategory());
 
 		if (!findBaseReviews.isEmpty()) {
 			throw new ConflictException("There is already a review posted with this user id.");
@@ -139,13 +149,15 @@ public class ReviewService {
 
 		if (request.getCategory() == LocationType.CAFE) {
 			final List<CafeReview> cafeReviews = request.getReviewTags().stream()
-				.map(reviewTag -> CafeReview.of(request.getCategory(), findUser, findLocation, (CafeReviewTag) reviewTag))
+				.map(
+					reviewTag -> CafeReview.of(request.getCategory(), findUser, findLocation, (CafeReviewTag)reviewTag))
 				.collect(toList());
 
 			baseReviewRepository.saveAll(cafeReviews);
 		} else if (request.getCategory() == LocationType.RESTAURANT) {
 			final List<RestaurantReview> RestaurantReviews = request.getReviewTags().stream()
-				.map(reviewTag -> RestaurantReview.of(request.getCategory(), findUser, findLocation, (RestaurantReviewTag) reviewTag))
+				.map(reviewTag -> RestaurantReview.of(request.getCategory(), findUser, findLocation,
+					(RestaurantReviewTag)reviewTag))
 				.collect(toList());
 
 			baseReviewRepository.saveAll(RestaurantReviews);

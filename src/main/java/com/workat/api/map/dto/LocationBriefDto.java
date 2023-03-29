@@ -1,7 +1,5 @@
 package com.workat.api.map.dto;
 
-import java.util.List;
-
 import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationType;
 import com.workat.domain.tag.dto.TagDto;
@@ -25,12 +23,12 @@ public class LocationBriefDto extends LocationDto {
 
 	private int reviewCount;
 
-	private List<TagDto> topReviews;
+	private TagDto[] topReviews;
 
 	@Builder
 	public LocationBriefDto(long id, String placeId, double longitude, double latitude, LocationType category,
 		String placeName, String roadAddressName, String thumbnailImageUrl, int reviewCount,
-		List<TagDto> topReviews) {
+		TagDto[] topReviews) {
 		super(id, placeId, longitude, latitude);
 
 		this.category = category;
@@ -41,7 +39,7 @@ public class LocationBriefDto extends LocationDto {
 		this.topReviews = topReviews;
 	}
 
-	public static LocationBriefDto from(Location location, int reviewCount, List<TagDto> topReviews) {
+	public static LocationBriefDto from(Location location, int reviewCount, TagDto[] topReviews) {
 		return LocationBriefDto.builder()
 			.id(location.getId())
 			.placeId(location.getPlaceId())
