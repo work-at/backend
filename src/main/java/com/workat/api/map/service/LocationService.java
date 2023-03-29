@@ -101,23 +101,13 @@ public class LocationService {
 				List<TagCountDto> locationReviews = reviewService.getLocationReviews(locationId, category);
 
 				int reviewCount = reviewService.countDistinctUserByLocationId(locationId, category);
+
 				List<TagDto> topReviews = locationReviews.stream()
 					.limit(TOP_REVIEW_LENGTH)
 					.map(TagCountDto::getTag)
 					.collect(Collectors.toList());
 
-				return LocationBriefDto.builder()
-					.id(locationId)
-					.placeId(location.getPlaceId())
-					.latitude(location.getLatitude())
-					.longitude(location.getLongitude())
-					.category(location.getType())
-					.placeName(location.getPlaceName())
-					.roadAddressName(location.getRoadAddressName())
-					.reviewCount(reviewCount)
-					.topReviews(topReviews)
-					.thumbnailImageUrl(baseUrl + "/uploaded" + location.getThumbnailImageUrl())
-					.build();
+				return LocationBriefDto.from(location, reviewCount, topReviews);
 			})
 			.collect(Collectors.toList());
 
