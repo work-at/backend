@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
-import com.workat.domain.review.repository.BaseReviewRepository;
-import com.workat.domain.user.repository.UsersRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,10 +39,12 @@ import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.http.dto.KakaoLocalMetaDto;
 import com.workat.domain.map.http.dto.KakaoLocalResponse;
 import com.workat.domain.map.repository.location.LocationRepository;
+import com.workat.domain.review.repository.BaseReviewRepository;
 import com.workat.domain.user.entity.UserProfile;
 import com.workat.domain.user.entity.Users;
 import com.workat.domain.user.job.DepartmentType;
 import com.workat.domain.user.job.DurationType;
+import com.workat.domain.user.repository.UsersRepository;
 
 @Import(DataJpaTestConfig.class)
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +60,6 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 	@Mock
 	private RestTemplate restTemplate;
-
 
 	@Autowired
 	private UsersRepository usersRepository;
@@ -93,7 +92,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertThrows(BadRequestException.class,
-			() -> locationService.getLocations(false, "", null, 1.0, 1.0, 1));
+			() -> locationService.getLocationBriefs("", null, 1.0, 1.0, 1));
 	}
 
 	@Test
@@ -104,7 +103,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertEquals(Collections.emptyList(),
-			locationService.getLocations(false, "", LocationType.RESTAURANT, 1.0, 1.0, 1).getLocations());
+			locationService.getLocationBriefs("", LocationType.RESTAURANT, 1.0, 1.0, 1).getLocations());
 	}
 
 	@Test
@@ -115,7 +114,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 
 		//then
 		assertEquals(Collections.emptyList(),
-			locationService.getLocations(false, "", LocationType.RESTAURANT, 1.0, 1.0, 1).getLocations());
+			locationService.getLocationBriefs("", LocationType.RESTAURANT, 1.0, 1.0, 1).getLocations());
 	}
 
 	// TODO: 2022/07/13 거리 관련 로직 확정전이라 exception이 무조건 발생
@@ -148,7 +147,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 	// 	locationRepository.saveAll(givenLocations);
 	//
 	// 	//when
-	// 	LocationResponse response = locationService.getLocations(false, LocationCategory.CAFE, 1.0,
+	// 	LocationResponse response = locationService.getLocationBriefs(LocationCategory.CAFE, 1.0,
 	// 		1.0, 1);
 	// 	List<LocationDetailDto> givenDtos = givenLocations.stream()
 	// 		.map(location -> LocationDetailDto.builder()
@@ -225,16 +224,7 @@ class LocationServiceTest extends MysqlContainerBaseTest {
 			.getLocationDetail();
 
 		//then
-		LocationDetailDto givenDto = LocationDetailDto.builder()
-			.id(given.getId())
-			.category(given.getType())
-			.phone(given.getPhone())
-			.placeId(given.getPlaceId())
-			.placeUrl(given.getPlaceUrl())
-			.placeName(given.getPlaceName())
-			.longitude(given.getLongitude())
-			.latitude(given.getLatitude())
-			.build();
+		LocationDetailDto givenDto = LocationDetailDto.from(given, "");
 
 		assertAll(
 			() -> assertEquals(givenDto.getId(), result.getId()),

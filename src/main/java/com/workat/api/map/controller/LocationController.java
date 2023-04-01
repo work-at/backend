@@ -51,9 +51,11 @@ public class LocationController {
 		@NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
-		LocationResponse response = locationService.getLocations(false, baseUrl, LocationType.CAFE, longitude,
+
+		LocationResponse response = locationService.getLocationBriefs(baseUrl, LocationType.CAFE, longitude,
 			latitude,
 			radius);
+
 		return ResponseEntity.ok(response);
 	}
 
@@ -71,9 +73,9 @@ public class LocationController {
 		@NotNull @RequestParam double longitude,
 		@NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
-		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationResponse response =
-			locationService.getLocations(true, baseUrl, LocationType.CAFE, longitude, latitude, radius);
+			locationService.getLocationsWithPin(LocationType.CAFE, longitude, latitude, radius);
+
 		return ResponseEntity.ok(response);
 	}
 
@@ -84,6 +86,7 @@ public class LocationController {
 		@PathVariable("locationId") long locationId,
 		@UserValidation Users user) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
+
 		LocationDetailResponse dto =
 			locationService.getLocationById(baseUrl, LocationType.CAFE, locationId, user.getId());
 		return ResponseEntity.ok(dto);
@@ -104,8 +107,10 @@ public class LocationController {
 		@NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
+
 		LocationResponse response =
-			locationService.getLocations(false, baseUrl, LocationType.RESTAURANT, longitude, latitude, radius);
+			locationService.getLocationBriefs(baseUrl, LocationType.RESTAURANT, longitude, latitude, radius);
+
 		return ResponseEntity.ok(response);
 	}
 
@@ -122,9 +127,9 @@ public class LocationController {
 	public ResponseEntity<LocationResponse> getRestaurantsPin(HttpServletRequest request, @UserValidation Users user,
 		@NotNull @RequestParam double longitude, @NotNull @RequestParam double latitude,
 		@RequestParam(required = false, defaultValue = DEFAULT_RADIUS) int radius) {
-		String baseUrl = UrlUtils.getBaseUrl(request);
 		LocationResponse response =
-			locationService.getLocations(true, baseUrl, LocationType.RESTAURANT, longitude, latitude, radius);
+			locationService.getLocationsWithPin(LocationType.RESTAURANT, longitude, latitude, radius);
+
 		return ResponseEntity.ok(response);
 	}
 
@@ -135,8 +140,10 @@ public class LocationController {
 		@UserValidation Users user,
 		@PathVariable("locationId") long locationId) {
 		String baseUrl = UrlUtils.getBaseUrl(request);
+
 		LocationDetailResponse dto =
 			locationService.getLocationById(baseUrl, LocationType.RESTAURANT, locationId, user.getId());
+
 		return ResponseEntity.ok(dto);
 	}
 }

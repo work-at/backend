@@ -1,5 +1,6 @@
 package com.workat.api.map.dto;
 
+import com.workat.domain.map.entity.Location;
 import com.workat.domain.map.entity.LocationType;
 
 import lombok.AccessLevel;
@@ -35,6 +36,22 @@ public class LocationDetailDto extends LocationDto {
 		this.fullImageUrl = fullImageUrl;
 		this.phone = phone;
 		this.placeUrl = placeUrl;
+	}
+
+	public static LocationDetailDto from(Location location, String fullImageUrl) {
+		
+		return LocationDetailDto.builder()
+			.id(location.getId())
+			.placeId(location.getPlaceId())
+			.latitude(location.getLatitude())
+			.longitude(location.getLongitude())
+			.category(location.getType())
+			.placeName(location.getPlaceName())
+			.roadAddressName(location.getRoadAddressName())
+			.fullImageUrl(fullImageUrl)
+			.phone(location.getPhone())
+			.placeUrl(location.getPlaceUrl())
+			.build();
 	}
 
 }

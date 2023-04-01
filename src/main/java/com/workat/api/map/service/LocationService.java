@@ -35,13 +35,10 @@ import com.workat.domain.map.http.dto.KakaoLocalDataDto;
 import com.workat.domain.map.repository.location.LocationRepository;
 import com.workat.domain.map.vo.MapPoint;
 import com.workat.domain.map.vo.MapRangeInfo;
-
-import com.workat.domain.tag.dto.TagCountDto;
 import com.workat.domain.tag.dto.TagDto;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 @Service
 public class LocationService {
@@ -58,10 +55,9 @@ public class LocationService {
 
 	private final LocationImageGenerator imageGenerator;
 
-	// TODO: 2022/07/31 pin 과 brief 를 분리해보기
 	@Transactional(readOnly = true)
-	public LocationResponse<? extends LocationDto> getLocations(boolean isPin, String baseUrl,
-		LocationType category, double longitude, double latitude, int radius) {
+	public LocationResponse<? extends LocationDto> getLocationsWithPin(LocationType category, double longitude,
+		double latitude, int radius) {
 
 		if (category == null) {
 			throw new BadRequestException("category must be food or cafe");
@@ -69,44 +65,44 @@ public class LocationService {
 
 		MapRangeInfo mapRangeInfo = DistanceUtils.getLocationPoint(longitude, latitude, radius);
 		List<Location> locations = locationRepository.findAllByRadius(category, mapRangeInfo);
-		log.info("findAllByRadius : " + locations.size());
 
 		if (locations.isEmpty()) {
 			return LocationResponse.of(Collections.emptyList());
 		}
 
-		if (isPin) {
-			List<LocationPinDto> locationPinDtos = locations.stream()
-				.map(location -> LocationPinDto.of(location.getId(), location.getPlaceId(), location.getLongitude(),
-					location.getLatitude()))
-				.collect(Collectors.toList());
+		List<LocationPinDto> locationPinDtos = locations.stream()
+			.map(location -> LocationPinDto.of(location.getId(), location.getPlaceId(), location.getLongitude(),
+				location.getLatitude()))
+			.collect(Collectors.toList());
 
-			return LocationResponse.of(locationPinDtos);
+		return LocationResponse.of(locationPinDtos);
+	}
+
+	@Transactional(readOnly = true)
+	public LocationResponse<? extends LocationDto> getLocationBriefs(String baseUrl,
+		LocationType category, double longitude, double latitude, int radius) {
+
+		if (category == null) {
+			throw new BadRequestException("category must be food or cafe");
+		}
+
+		MapRangeInfo mapRangeInfo = DistanceUtils.getLocationPoint(longitude, latitude, radius);
+
+		List<Location> locations = locationRepository.findAllByRadius(category, mapRangeInfo);
+
+		if (locations.isEmpty()) {
+			return LocationResponse.of(Collections.emptyList());
 		}
 
 		List<LocationBriefDto> locationBriefs = locations.stream()
 			.map(location -> {
 				long locationId = location.getId();
-				List<TagCountDto> locationReviews = reviewService.getLocationReviews(locationId, category);
 
 				int reviewCount = reviewService.countDistinctUserByLocationId(locationId, category);
-				List<TagDto> topReviews = locationReviews.stream()
-					.limit(TOP_REVIEW_LENGTH)
-					.map(TagCountDto::getTag)
-					.collect(Collectors.toList());
 
-				return LocationBriefDto.builder()
-					.id(locationId)
-					.placeId(location.getPlaceId())
-					.latitude(location.getLatitude())
-					.longitude(location.getLongitude())
-					.category(location.getType())
-					.placeName(location.getPlaceName())
-					.roadAddressName(location.getRoadAddressName())
-					.reviewCount(reviewCount)
-					.topReviews(topReviews)
-					.thumbnailImageUrl(baseUrl + "/uploaded" + location.getThumbnailImageUrl())
-					.build();
+				TagDto[] topReviews = reviewService.getLocationTopReviews(locationId, category, TOP_REVIEW_LENGTH);
+
+				return LocationBriefDto.from(location, reviewCount, topReviews);
 			})
 			.collect(Collectors.toList());
 
@@ -124,18 +120,8 @@ public class LocationService {
 			throw new NotFoundException("location is not found");
 		});
 
-		final LocationDetailDto locationDetailDto = LocationDetailDto.builder()
-			.id(location.getId())
-			.placeId(location.getPlaceId())
-			.longitude(location.getLongitude())
-			.latitude(location.getLatitude())
-			.category(location.getType())
-			.placeName(location.getPlaceName())
-			.roadAddressName(location.getRoadAddressName())
-			.phone(location.getPhone())
-			.placeUrl(location.getPlaceUrl())
-			.fullImageUrl(baseUrl + "/uploaded" + location.getFullImageUrl())
-			.build();
+		LocationDetailDto locationDetailDto = LocationDetailDto.from(location,
+			baseUrl + "/uploaded" + location.getFullImageUrl());
 
 		final ReviewWithUserDto locationLocationReviewDto = reviewService.getLocationReviewsWithUser(
 			userId,
@@ -158,9 +144,6 @@ public class LocationService {
 		for (LocationType category : LocationType.values()) {
 			List<Area> areas = areaRepository.findAll();
 			for (Area area : areas) {
-				log.info(area.getName() + " " + category.getValue() + " batch start, total area size : " + areas.size()
-					+ " of this batch index : " + (areas.indexOf(area) + 1));
-
 				ArrayList<Location> result = new ArrayList<>();
 				for (int x = -3; x <= 3; x++) {
 					for (int y = -3; y <= 3; y++) {
