@@ -1,3 +1,3 @@
 # 워크앳 - backend
 
-[결과 정리 Notion](https://seung-00.notion.site/seung-00/64723cbb4b824ebea1f3642d5d839fa5)
+[결과 정리 Notion](https://oil-force-e60.notion.site/0255040b28504530a32d2778b6d77e28)
